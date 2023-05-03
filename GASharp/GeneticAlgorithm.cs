@@ -47,7 +47,7 @@ class GeneticAlgorithm<T> where T: Chromosome<T>
             .Select(_ => this.createNewInd() )
             .ToArray();
 
-        for (int i = 0; i < MaxGenerations; i++)
+        for (int genNum = 0; genNum < MaxGenerations; genNum++)
         {
             // update Fitness
             population
@@ -78,7 +78,7 @@ class GeneticAlgorithm<T> where T: Chromosome<T>
             {
                 next_population = next_population
                     .AsParallel()
-                    .Select(x => mut.Mutate(x) )
+                    .Select(x => mut.Mutate(x, genNum) )
                     .ToArray();
             }
 
