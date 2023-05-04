@@ -1,4 +1,4 @@
-class GeneticAlgorithm<T> where T: Chromosome<T>
+public class GeneticAlgorithm<T> where T: Chromosome<T>
 {
     /// <summary>
     /// Function to use when creating new random solution.
@@ -34,6 +34,7 @@ class GeneticAlgorithm<T> where T: Chromosome<T>
         this.crossovers = crossovers;
         this.fitnessFunction = fitness;
         this.populationStrategy = popCombination;
+        this.selectionStrategy = selection;
         this.callback = callback;
     }
     

@@ -1,5 +1,5 @@
-abstract class Mutation<T>
+public abstract class Mutation<T>
 {
-    protected double MutationProbability { get; private set; }
+    public double MutationProbability { get; protected set; }
     public abstract T Mutate(T ind, int genNum);
 }
