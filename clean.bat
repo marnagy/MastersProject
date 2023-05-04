@@ -1,0 +1,1 @@
+call dotnet clean --nologo

@@ -1,4 +1,4 @@
 public abstract class Selection<T>
 {
-    public abstract Tuple<T, T> ChooseParents(IEnumerable<T> population);
+    public abstract Tuple<T, T> ChooseParents(IList<T> population);
 }

@@ -15,9 +15,9 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
         this.Layers = layers;
     }
     public IReadOnlyList<CartesianNode> this[int i]
-   {
-      get => i == 0 ? Inputs : Layers[i-1];
-   }
+    {
+        get => i == 0 ? Inputs : Layers[i-1];
+    }
 
     public static CartesianChromosome CreateNewRandom(int[] layerSizes,
         IReadOnlyList<CartesianNode> nodeCatalogue)
@@ -90,6 +90,19 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
                 )
                 .ToList()
         );
+    
+    public List<List<CartesianNode>> DeepCopyLayers()
+    {
+        return this.Layers
+            .Select(layer => layer
+                .Select(node => node.Clone())
+                .ToList()
+            )
+            .ToList();
+    }
+
+    public IEnumerable<int> GetLayerSizes()
+        => this.Layers.Select(layer => layer.Count);
 
     public override CartesianChromosome CreateNew()
     {

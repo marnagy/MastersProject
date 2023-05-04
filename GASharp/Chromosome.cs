@@ -1,10 +1,11 @@
-public abstract class Chromosome<T>
+public abstract class Chromosome<T> where T: Chromosome<T>
 {
     public double Fitness { get; set; }
     public abstract T CreateNew();
-    public abstract Chromosome<T> Clone();
-    public virtual void UpdateFitness(Fitness<Chromosome<T>> fitness)
+    public abstract T Clone();
+    public virtual void UpdateFitness(Fitness<T> fitness)
     {
-        this.Fitness = fitness.ComputeFitness(this);
+        // ?: Can this be done without cast?
+        this.Fitness = fitness.ComputeFitness((T)this);
     }
 }

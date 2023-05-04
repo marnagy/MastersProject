@@ -3,31 +3,31 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
     /// <summary>
     /// Function to use when creating new random solution.
     /// </summary>
-    private Func<Chromosome<T>> createNewInd;
-    private Mutation<Chromosome<T>>[] mutations;
-    private Crossover<Chromosome<T>>[] crossovers;
-    private Fitness<Chromosome<T>> fitnessFunction;
-    private Selection<Chromosome<T>> selectionStrategy;
+    private Func<T> createNewInd;
+    private Mutation<T>[] mutations;
+    private Crossover<T>[] crossovers;
+    private Fitness<T> fitnessFunction;
+    private Selection<T> selectionStrategy;
     /// <summary>
     /// Used for combining population and next_population at the end of every generation.
     /// This function is called **before** callback.
     /// </summary>
-    private PopulationCombinationStrategy<Chromosome<T>> populationStrategy;
+    private PopulationCombinationStrategy<T> populationStrategy;
     /// <summary>
     /// Function called after every generation.
     /// Can be used for collecting metadata for analysis after run.
     /// </summary>
-    private Action<IReadOnlyList<Chromosome<T>>> callback;
+    private Action<int, IReadOnlyList<T>> callback;
     public double CrossoverProbability;
     public double MutationProbability;
     public int MaxGenerations = 5_000;
     public int PopulationSize = 50;
     public int MinThreads = 2;
     public int MaxThreads = 4;
-    public GeneticAlgorithm(Func<Chromosome<T>> createNewFunc,
-        IEnumerable<Mutation<Chromosome<T>>> mutations,
-        Crossover<Chromosome<T>>[] crossovers, Fitness<Chromosome<T>> fitness, Selection<Chromosome<T>> selection,
-        PopulationCombinationStrategy<Chromosome<T>> popCombination, Action<IReadOnlyList<Chromosome<T>>> callback)
+    public GeneticAlgorithm(Func<T> createNewFunc,
+        IEnumerable<Mutation<T>> mutations,
+        Crossover<T>[] crossovers, Fitness<T> fitness, Selection<T> selection,
+        PopulationCombinationStrategy<T> popCombination, Action<int, IReadOnlyList<T>> callback)
     {
         this.createNewInd = createNewFunc;
         this.mutations = mutations.ToArray();
@@ -52,7 +52,6 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
         {
             // update Fitness
             population
-                .AsParallel()
                 .ForEach(ind => ind.UpdateFitness(this.fitnessFunction)  );
 
             // select parents
@@ -86,7 +85,7 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
             // combine populations (elitism, ...)
             population = populationStrategy.Combine(population, next_population);
 
-            this.callback(population);
+            this.callback(genNum, population);
         }
     }
 }
