@@ -1,7 +1,5 @@
-public class CartesianChromosome : Chromosome<CartesianChromosome>, ICloneable
+public class CartesianChromosome : Chromosome<CartesianChromosome>
 {
-    private static bool canOverwriteCatalogue = true;
-    //private static IReadOnlyList<CartesianNode>? NodeCatalogue;
     private readonly ValueNode[] Inputs;
     private List<List<CartesianNode>> Layers;
     /// <summary>
@@ -18,12 +16,7 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>, ICloneable
     }
     public IReadOnlyList<CartesianNode> this[int i]
    {
-      get {
-        if (i == 0)
-            return Inputs;
-        else
-            return Layers[i-1];
-      }
+      get => i == 0 ? Inputs : Layers[i-1];
    }
 
     public static CartesianChromosome CreateNewRandom(int[] layerSizes,
@@ -35,22 +28,22 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>, ICloneable
         List<List<CartesianNode>> layers = new List<List<CartesianNode>>();
         for (int currentLayer = 1; currentLayer < layerSizes.Length; currentLayer++)
         {
-            layers.Add(new());
+            layers.Add(new List<CartesianNode>(layerSizes[currentLayer]));
             for (int j = 0; j < layerSizes[currentLayer]; j++)
             {
                 // choose 2 parents
-                List<ParentIndices> parents = new();
-                for (int k = 0; k < 2; k++)
+                List<ParentIndices> parents = new List<ParentIndices>(CartesianNode.ParentsAmount);
+                for (int k = 0; k < CartesianNode.ParentsAmount; k++)
                 {
-                    var layerIndex = rng.Next(currentLayer);
-                    var nodeIndex = rng.Next(layerSizes[layerIndex]);
+                    int layerIndex = rng.Next(currentLayer);
+                    int nodeIndex = rng.Next(layerSizes[layerIndex]);
                     parents.Add( new ParentIndices{
                         LayerIndex = layerIndex,
                         Index = nodeIndex
                     } );
                 }
                 // choose node and create clone with new parents
-                var templateNode = nodeCatalogue[
+                CartesianNode templateNode = nodeCatalogue[
                     rng.Next(nodeCatalogue.Count)
                 ];
                 layers[currentLayer - 1].Add(
@@ -59,7 +52,6 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>, ICloneable
                     )
                 );
             }
-
         }
 
         return new CartesianChromosome(inputsAmount, layers);
@@ -88,18 +80,19 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>, ICloneable
             // .ToArray(); // maybe remove for optimalization?
     }
 
-    public override Chromosome<CartesianChromosome> Clone()
-    {
-        throw new NotImplementedException();
-    }
+    public override CartesianChromosome Clone()
+        => new CartesianChromosome(
+            inputsAmount: this.Inputs.Length,
+            layers: this.Layers
+                .Select(layer => layer
+                    .Select(node => node.Clone())    
+                    .ToList()
+                )
+                .ToList()
+        );
 
     public override CartesianChromosome CreateNew()
     {
-        throw new NotImplementedException();
-    }
-
-    object ICloneable.Clone()
-    {
-        throw new NotImplementedException();
+        throw new Exception($"Not implemented for CartesianChromosome. Please use CartesianChromosome.CreateNewRandom(...)");
     }
 }
