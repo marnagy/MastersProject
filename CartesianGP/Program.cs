@@ -35,7 +35,6 @@ for (int i = 0; i < layerSizes.Length; i++)
 
 
 // TODO: implement neccessary functions
-PopulationCombinationStrategy<CartesianChromosome> combination = new DummyCombination();
 var ga = new GeneticAlgorithm<CartesianChromosome>(
     () => CartesianChromosome.CreateNewRandom(
         new[] { 3, 10, 5, 2 },
@@ -44,8 +43,8 @@ var ga = new GeneticAlgorithm<CartesianChromosome>(
     new[] {new DummyMutation(0.5)},
     new[] {new DummyCrossover()},
     new DummyFitness(),
-    new DummySelection(),
-    combination,
+    new RandomFavoredSelection(),
+    new DummyCombination(),
     (_,_) => { }
 );
 
