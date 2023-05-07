@@ -3,10 +3,11 @@ var inputs = new double[5, 2];
 
 var readOnlyInputs = new ReadOnly2DArray(inputs);
 
-List<CartesianNode> nodeCatalogue = new List<CartesianNode>() {
-    new ValueNode(0d, CartesianNode.GetEmptyParents()),
-    new SumNode(CartesianNode.GetEmptyParents()),
-    new ProductNode(CartesianNode.GetEmptyParents())
+Dictionary<int, List<CartesianNode>> nodeCatalogue = new Dictionary<int, IList<CartesianNode>>
+{
+    {0, new List<CartesianNode> {new ValueNode(0d, CartesianNode.GetEmptyParents())} },
+    {2, new List<CartesianNode> {new SumNode(CartesianNode.GetEmptyParents()),
+    new ProductNode(CartesianNode.GetEmptyParents()) }
 };
 
 var layerSizes = new[] { 3, 10, 5, 2 };
@@ -40,7 +41,7 @@ var ga = new GeneticAlgorithm<CartesianChromosome>(
         new[] { 3, 10, 5, 2 },
         nodeCatalogue
     ),
-    new[] {new DummyMutation(0.5)},
+    new[] {new ChangeNodeMutation(0.2, 0.5)},
     new[] {new DummyCrossover()},
     new DummyFitness(),
     new RandomFavoredSelection(),
