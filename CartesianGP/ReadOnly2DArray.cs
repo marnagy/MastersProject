@@ -1,9 +1,11 @@
 public sealed class ReadOnly2DArray
 {
-    public readonly double[,] Inputs;
+    public readonly double[,] Values;
+    public int ColumnsAmount => this.Values.GetLength(1);
+    public int RowsAmount => this.Values.GetLength(0);
     public ReadOnly2DArray(double[,] inputs)
     {
-        this.Inputs = inputs;
+        this.Values = inputs;
     }
     public ReadOnly2DArray(double[][] inputs)
     {
@@ -17,6 +19,6 @@ public sealed class ReadOnly2DArray
             }
         }
 
-        this.Inputs = localInputs;
+        this.Values = localInputs;
     }
 }
