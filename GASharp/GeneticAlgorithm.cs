@@ -48,12 +48,13 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
         var population = Enumerable.Range(0, PopulationSize)
             .Select(_ => this.createNewInd() )
             .ToArray();
+        
+        // update Fitness
+        population
+            .ForEach(ind => ind.UpdateFitness(this.fitnessFunction)  );
 
         for (int genNum = 0; genNum < MaxGenerations; genNum++)
         {
-            // update Fitness
-            population
-                .ForEach(ind => ind.UpdateFitness(this.fitnessFunction)  );
 
             // select parents
             var parents = Enumerable.Range(0, population.Length / 2)
@@ -85,6 +86,10 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
 
             // combine populations (elitism, ...)
             population = populationStrategy.Combine(population, next_population);
+            
+            // update Fitness
+            population
+                .ForEach(ind => ind.UpdateFitness(this.fitnessFunction)  );
 
             this.callback(genNum, population);
         }
