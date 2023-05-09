@@ -1,7 +1,15 @@
 static class RandomExtensions
 {
-    public static T Choose<T>(this Random rng, IList<T> arr, IList<double> probabilities)
-    {
+    public static T Choose<T>(this Random rng, IList<T> arr, IList<double>? probabilities = null)
+    {   
+        if (probabilities is null)
+        {
+            // use uniform probabilities
+            probabilities = Enumerable.Range(0,arr.Count)
+                .Select(_ => 1d / arr.Count)
+                .ToArray();
+        }
+
         if ( arr.Count != probabilities.Count )
             throw new ArgumentException("Array of individuals and probabilities have to have the same length.");
         

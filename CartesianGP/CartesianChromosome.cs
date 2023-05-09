@@ -7,7 +7,7 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
     /// </summary>
     /// <param name="hiddenLayerSizes">First is input layer, last is number of outputs.</param>
     /// <param name="nodeCatalogue">Set of possible Nodes</param>
-    private CartesianChromosome(int inputsAmount, List<List<CartesianNode>> layers)
+    public CartesianChromosome(int inputsAmount, List<List<CartesianNode>> layers)
     {
         this.Inputs = Enumerable.Range(0, inputsAmount)
             .Select(_ => new ValueNode(0d, CartesianNode.GetEmptyParents()))
@@ -20,7 +20,7 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
     }
 
     public static CartesianChromosome CreateNewRandom(int[] layerSizes,
-        IReadOnlyList<CartesianNode> nodeCatalogue)
+        Dictionary<int, IList<CartesianNode>> nodeCatalogue)
     {
         var rng = new Random();
 
@@ -43,9 +43,12 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
                     } );
                 }
                 // choose node and create clone with new parents
-                CartesianNode templateNode = nodeCatalogue[
-                    rng.Next(nodeCatalogue.Count)
-                ];
+                // choose random arity
+                var arities = nodeCatalogue.Keys.ToArray();
+                var arityIndex = rng.Choose(arities);
+                CartesianNode templateNode = rng.Choose(nodeCatalogue[
+                    arityIndex
+                ]);
                 layers[currentLayer - 1].Add(
                     templateNode.Clone(
                         parents.ToArray()
@@ -90,7 +93,10 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
                 )
                 .ToList()
         );
-    
+    /// <summary>
+    /// Deep copy layers of Cartesian chromosome. Does NOT include input layer.
+    /// </summary>
+    /// <returns></returns>
     public List<List<CartesianNode>> DeepCopyLayers()
     {
         return this.Layers
@@ -103,6 +109,8 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
 
     public IEnumerable<int> GetLayerSizes()
         => this.Layers.Select(layer => layer.Count);
+    
+    public int InputsAmount { get => this.Inputs.Length; }
 
     public override CartesianChromosome CreateNew()
     {
