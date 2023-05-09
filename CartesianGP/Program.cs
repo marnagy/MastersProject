@@ -34,21 +34,41 @@ for (int i = 0; i < layerSizes.Length; i++)
     }
 }
 
+string csvFilePath = @"C:\Users\mnagy\Documents\Matfyz\Diplomka\MastersProject\prepared_Iris.csv";
+var inputsLength = 4;
+var accuracy = AccuracyFitness.Use(csvFilePath, inputsLength);
+
+var populationCorrect = Enumerable.Range(0, 10)
+    .Select(_ => CartesianChromosome.CreateNewRandom(
+        new[] { inputsLength, 10, 5, 2 },
+        nodeCatalogue
+    ))
+    .Select(ind => CartesianChromosome.IsValid(ind))
+    .ToArray();
+    //.All(ind );
+System.Console.WriteLine(populationCorrect);
 
 // TODO: implement neccessary functions
 var ga = new GeneticAlgorithm<CartesianChromosome>(
     () => CartesianChromosome.CreateNewRandom(
-        new[] { 3, 10, 5, 2 },
+        new[] { inputsLength, 10, 5, 2 },
         nodeCatalogue
     ),
     new[] {new ChangeNodeMutation(0.2, 0.5, nodeCatalogue)},
     new[] {new DummyCrossover()},
-    AccuracyFitness.Use("[csv_file]", 3),
+    accuracy,
     new RandomFavoredSelection(),
-    new DummyCombination(),
-    (genNum, population) => { System.Console.WriteLine($"Generation {genNum} has finished."); }
+    new TakeNewCombination(),
+    (genNum, population) =>
+    {
+        System.Console.WriteLine($"Generation {genNum} has finished.");
+        System.Console.WriteLine($"Best fitness was {population.Select(ind => ind.Fitness).Max()}");
+    }
 );
 
 ga.MaxGenerations = 100;
+ga.PopulationSize = 10;
 
+ga.Start();
 
+System.Threading.Thread.Sleep(5_000);

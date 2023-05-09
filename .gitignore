@@ -2,3 +2,7 @@
 */obj
 .vscode
 *.log
+*.zip
+*.csv
+
+python/venv

@@ -22,6 +22,8 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
     public static CartesianChromosome CreateNewRandom(int[] layerSizes,
         Dictionary<int, IList<CartesianNode>> nodeCatalogue)
     {
+        // !: Fix creation of chromosome
+        // invalid LayerIndex in nodes
         var rng = new Random();
 
         int inputsAmount = layerSizes[0];
@@ -105,6 +107,27 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
                 .ToList()
             )
             .ToList();
+    }
+
+    public static bool IsValid(CartesianChromosome chromosome)
+    {
+        bool isValid = true;
+
+        for (int layerIndex = 0; layerIndex < chromosome.Layers.Count; layerIndex++)
+        {
+            var layer = chromosome.Layers[layerIndex];
+            foreach (CartesianNode node in layer)
+            {
+                isValid = isValid
+                    && node.Parents.All(par => par.Index < chromosome[par.LayerIndex].Count)
+                    && node.Parents.All(par => par.LayerIndex < layerIndex + 1); // include Inputs layer
+            }
+
+            if ( !isValid )
+                break;
+        }
+
+        return isValid;
     }
 
     public IEnumerable<int> GetLayerSizes()

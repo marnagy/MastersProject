@@ -11,11 +11,16 @@ public class SumNode : BinaryNode
         => new SumNode(newParents);
 
     public override void Compute(CartesianChromosome chromosome)
-    {
-        this.Result = Parents[..this.Arity]
-            .Select(p => chromosome[p.LayerIndex][p.Index])
-            .Select(node => node.Result)
-            .Aggregate(0d, (a,b) => a+b);
+    {   
+        this.Result = 0;
+        for (int i = 0; i < this.Arity; i++)
+        {
+            this.Result = chromosome[this.Parents[i].LayerIndex][this.Parents[i].Index].Result;
+        }
+        // this.Result = Parents[..this.Arity]
+        //     .Select(p => chromosome[p.LayerIndex][p.Index])
+        //     .Select(node => node.Result)
+        //     .Aggregate(0d, (a,b) => a+b);
     }
 
     public override bool Equals(CartesianNode? other)
