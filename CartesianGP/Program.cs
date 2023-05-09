@@ -43,11 +43,12 @@ var ga = new GeneticAlgorithm<CartesianChromosome>(
     ),
     new[] {new ChangeNodeMutation(0.2, 0.5, nodeCatalogue)},
     new[] {new DummyCrossover()},
-    new DummyFitness(),
+    AccuracyFitness.Use("[csv_file]", 3),
     new RandomFavoredSelection(),
     new DummyCombination(),
     (genNum, population) => { System.Console.WriteLine($"Generation {genNum} has finished."); }
 );
 
 ga.MaxGenerations = 100;
+
 
