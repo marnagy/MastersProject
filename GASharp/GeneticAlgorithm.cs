@@ -20,10 +20,11 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
     private Action<int, IReadOnlyList<T>> callback;
     public double CrossoverProbability;
     public double MutationProbability;
-    public int MaxGenerations = 5_000;
+    public int MaxGenerations = 500;
     public int PopulationSize = 50;
-    public int MinThreads = 2;
-    public int MaxThreads = 4;
+    // default is single-threaded
+    public int MinThreads = 1;
+    public int MaxThreads = 1;
     public GeneticAlgorithm(Func<T> createNewFunc,
         IEnumerable<Mutation<T>> mutations,
         Crossover<T>[] crossovers, Fitness<T> fitness, Selection<T> selection,
