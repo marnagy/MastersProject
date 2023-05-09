@@ -2,7 +2,10 @@ public class ProductNode : BinaryNode
 {
     public ProductNode(ParentIndices[] parents): base(parents) { }
     public override CartesianNode Clone()
-        => new ProductNode(this.Parents);
+        => new ProductNode(this.Parents
+            .Select(par => par)
+            .ToArray()
+        );
 
     public override CartesianNode Clone(ParentIndices[] newParents)
         => new ProductNode(newParents);

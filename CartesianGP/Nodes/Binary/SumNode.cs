@@ -2,7 +2,10 @@ public class SumNode : BinaryNode
 {
     public SumNode(ParentIndices[] parents): base(parents) { }
     public override CartesianNode Clone()
-        => new SumNode(this.Parents);
+        => new SumNode(this.Parents
+            .Select(par => par)
+            .ToArray()
+        );
 
     public override CartesianNode Clone(ParentIndices[] newParents)
         => new SumNode(newParents);

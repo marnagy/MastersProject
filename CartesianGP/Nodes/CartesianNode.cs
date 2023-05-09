@@ -1,6 +1,10 @@
 public abstract class CartesianNode: IEquatable<CartesianNode>
 {
     public const int ParentsAmount = 3;
+    /// <summary>
+    /// Arity (amount of parents) of the node. Value *-1* signifies not assigned.
+    /// </summary>
+    /// <value></value>
     public int Arity { get; protected init; } = -1;
     private static ParentIndices[]? _invalidParents;
     public static ParentIndices[] GetEmptyParents()
