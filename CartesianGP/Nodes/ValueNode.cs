@@ -21,7 +21,8 @@ public class ValueNode : CartesianNode
         if (other is null)
             return false;
 
-        if ( other is ValueNode otherValueNode) {
+        if (other is ValueNode otherValueNode)
+        {
             return this.Value == otherValueNode.Value
                 && Enumerable.Range(0, this.Parents.Length)
                     .All(parentIndex => this.Parents[parentIndex] == otherValueNode.Parents[parentIndex]);

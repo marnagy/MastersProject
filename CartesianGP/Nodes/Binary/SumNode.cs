@@ -1,6 +1,6 @@
 public class SumNode : BinaryNode
 {
-    public SumNode(ParentIndices[] parents): base(parents) { }
+    public SumNode(ParentIndices[] parents) : base(parents) { }
     public override CartesianNode Clone()
         => new SumNode(this.Parents
             .Select(par => par)
@@ -11,7 +11,7 @@ public class SumNode : BinaryNode
         => new SumNode(newParents);
 
     public override void Compute(CartesianChromosome chromosome)
-    {   
+    {
         this.Result = 0;
         for (int i = 0; i < this.Arity; i++)
         {
@@ -28,7 +28,8 @@ public class SumNode : BinaryNode
         if (other is null)
             return false;
 
-        if ( other is SumNode otherSumNode) {
+        if (other is SumNode otherSumNode)
+        {
             return Enumerable.Range(0, this.Parents.Length)
                 .All(parentIndex => this.Parents[parentIndex] == otherSumNode.Parents[parentIndex]);
         }

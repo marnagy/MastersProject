@@ -4,7 +4,7 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
     public double PercentageToChange { get; }
     private readonly IReadOnlyDictionary<int, IList<CartesianNode>> NodeCatalogue;
     private readonly IList<CartesianNode> Nodes;
-    public ChangeNodeMutation(double chromosomePercentageToChange, double probability, Dictionary<int, IList<CartesianNode>> nodeCatalogue): base(probability)
+    public ChangeNodeMutation(double chromosomePercentageToChange, double probability, Dictionary<int, IList<CartesianNode>> nodeCatalogue) : base(probability)
     {
         this.PercentageToChange = chromosomePercentageToChange;
         this.NodeCatalogue = nodeCatalogue;
@@ -15,18 +15,18 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
     public override CartesianChromosome Mutate(CartesianChromosome ind, int genNum)
     {
         double rand_value;
-        lock(_rng)
+        lock (_rng)
         {
             rand_value = _rng.NextDouble();
         }
 
         // don't mutate
-        if ( rand_value > this.MutationProbability )
+        if (rand_value > this.MutationProbability)
             return ind.Clone();
-        
+
         // mutate
         IList<IList<double>> nodeProbabilities;
-        lock(_rng)
+        lock (_rng)
         {
             nodeProbabilities = ind.GetLayerSizes()
                 .Select(layerSize => Enumerable.Range(0, layerSize)
@@ -42,7 +42,7 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
         {
             for (int j = 0; j < layers[i].Count; j++)
             {
-                if ( nodeProbabilities[i][j] < this.PercentageToChange )
+                if (nodeProbabilities[i][j] < this.PercentageToChange)
                 {
                     // choose new random node, preserve parents
                     layers[i][j] = _rng.Choose<CartesianNode>(this.Nodes).Clone(layers[i][j].Parents);

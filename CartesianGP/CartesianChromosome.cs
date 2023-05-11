@@ -16,7 +16,7 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
     }
     public IReadOnlyList<CartesianNode> this[int i]
     {
-        get => i == 0 ? Inputs : Layers[i-1];
+        get => i == 0 ? Inputs : Layers[i - 1];
     }
 
     public static CartesianChromosome CreateNewRandom(int[] layerSizes,
@@ -25,7 +25,7 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
         // !: Fix creation of chromosome
         // invalid LayerIndex in nodes
         var now = DateTime.UtcNow;
-        var rng = new Random( now.GetTimestamp() );
+        var rng = new Random(now.GetTimestamp());
 
         int inputsAmount = layerSizes[0];
         List<List<CartesianNode>> layers = new List<List<CartesianNode>>();
@@ -51,10 +51,11 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
                         nodeIndex = rng.Next(layers[layerIndex - 1].Count);
                     }
                     System.Console.Error.WriteLine($"Choosing parent LayerIndex {layerIndex} with Index {nodeIndex}");
-                    parents.Add( new ParentIndices{
+                    parents.Add(new ParentIndices
+                    {
                         LayerIndex = layerIndex,
                         Index = nodeIndex
-                    } );
+                    });
                 }
                 // choose node and create clone with new parents
                 // choose random arity
@@ -82,9 +83,9 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
 
     public IEnumerable<double> ComputeResult(double[] input)
     {
-        if ( this.Inputs.Length != input.Length )
+        if (this.Inputs.Length != input.Length)
             throw new ArgumentException($"Invalid number of inputs. Expected {this.Inputs.Length}, got {input.Length}");
-        
+
         for (int i = 0; i < input.Length; i++)
         {
             this.Inputs[i].Value = input[i];
@@ -100,7 +101,7 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
 
         return this.Layers[^1]
             .Select(node => node.Result);
-            // .ToArray(); // maybe remove for optimalization?
+        // .ToArray(); // maybe remove for optimalization?
     }
 
     public override CartesianChromosome Clone()
@@ -108,7 +109,7 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
             inputsAmount: this.Inputs.Length,
             layers: this.Layers
                 .Select(layer => layer
-                    .Select(node => node.Clone())    
+                    .Select(node => node.Clone())
                     .ToList()
                 )
                 .ToList()
@@ -157,7 +158,7 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
                     && nodeInLayerTest && layerTest; // include Inputs layer
             }
 
-            if ( !isValid )
+            if (!isValid)
                 break;
         }
 
@@ -166,7 +167,7 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
 
     public IEnumerable<int> GetLayerSizes()
         => this.Layers.Select(layer => layer.Count);
-    
+
     public int InputsAmount => this.Inputs.Length;
 
     public override CartesianChromosome CreateNew()

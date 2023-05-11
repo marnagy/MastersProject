@@ -1,7 +1,8 @@
-public struct ParentIndices: IEquatable<ParentIndices>
+public struct ParentIndices : IEquatable<ParentIndices>
 {
     public static ParentIndices GetInvalid()
-        => new ParentIndices(){
+        => new ParentIndices()
+        {
             LayerIndex = -1,
             Index = -1
         };
@@ -29,13 +30,13 @@ public struct ParentIndices: IEquatable<ParentIndices>
     {
         if (obj is null)
             return false;
-        
+
         if (obj is ParentIndices parent)
         {
             return this.LayerIndex == parent.LayerIndex
                 && this.Index == parent.Index;
         }
-        else 
+        else
             return false;
     }
     public override int GetHashCode()

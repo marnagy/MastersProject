@@ -1,4 +1,4 @@
-public abstract class CartesianNode: IEquatable<CartesianNode>
+public abstract class CartesianNode : IEquatable<CartesianNode>
 {
     public const int ParentsAmount = 3;
     /// <summary>
@@ -9,7 +9,8 @@ public abstract class CartesianNode: IEquatable<CartesianNode>
     private static ParentIndices[]? _invalidParents;
     public static ParentIndices[] GetEmptyParents()
     {
-        if (_invalidParents is null){
+        if (_invalidParents is null)
+        {
             _invalidParents = Enumerable.Range(0, CartesianNode.ParentsAmount)
                 .Select(_ => ParentIndices.GetInvalid())
                 .ToArray();
@@ -29,7 +30,8 @@ public abstract class CartesianNode: IEquatable<CartesianNode>
     public ParentIndices[] Parents;
     public double Result { get; protected set; }
 
-    protected CartesianNode(ParentIndices[] parents) {
+    protected CartesianNode(ParentIndices[] parents)
+    {
         if (parents.Length != ParentsAmount)
             throw new ArgumentException($"Expected {ParentsAmount} parents' indices, got {parents.Length}.");
 

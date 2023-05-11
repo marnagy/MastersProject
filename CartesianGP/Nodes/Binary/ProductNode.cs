@@ -1,6 +1,6 @@
 public class ProductNode : BinaryNode
 {
-    public ProductNode(ParentIndices[] parents): base(parents) { }
+    public ProductNode(ParentIndices[] parents) : base(parents) { }
     public override CartesianNode Clone()
         => new ProductNode(this.Parents
             .Select(par => par)
@@ -15,7 +15,7 @@ public class ProductNode : BinaryNode
         this.Result = Parents[..this.Arity]
             .Select(p => chromosome[p.LayerIndex][p.Index])
             .Select(node => node.Result)
-            .Aggregate(1d, (a,b) => a*b);
+            .Aggregate(1d, (a, b) => a * b);
     }
 
     public override bool Equals(CartesianNode? other)
@@ -23,7 +23,8 @@ public class ProductNode : BinaryNode
         if (other is null)
             return false;
 
-        if ( other is ProductNode otherProductNode) {
+        if (other is ProductNode otherProductNode)
+        {
             return Enumerable.Range(0, this.Parents.Length)
                 .All(parentIndex => this.Parents[parentIndex] == otherProductNode.Parents[parentIndex]);
         }
