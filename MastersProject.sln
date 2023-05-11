@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GASharp", "GASharp\GASharp.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CartesianGP", "CartesianGP\CartesianGP.csproj", "{7EF2C34B-DC3B-423B-B1B8-F66C74459B6D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CartesianGPTests", "CartesianGPTests\CartesianGPTests.csproj", "{7EF2C34B-DC3B-423B-B1B8-F66C74459B6D}"
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
