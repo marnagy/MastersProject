@@ -24,7 +24,8 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
     {
         // !: Fix creation of chromosome
         // invalid LayerIndex in nodes
-        var rng = new Random();
+        var now = DateTime.UtcNow;
+        var rng = new Random( now.GetTimestamp() );
 
         int inputsAmount = layerSizes[0];
         List<List<CartesianNode>> layers = new List<List<CartesianNode>>();
@@ -38,7 +39,17 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
                 for (int k = 0; k < CartesianNode.ParentsAmount; k++)
                 {
                     int layerIndex = rng.Next(currentLayer);
-                    int nodeIndex = rng.Next(layerSizes[layerIndex]);
+                    int nodeIndex;
+                    if (layerIndex == 0)
+                    {
+                        // random from input layer
+                        nodeIndex = rng.Next(inputsAmount);
+                    }
+                    else
+                    {
+                        // random from other layers
+                        nodeIndex = rng.Next(layers[layerIndex - 1].Count);
+                    }
                     parents.Add( new ParentIndices{
                         LayerIndex = layerIndex,
                         Index = nodeIndex
@@ -133,7 +144,7 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
     public IEnumerable<int> GetLayerSizes()
         => this.Layers.Select(layer => layer.Count);
     
-    public int InputsAmount { get => this.Inputs.Length; }
+    public int InputsAmount => this.Inputs.Length;
 
     public override CartesianChromosome CreateNew()
     {
