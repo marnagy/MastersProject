@@ -24,4 +24,22 @@ public struct ParentIndices: IEquatable<ParentIndices>
 
     public int LayerIndex { get; init; }
     public int Index { get; init; }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null)
+            return false;
+        
+        if (obj is ParentIndices parent)
+        {
+            return this.LayerIndex == parent.LayerIndex
+                && this.Index == parent.Index;
+        }
+        else 
+            return false;
+    }
+    public override int GetHashCode()
+    {
+        return $"{this.LayerIndex}:{this.Index}".GetHashCode();
+    }
 }

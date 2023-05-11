@@ -26,7 +26,7 @@ for (int i = 0; i < layerSizes.Length; i++)
     System.Console.WriteLine($"Comparing layer {i}...");
     System.Console.WriteLine($"Does chromosome1 layer size correspond to the assignment? {chromosome1[i].Count == layerSizes[i]}");
     System.Console.WriteLine($"Does chromosome2 layer size correspond to the assignment? {chromosome2[i].Count == layerSizes[i]}");
-    System.Console.WriteLine($"Are they the same object? {Object.ReferenceEquals(chromosome1[i].Count, chromosome2[i].Count)}");
+    System.Console.WriteLine($"Are they the same object? {Object.ReferenceEquals(chromosome1[i], chromosome2[i])}");
     for (int j = 0; j < layerSizes[i]; j++)
     {
         System.Console.WriteLine($"Are the nodes the same object? {Object.ReferenceEquals(chromosome1[i][j], chromosome2[i][j])}");
@@ -47,6 +47,8 @@ var populationCorrect = Enumerable.Range(0, 10)
     .ToArray();
     //.All(ind );
 System.Console.WriteLine(populationCorrect);
+
+return;
 
 // TODO: implement neccessary functions
 var ga = new GeneticAlgorithm<CartesianChromosome>(

@@ -50,6 +50,7 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
                         // random from other layers
                         nodeIndex = rng.Next(layers[layerIndex - 1].Count);
                     }
+                    System.Console.Error.WriteLine($"Choosing parent LayerIndex {layerIndex} with Index {nodeIndex}");
                     parents.Add( new ParentIndices{
                         LayerIndex = layerIndex,
                         Index = nodeIndex
@@ -62,10 +63,16 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
                 CartesianNode templateNode = rng.Choose(nodeCatalogue[
                     arityIndex
                 ]);
+                CartesianNode newNode = templateNode.Clone(
+                    parents.ToArray()
+                );
+                System.Console.Error.WriteLine($"Creating node with parents:");
+                foreach (ParentIndices par in newNode.Parents)
+                {
+                    System.Console.Error.WriteLine($"Choosing parent LayerIndex {par.LayerIndex} with Index {par.Index}");
+                }
                 layers[currentLayer - 1].Add(
-                    templateNode.Clone(
-                        parents.ToArray()
-                    )
+                    newNode
                 );
             }
         }
@@ -124,14 +131,30 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
     {
         bool isValid = true;
 
+        // inputs layer
+        foreach (ValueNode valNode in chromosome.Inputs)
+        {
+            isValid = isValid && valNode.Parents.All(par => par == ParentIndices.GetInvalid());
+        }
+
+        // other layers
         for (int layerIndex = 0; layerIndex < chromosome.Layers.Count; layerIndex++)
         {
             var layer = chromosome.Layers[layerIndex];
+            System.Console.Error.WriteLine($"Validating layer {layerIndex}");
             foreach (CartesianNode node in layer)
             {
+                System.Console.Error.WriteLine("Node parents:");
+                foreach (var par in node.Parents)
+                {
+                    System.Console.Error.WriteLine($"LayerIndex: {par.LayerIndex}, Index: {par.Index}");
+                }
+                System.Console.Error.WriteLine($"Testing nodeINLayerTest...");
+                var nodeInLayerTest = node.Parents.All(par => par.Index < chromosome[par.LayerIndex].Count);
+                System.Console.Error.WriteLine($"Testing layerTest...");
+                var layerTest = node.Parents.All(par => par.LayerIndex < layerIndex + 1);
                 isValid = isValid
-                    && node.Parents.All(par => par.Index < chromosome[par.LayerIndex].Count)
-                    && node.Parents.All(par => par.LayerIndex < layerIndex + 1); // include Inputs layer
+                    && nodeInLayerTest && layerTest; // include Inputs layer
             }
 
             if ( !isValid )

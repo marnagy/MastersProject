@@ -14,7 +14,7 @@ public class ValueNode : CartesianNode
         => new ValueNode(this.Value, CartesianNode.GetEmptyParents());
 
     public override CartesianNode Clone(ParentIndices[] newParents)
-        => this.Clone();
+        => new ValueNode(this.Value, newParents);
 
     public override bool Equals(CartesianNode? other)
     {
