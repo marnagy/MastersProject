@@ -4,5 +4,6 @@
 *.log
 *.zip
 *.csv
+.vs
 
 python/venv
