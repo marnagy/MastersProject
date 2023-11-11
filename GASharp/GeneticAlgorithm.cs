@@ -41,6 +41,12 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
     
     public void Start()
     {
+        if (MinThreads == 1 && MaxThreads == 1)
+        {
+            this.StartSingleThreaded();
+            return;
+        }
+
         ThreadPool.SetMinThreads((int)MinThreads, (int)MinThreads);
         ThreadPool.SetMaxThreads((int)MaxThreads, (int)MaxThreads);
 
@@ -80,6 +86,55 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
             {
                 next_population = next_population
                     .AsParallel()
+                    .Select(x => mut.Mutate(x, genNum) )
+                    .ToArray();
+            }
+
+            // combine populations (elitism, ...)
+            population = populationStrategy.Combine(population, next_population);
+            
+            // update Fitness
+            population
+                .ForEach(ind => ind.UpdateFitness(this.fitnessFunction)  );
+
+            this.callback(genNum, population);
+        }
+    }
+    public void StartSingleThreaded()
+    {
+        var population = Enumerable.Range(0, PopulationSize)
+            .Select(_ => this.createNewInd() )
+            .ToArray();
+        
+        // update Fitness
+        population
+            .ForEach(ind => ind.UpdateFitness(this.fitnessFunction)  );
+
+        for (int genNum = 0; genNum < MaxGenerations; genNum++)
+        {
+
+            // select parents
+            var parents = Enumerable.Range(0, population.Length / 2)
+                .Select(_ => this.selectionStrategy.ChooseParents(population))
+                .ToArray();
+
+            // crossover
+            // TODO: choose only 1 using GA.
+            var next_population = parents
+                .Select(p => (p, prob: Random.Shared.NextDouble()))
+                .Select(parents => {
+                    if (parents.prob < this.CrossoverProbability)
+                        return this.crossovers[0].Cross(parents.p.Item1, parents.p.Item2);
+                    else
+                        return parents.p;
+                })
+                .SelectMany(tup => new[] {tup.Item1, tup.Item2})
+                .ToArray();
+
+            // mutation
+            foreach (var mut in this.mutations)
+            {
+                next_population = next_population
                     .Select(x => mut.Mutate(x, genNum) )
                     .ToArray();
             }
