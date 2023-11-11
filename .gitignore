@@ -5,5 +5,7 @@
 *.zip
 *.csv
 .vs
+*.err
+*.out
 
 python/venv

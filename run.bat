@@ -1,1 +1,1 @@
-call dotnet run --project ./CartesianGP
+call dotnet run --project ./CartesianGP 2> CartesianGP.err

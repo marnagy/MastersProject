@@ -44,9 +44,13 @@ var populationCorrect = Enumerable.Range(0, 10)
     .Select(ind => CartesianChromosome.IsValid(ind))
     .ToArray();
     //.All(ind );
-System.Console.WriteLine(populationCorrect);
 
-return;
+foreach (var boolValue in populationCorrect)
+{
+    System.Console.WriteLine(boolValue);
+}
+
+// return;
 
 // TODO: implement neccessary functions
 var ga = new GeneticAlgorithm<CartesianChromosome>(
@@ -66,9 +70,9 @@ var ga = new GeneticAlgorithm<CartesianChromosome>(
     }
 );
 
-ga.MaxGenerations = 100;
+ga.MaxGenerations = 10;
 ga.PopulationSize = 10;
 
-ga.Start();
+ga.StartSingleThreaded();
 
-System.Threading.Thread.Sleep(5_000);
+// System.Threading.Thread.Sleep(5_000);
