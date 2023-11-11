@@ -95,8 +95,7 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
             
             // update Fitness
             population
-                .ForEach(ind => ind.UpdateFitness(this.fitnessFunction)  );
-
+                .ForEach(ind => ind.UpdateFitness(this.fitnessFunction));
             this.callback(genNum, population);
         }
     }
