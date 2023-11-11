@@ -1,7 +1,7 @@
 /// <summary>
 /// Splits Chromosomes using the same index of layers and fixes index
 /// </summary>
-public class FixedParentsCrossover : Crossover<CartesianChromosome>
+public class FixedIndexCrossover : Crossover<CartesianChromosome>
 {
     private static Random _rng = new();
     public override Tuple<CartesianChromosome, CartesianChromosome> Cross(CartesianChromosome ind1, CartesianChromosome ind2)
@@ -19,11 +19,11 @@ public class FixedParentsCrossover : Crossover<CartesianChromosome>
         var layers1 = ind1.DeepCopyLayers();
         var layers2 = ind2.DeepCopyLayers();
 
-        var newLayers1 = layers1.GetRange(0, splittingIndex);
+        var newLayers1 = layers1.GetRange(0, splittingIndex-1);
         newLayers1.AddRange(
             layers2.GetRange(splittingIndex, layers2.Count - splittingIndex)
         );
-        var newLayers2 = layers2.GetRange(0, splittingIndex);
+        var newLayers2 = layers2.GetRange(0, splittingIndex-1);
         newLayers2.AddRange(
             layers1.GetRange(splittingIndex, layers1.Count - splittingIndex)
         );
@@ -44,9 +44,9 @@ public class FixedParentsCrossover : Crossover<CartesianChromosome>
                             var fixedParentIndexWithinLayer = parent.Index;
 
                             // If the node is from bigger layer, fix to the last node.
-                            if (fixedParentIndexWithinLayer >= layers[parentLayerIndex].Count)
+                            if (fixedParentIndexWithinLayer >= layers[parentLayerIndex - 1].Count)
                             {
-                                fixedParentIndexWithinLayer = layers[parentLayerIndex].Count - 1;
+                                fixedParentIndexWithinLayer = layers[parentLayerIndex - 1].Count - 1;
                             }
                             return new ParentIndices() {
                                 LayerIndex=parentLayerIndex,
