@@ -36,7 +36,6 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
                 .ToArray();
         }
 
-        // TODO: replace node with probability < this.PercentageToChange
         var layers = ind.DeepCopyLayers();
         for (int i = 0; i < layers.Count; i++)
         {

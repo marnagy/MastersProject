@@ -47,8 +47,8 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
             return;
         }
 
-        ThreadPool.SetMinThreads((int)MinThreads, (int)MinThreads);
-        ThreadPool.SetMaxThreads((int)MaxThreads, (int)MaxThreads);
+        ThreadPool.SetMinThreads(MinThreads, MinThreads);
+        ThreadPool.SetMaxThreads(MaxThreads, MaxThreads);
 
 
         var population = Enumerable.Range(0, PopulationSize)
