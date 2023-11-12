@@ -44,14 +44,23 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
                 if (nodeProbabilities[i][j] < this.PercentageToChange)
                 {
                     // choose new random node, preserve parents
-                    layers[i][j] = _rng.Choose<CartesianNode>(this.Nodes).Clone(layers[i][j].Parents);
+                    System.Console.Error.WriteLine($"PreviousParents: {layers[i][j].Parents}");
+                    layers[i][j] = _rng.Choose(this.Nodes).Clone(layers[i][j].Parents);
+                    System.Console.Error.WriteLine($"Parents after mutation: {layers[i][j].Parents}");
                 }
             }
         }
 
-        return new CartesianChromosome(
+        var newChromosome = new CartesianChromosome(
             ind.InputsAmount,
             layers
         );
+
+        System.Console.Error.WriteLine($"ChangeNodeCreated valid chromosome? {CartesianChromosome.IsValid(newChromosome)}");
+
+        // if ( !CartesianChromosome.IsValid(newChromosome) )
+        //     throw new Exception($"Created invalid chromosome in {this.GetType()}!");
+
+        return newChromosome;
     }
 }

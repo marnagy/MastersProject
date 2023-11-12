@@ -1,1 +1,5 @@
-call dotnet run --project ./CartesianGP 2> CartesianGP.err
+call ./clean.bat
+
+call ./build.bat
+
+call dotnet run --project ./CartesianGP
