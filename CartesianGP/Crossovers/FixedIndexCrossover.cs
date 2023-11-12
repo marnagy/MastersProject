@@ -14,7 +14,11 @@ public class FixedIndexCrossover : Crossover<CartesianChromosome>
         // subtract input layer
         int maxCommonIndex = Math.Min(count1, count2) - 1;
 
-        int splittingIndex = _rng.Next(maxCommonIndex);
+        int splittingIndex;
+        lock (_rng)
+        {
+            splittingIndex = _rng.Next(maxCommonIndex);
+        }
 
         var layers1 = ind1.DeepCopyLayers();
         var layers2 = ind2.DeepCopyLayers();
