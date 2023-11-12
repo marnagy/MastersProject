@@ -30,4 +30,8 @@ public class ValueNode : CartesianNode
 
         return false;
     }
+    public override string ToString()
+    {
+        return $"ValueNode:{this.Value}";
+    }
 }

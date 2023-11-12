@@ -1,3 +1,5 @@
+using System.Text;
+
 public class CartesianChromosome : Chromosome<CartesianChromosome>
 {
     private readonly ValueNode[] Inputs;
@@ -127,16 +129,22 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
             )
             .ToList();
     }
+    public bool IsValid() => CartesianChromosome.IsValid(this);
 
     public static bool IsValid(CartesianChromosome chromosome)
     {
         bool isValid = true;
-
+        // chromosome.Inputs
+        //     .All(valueNode => valueNode.Parents.All(par => par == ParentIndices.GetInvalid()));
+        
         // inputs layer
+        ParentIndices invalidParents = ParentIndices.GetInvalid();
         foreach (ValueNode valNode in chromosome.Inputs)
         {
-            isValid = isValid && valNode.Parents.All(par => par == ParentIndices.GetInvalid());
+            isValid = isValid && valNode.Parents.All(par => par == invalidParents);
         }
+
+        System.Console.Error.WriteLine($"Inputs' parents valid? {isValid}");
 
         // other layers
         for (int layerIndex = 0; layerIndex < chromosome.Layers.Count; layerIndex++)
@@ -173,5 +181,22 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
     public override CartesianChromosome CreateNew()
     {
         throw new Exception($"Not implemented for CartesianChromosome. Please use CartesianChromosome.CreateNewRandom(...)");
+    }
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("CartesianChromosome:");
+        // inputs
+        sb.Append("[");
+        sb.Append(string.Join(", ", this.Inputs.AsEnumerable()));
+        sb.AppendLine("]");
+        // layers
+        foreach (var layer in this.Layers)
+        {
+            sb.Append("[");
+            sb.Append(string.Join(", ", layer));
+            sb.AppendLine("]");
+        }
+        return sb.ToString();
     }
 }

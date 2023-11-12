@@ -37,4 +37,8 @@ public abstract class CartesianNode : IEquatable<CartesianNode>
 
         this.Parents = parents;
     }
+    public override string ToString()
+    {
+        return $"CartesianNode:DEFAULT_STRING";
+    }
 }

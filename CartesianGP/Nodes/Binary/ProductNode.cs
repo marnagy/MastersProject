@@ -31,4 +31,8 @@ public class ProductNode : BinaryNode
 
         return false;
     }
+    public override string ToString()
+    {
+        return $"ProductNode:{this.Parents}";
+    }
 }

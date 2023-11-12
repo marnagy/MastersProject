@@ -43,4 +43,8 @@ public struct ParentIndices : IEquatable<ParentIndices>
     {
         return $"{this.LayerIndex}:{this.Index}".GetHashCode();
     }
+    public override string ToString()
+    {
+        return $"ParentIndices[LayerIndex:{this.LayerIndex}, Index:{this.Index}]";
+    }
 }
