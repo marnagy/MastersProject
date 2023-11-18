@@ -11,7 +11,7 @@ public class ValueNode : CartesianNode
     public override void Compute(CartesianChromosome chromosome) { }
 
     public override CartesianNode Clone()
-        => new ValueNode(this.Value, CartesianNode.GetEmptyParents());
+        => new ValueNode(this.Value, this.Parents);
 
     public override CartesianNode Clone(ParentIndices[] newParents)
         => new ValueNode(this.Value, newParents);
