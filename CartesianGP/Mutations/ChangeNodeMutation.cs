@@ -44,9 +44,9 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
                 if (nodeProbabilities[i][j] < this.PercentageToChange)
                 {
                     // choose new random node, preserve parents
-                    System.Console.Error.WriteLine($"PreviousParents: {layers[i][j].Parents}");
+                    System.Console.Error.WriteLine($"PreviousParents: {layers[i][j].Parents.Stringify()}");
                     layers[i][j] = _rng.Choose(this.Nodes).Clone(layers[i][j].Parents);
-                    System.Console.Error.WriteLine($"Parents after mutation: {layers[i][j].Parents}");
+                    System.Console.Error.WriteLine($"Parents after mutation: {layers[i][j].Parents.Stringify()}");
                 }
             }
         }

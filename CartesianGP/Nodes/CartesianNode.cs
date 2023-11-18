@@ -1,3 +1,5 @@
+using System.Text;
+
 public abstract class CartesianNode : IEquatable<CartesianNode>
 {
     public const int ParentsAmount = 3;
@@ -26,7 +28,9 @@ public abstract class CartesianNode : IEquatable<CartesianNode>
     public abstract CartesianNode Clone(ParentIndices[] newParents);
 
     public abstract bool Equals(CartesianNode? other);
-
+    /// <summary>
+    /// Stores Indices for CartesianChromosome class.
+    /// </summary>
     public ParentIndices[] Parents;
     public double Result { get; protected set; }
 
@@ -39,6 +43,15 @@ public abstract class CartesianNode : IEquatable<CartesianNode>
     }
     public override string ToString()
     {
-        return $"CartesianNode:DEFAULT_STRING";
+        var sb = new StringBuilder();
+        sb.Append(this.GetType());
+        sb.Append(':');
+        if (this is not ValueNode)
+        {
+            sb.Append('[');
+            sb.Append(string.Join(',', this.Parents));
+            sb.Append(']');
+        }
+        return sb.ToString();
     }
 }

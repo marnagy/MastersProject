@@ -1,3 +1,5 @@
+using System.Text;
+
 public class SumNode : BinaryNode
 {
     public SumNode(ParentIndices[] parents) : base(parents) { }
@@ -31,8 +33,13 @@ public class SumNode : BinaryNode
 
         return false;
     }
-    public override string ToString()
-    {
-        return $"SumNode:{this.Parents}";
-    }
+    // public override string ToString()
+    // {
+    //     var sb = new StringBuilder();
+    //     sb.Append("SumNode:");
+    //     sb.Append('[');
+    //     string.Join(", ", this.Parents);
+    //     sb.Append(']');
+    //     return sb.ToString();
+    // }
 }

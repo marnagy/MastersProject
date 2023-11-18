@@ -105,6 +105,11 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
             .Select(_ => this.createNewInd() )
             .ToArray();
         
+        foreach (var ind in population)
+        {
+            System.Console.Error.WriteLine($"Is initial individual valid? {ind.IsValid()}");
+        }
+        
         // update Fitness
         population
             .ForEach(ind => ind.UpdateFitness(this.fitnessFunction)  );

@@ -2,7 +2,13 @@ using System.Text;
 
 public class CartesianChromosome : Chromosome<CartesianChromosome>
 {
+    /// <summary>
+    /// Layer of ValueNode nodes representing inputs. ParentIndices set to <b>-1</b>. 
+    /// </summary>
     private readonly ValueNode[] Inputs;
+    /// <summary>
+    /// Internal layer <b>excluding</b> Inputs.
+    /// </summary>
     private List<List<CartesianNode>> Layers;
     /// <summary>
     /// Create new random individual.
@@ -129,13 +135,14 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
             )
             .ToList();
     }
-    public bool IsValid() => CartesianChromosome.IsValid(this);
+    public override bool IsValid() => CartesianChromosome.IsValid(this);
 
     public static bool IsValid(CartesianChromosome chromosome)
     {
         bool isValid = true;
-        // chromosome.Inputs
-        //     .All(valueNode => valueNode.Parents.All(par => par == ParentIndices.GetInvalid()));
+
+        System.Console.WriteLine("Checking chromosome:");
+        System.Console.WriteLine(chromosome);
         
         // inputs layer
         ParentIndices invalidParents = ParentIndices.GetInvalid();
@@ -150,14 +157,11 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
         for (int layerIndex = 0; layerIndex < chromosome.Layers.Count; layerIndex++)
         {
             var layer = chromosome.Layers[layerIndex];
-            System.Console.Error.WriteLine($"Validating layer {layerIndex}");
+            System.Console.Error.WriteLine($"Validating internal layer {layerIndex}");
             foreach (CartesianNode node in layer)
             {
-                System.Console.Error.WriteLine("Node parents:");
-                foreach (var par in node.Parents)
-                {
-                    System.Console.Error.WriteLine($"LayerIndex: {par.LayerIndex}, Index: {par.Index}");
-                }
+                System.Console.Error.WriteLine($"Checking node of type {node.GetType()}");
+                System.Console.Error.WriteLine($"Node parents:{node.Parents.Stringify()}");
                 System.Console.Error.WriteLine($"Testing nodeINLayerTest...");
                 var nodeInLayerTest = node.Parents.All(par => par.Index < chromosome[par.LayerIndex].Count);
                 System.Console.Error.WriteLine($"Testing layerTest...");

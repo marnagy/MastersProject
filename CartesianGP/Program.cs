@@ -80,7 +80,13 @@ var ga = new GeneticAlgorithm<CartesianChromosome>(
     {
         System.Console.WriteLine($"Generation {genNum} has finished.");
         System.Console.WriteLine($"Best fitness was {population.Select(ind => ind.Fitness).Max()}");
-        
+
+        // print population
+        foreach (var ind in population)
+        {
+            System.Console.WriteLine(ind);
+            System.Console.WriteLine();
+        }
     }
 );
 
