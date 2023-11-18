@@ -12,7 +12,7 @@ If you use input JSON **and** other commandline arguments that may conflict, the
 
 ## Multithreading
 
-This attribute can be set via command line argument *--use-multithreading* and uses additional flags *--min-threads* and *--max-threads*. These are used as setting in dotnet's ThreadPool class that is internally used by GA.
+This attribute can be set via command line argument *--multi-threaded* and uses additional flags *--min-threads* and *--max-threads*. These are used as setting in dotnet's ThreadPool class that is internally used by GA.
 
 If you *don't* want to use multithreading, you can use flag *--single-threaded* for the algorithm to run in single-thread. This can be used in combination with flag *--seed* to reproduce results repeatedly.
 
