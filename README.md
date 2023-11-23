@@ -18,6 +18,12 @@ If you *don't* want to use multithreading, you can use flag *--single-threaded* 
 
 # Cartesian GP
 
+## Chromosome structure
+
+Chromosome consists of layers of nodes where each can represent a value, a mathematical operation/function or branching condition (if ... then ... else ...). Each of these nodes can have upto 3 parents except input ($0th$) layer which has invalid parents. Each of these parents have to be at least 1 layer closer to input compared to the child node.
+
+Computation is done by layers from input layers to output layers. It is possible to compute results recursively from results, but this approach is not yet implemented.
+
 ## Mutations
 
 ## Crossovers
