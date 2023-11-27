@@ -1,12 +1,12 @@
 public abstract class TreeNode
 {
     protected readonly TreeNode?[] Children;
-    private const byte _childrenAmount = 3;
+    public const int ChildrenAmount = 3;
     public double Result { get; protected set; }
     protected TreeNode(TreeNode?[] children)
     {
-        if (children.Length != TreeNode._childrenAmount)
-            throw new Exception($"TreeNode requires exactly {TreeNode._childrenAmount} children");
+        if (children.Length != TreeNode.ChildrenAmount)
+            throw new Exception($"TreeNode requires exactly {TreeNode.ChildrenAmount} children");
         this.Children = children;
     }
     public abstract TreeNode Clone();
