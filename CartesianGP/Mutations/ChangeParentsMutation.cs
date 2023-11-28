@@ -1,10 +1,10 @@
-public class ChangeNodeMutation : Mutation<CartesianChromosome>
+public class ChangeParentsMutation : Mutation<CartesianChromosome>
 {
     private readonly Random _rng = new Random();
     public double PercentageToChange { get; }
     private readonly IReadOnlyDictionary<int, IList<CartesianNode>> NodeCatalogue;
     private readonly IList<CartesianNode> Nodes;
-    public ChangeNodeMutation(double chromosomePercentageToChange, double probability, Dictionary<int, IList<CartesianNode>> nodeCatalogue) : base(probability)
+    public ChangeParentsMutation(double chromosomePercentageToChange, double probability, Dictionary<int, IList<CartesianNode>> nodeCatalogue) : base(probability)
     {
         this.PercentageToChange = chromosomePercentageToChange;
         this.NodeCatalogue = nodeCatalogue;
@@ -44,9 +44,20 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
             {
                 if (shouldNodeMutate[i][j])
                 {
-                    // choose new random node, preserve parents
+                    // choose new parent nodes
+                    // choose layer and index within uniformly
+                    ParentIndices[] newParents = Enumerable.Range(0, CartesianNode.ParentsAmount)
+                        .Select(_ => this._rng.Next(j + 1))
+                        .Select(layerIndex => new ParentIndices
+                            {
+                                LayerIndex=layerIndex,
+                                Index=this._rng.Next(ind[layerIndex].Count)
+                            }
+                        )
+                        .ToArray();
+
                     System.Console.Error.WriteLine($"PreviousParents: {layers[i][j].Parents.Stringify()}");
-                    layers[i][j] = _rng.Choose(this.Nodes).Clone(layers[i][j].Parents);
+                    layers[i][j] =  layers[i][j].Clone(newParents);
                     System.Console.Error.WriteLine($"Parents after mutation: {layers[i][j].Parents.Stringify()}");
                 }
             }

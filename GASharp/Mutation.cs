@@ -7,6 +7,9 @@ public abstract class Mutation<T>
 
         this.MutationProbability = probability;
     }
+    /// <summary>
+    /// Probability that the mutation will occur.
+    /// </summary>
     public double MutationProbability { get; private set; }
     public abstract T Mutate(T ind, int genNum);
 }
