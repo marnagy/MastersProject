@@ -94,22 +94,14 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
         if (this.Inputs.Length != input.Length)
             throw new ArgumentException($"Invalid number of inputs. Expected {this.Inputs.Length}, got {input.Length}");
 
+        // set input nodes
         for (int i = 0; i < input.Length; i++)
         {
             this.Inputs[i].Value = input[i];
         }
 
-        foreach (var layer in this.Layers)
-        {
-            foreach (var node in layer)
-            {
-                node.Compute(this);
-            }
-        }
-
         return this.Layers[^1]
-            .Select(node => node.Result);
-        // .ToArray(); // maybe remove for optimalization?
+            .Select(node => node.Compute(this));
     }
 
     public override CartesianChromosome Clone()
