@@ -1,6 +1,6 @@
 public class TreeChromosome : Chromosome<TreeChromosome>
 {
-    private readonly TreeNode _rootNode;
+    public readonly TreeNode _rootNode;
     public readonly int Depth;
     public TreeChromosome(TreeNode rootNode)
     {

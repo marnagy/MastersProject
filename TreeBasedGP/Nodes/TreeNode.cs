@@ -1,6 +1,6 @@
 public abstract class TreeNode
 {
-    protected readonly TreeNode?[] Children;
+    internal readonly TreeNode?[] Children;
     public const int ChildrenAmount = 3;
     public double Result { get; protected set; }
     protected TreeNode(TreeNode?[] children)
