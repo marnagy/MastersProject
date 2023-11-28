@@ -50,7 +50,7 @@ public class FixedIndexCrossover : Crossover<CartesianChromosome>
                             // If the node is from bigger layer, fix to the last node.
                             if (fixedParentIndexWithinLayer >= layers[parentLayerIndex - 1].Count)
                             {
-                                fixedParentIndexWithinLayer = layers[parentLayerIndex - 1].Count - 1;
+                                fixedParentIndexWithinLayer = fixedParentIndexWithinLayer % layers[parentLayerIndex - 1].Count;
                             }
                             return new ParentIndices() {
                                 LayerIndex=parentLayerIndex,
