@@ -1,9 +1,6 @@
 public class ConditionNode : CartesianNode
 {
     public ConditionNode(ParentIndices[] parents): base(parents) { }
-    public override CartesianNode Clone()
-    => new ConditionNode(this.Parents);
-
     public override CartesianNode Clone(ParentIndices[] newParents)
     => new ConditionNode(newParents);
     private CartesianNode GetConditionNode(CartesianChromosome chromosome)

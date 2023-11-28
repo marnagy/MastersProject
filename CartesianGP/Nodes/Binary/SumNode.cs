@@ -3,14 +3,8 @@ using System.Text;
 public class SumNode : BinaryNode
 {
     public SumNode(ParentIndices[] parents) : base(parents) { }
-    public override CartesianNode Clone()
-        => new SumNode(this.Parents
-            .Select(par => par)
-            .ToArray()
-        );
-
     public override CartesianNode Clone(ParentIndices[] newParents)
-        => new SumNode(newParents);
+    => new SumNode(newParents);
 
     public override double Compute(CartesianChromosome chromosome)
     => Parents[..this.Arity]
@@ -31,13 +25,4 @@ public class SumNode : BinaryNode
 
         return false;
     }
-    // public override string ToString()
-    // {
-    //     var sb = new StringBuilder();
-    //     sb.Append("SumNode:");
-    //     sb.Append('[');
-    //     string.Join(", ", this.Parents);
-    //     sb.Append(']');
-    //     return sb.ToString();
-    // }
 }
