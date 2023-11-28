@@ -8,7 +8,8 @@ public class ValueNode : CartesianNode
         this.Result = this.Value;
     }
 
-    public override void Compute(CartesianChromosome chromosome) { }
+    public override double Compute(CartesianChromosome chromosome)
+    => this.Value;
 
     public override CartesianNode Clone()
         => new ValueNode(this.Value, this.Parents);

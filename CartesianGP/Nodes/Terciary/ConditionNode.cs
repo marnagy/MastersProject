@@ -6,20 +6,30 @@ public class ConditionNode : CartesianNode
 
     public override CartesianNode Clone(ParentIndices[] newParents)
     => new ConditionNode(newParents);
+    private CartesianNode GetConditionNode(CartesianChromosome chromosome)
+    => chromosome[this.Parents[0].LayerIndex][this.Parents[0].Index];
+    private CartesianNode GetTrueNode(CartesianChromosome chromosome)
+    => chromosome[this.Parents[1].LayerIndex][this.Parents[1].Index];
+    private CartesianNode GetFalseNode(CartesianChromosome chromosome)
+    => chromosome[this.Parents[2].LayerIndex][this.Parents[2].Index];
 
-    public override void Compute(CartesianChromosome chromosome)
-    {
-        var condNodeParents = Parents[0];
-        var condResult = chromosome[condNodeParents.LayerIndex][condNodeParents.Index].Result;
+    public override double Compute(CartesianChromosome chromosome)
+    => this.GetConditionNode(chromosome).Compute(chromosome) > 0
+        ? this.GetTrueNode(chromosome).Compute(chromosome)
+        : this.GetFalseNode(chromosome).Compute(chromosome);
 
-        ParentIndices indices;
-        if (condResult > 0)
-            indices = Parents[1];
-        else
-            indices = Parents[2];
+    // {
+    //     var condNodeParents = Parents[0];
+    //     var condResult = chromosome[condNodeParents.LayerIndex][condNodeParents.Index].Result;
+
+    //     ParentIndices indices;
+    //     if (condResult > 0)
+    //         indices = Parents[1];
+    //     else
+    //         indices = Parents[2];
         
-        this.Result = chromosome[indices.LayerIndex][indices.Index].Result;
-    }
+    //     this.Result = chromosome[indices.LayerIndex][indices.Index].Result;
+    // }
 
     public override bool Equals(CartesianNode? other)
     {

@@ -22,7 +22,7 @@ public abstract class CartesianNode : IEquatable<CartesianNode>
     /// <summary>
     /// Store result inside instance
     /// </summary>
-    abstract public void Compute(CartesianChromosome chromosome);
+    abstract public double Compute(CartesianChromosome chromosome);
 
     public abstract CartesianNode Clone();
     public abstract CartesianNode Clone(ParentIndices[] newParents);

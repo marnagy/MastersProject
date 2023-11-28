@@ -10,13 +10,11 @@ public class ProductNode : BinaryNode
     public override CartesianNode Clone(ParentIndices[] newParents)
         => new ProductNode(newParents);
 
-    public override void Compute(CartesianChromosome chromosome)
-    {
-        this.Result = Parents[..this.Arity]
-            .Select(p => chromosome[p.LayerIndex][p.Index])
-            .Select(node => node.Result)
-            .Aggregate(1d, (a, b) => a * b);
-    }
+    public override double Compute(CartesianChromosome chromosome)
+    => Parents[..this.Arity]
+        .Select(p => chromosome[p.LayerIndex][p.Index])
+        .Select(node => node.Compute(chromosome))
+        .Aggregate(1d, (a, b) => a * b);
 
     public override bool Equals(CartesianNode? other)
     {
