@@ -8,6 +8,7 @@ public class ValueNode : TreeNode
     public ValueNode(double value, TreeNode?[] children): base(children)
     {
         this._value = value;
+        this.Arity = 0;
     }
 
     public override TreeNode Clone()
@@ -16,8 +17,6 @@ public class ValueNode : TreeNode
     public override TreeNode Clone(TreeNode?[] children)
     => new ValueNode(this._value, children);
 
-    public override void Compute()
-    {
-        this.Result = _value;
-    }
+    public override double Compute()
+    => this._value;
 }
