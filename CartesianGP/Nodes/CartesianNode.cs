@@ -24,7 +24,12 @@ public abstract class CartesianNode : IEquatable<CartesianNode>
     /// </summary>
     abstract public double Compute(CartesianChromosome chromosome);
 
-    public abstract CartesianNode Clone();
+    public virtual CartesianNode Clone()
+    => this.Clone(
+        this.Parents
+            .Select(x => x)
+            .ToArray()
+    );
     public abstract CartesianNode Clone(ParentIndices[] newParents);
 
     public abstract bool Equals(CartesianNode? other);
