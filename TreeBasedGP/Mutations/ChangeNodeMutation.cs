@@ -8,18 +8,22 @@ public class ChangeNodeMutation : Mutation<TreeChromosome>
     {
         this._nodeCatalogue = nodeCatalogue;
     }
+    private bool ShouldChange()
+    => _rng.NextDouble() < this.MutationProbability;
     public override TreeChromosome Mutate(TreeChromosome ind, int genNum)
     {
-        int nodeAmount = Enumerable.Range(0, ind.Depth)
-            .Select(level => TreeNode.ChildrenAmount.Pow(level))
-            .Sum();
-        
-        var shouldChangeNode = Enumerable.Range(0, nodeAmount)
-            .Select(_ => _rng.NextDouble())
-            .Select(prob => prob < this.MutationProbability)
-            .ToArray();
-        
-        // TODO: continue here
+        var stack = new Stack<TreeNode>();
+        var seenNodes = new HashSet<TreeNode>();
+        stack.Push(ind._rootNode);
+
+        while (stack.Count > 0)
+        {
+            var node = stack.Pop();
+            if (seenNodes.Contains(node))
+                continue;
+            
+            // TODO: continue here
+        }
     }
     private int IntegerPow(int baseNum, int power)
     {
