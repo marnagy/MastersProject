@@ -13,10 +13,10 @@ class Program
         var test_input = new[] {1,2,3,4,5};
         var inputs = new double[5, 2];
 
-        Dictionary<int, IList<CartesianNode>> nodeCatalogue = new Dictionary<int, IList<CartesianNode>>
+        IReadOnlyDictionary<int, IReadOnlyList<CartesianNode>> nodeCatalogue = new Dictionary<int, IReadOnlyList<CartesianNode>>
         {
-            {0, new List<CartesianNode> {new ValueNode(0d, CartesianNode.GetEmptyParents())} },
-            {2, new List<CartesianNode> {new SumNode(CartesianNode.GetEmptyParents()),
+            {0, new CartesianNode[] {new ValueNode(0d, CartesianNode.GetEmptyParents())} },
+            {2, new CartesianNode[] {new SumNode(CartesianNode.GetEmptyParents()),
                 new ProductNode(CartesianNode.GetEmptyParents()) } }
         };
 

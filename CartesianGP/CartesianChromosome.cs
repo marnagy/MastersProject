@@ -28,7 +28,7 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
     }
 
     public static CartesianChromosome CreateNewRandom(int[] layerSizes,
-        Dictionary<int, IList<CartesianNode>> nodeCatalogue)
+        IReadOnlyDictionary<int, IReadOnlyList<CartesianNode>> nodeCatalogue)
     {
         // !: Fix creation of chromosome
         // invalid LayerIndex in nodes
