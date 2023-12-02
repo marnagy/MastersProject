@@ -1,7 +1,7 @@
 public class RandomFavoredSelection : Selection<CartesianChromosome>
 {
     private Random _rng = new Random();
-    public override Tuple<CartesianChromosome, CartesianChromosome> ChooseParents(IList<CartesianChromosome> population)
+    public override Tuple<CartesianChromosome, CartesianChromosome> ChooseParents(IReadOnlyList<CartesianChromosome> population)
     {   
         // we want to prioritize lower fitness
         // lower fitness -> higher probability
