@@ -1,3 +1,7 @@
+/// <summary>
+/// Node representing a simple value.
+/// It has <i>no Children</i> (ValueNode.Children is <b>null</b>)
+/// </summary>
 public class ValueNode : TreeNode
 {
     private readonly double _value;
@@ -5,7 +9,7 @@ public class ValueNode : TreeNode
     // {
     //     this._value = value;
     // }
-    public ValueNode(double value, TreeNode[]? children): base(children)
+    public ValueNode(double value, TreeNode[]? children): base(null)
     {
         this._value = value;
         this.Arity = 0;

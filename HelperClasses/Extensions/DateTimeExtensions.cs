@@ -1,4 +1,4 @@
-static class DateTimeExtensions
+public static class DateTimeExtensions
 {
     public static int GetTimestamp(this DateTime value)
     {

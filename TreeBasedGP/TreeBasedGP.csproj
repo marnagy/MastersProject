@@ -3,6 +3,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../GASharp/GASharp.csproj" />
+    <ProjectReference Include="../HelperClasses/HelperClasses.csproj" />
   </ItemGroup>
 
   <ItemGroup>

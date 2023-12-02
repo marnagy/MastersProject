@@ -1,17 +1,19 @@
-using System.Runtime.InteropServices;
-
 public class ChangeNodeMutation : Mutation<TreeChromosome>
 {
     private readonly Dictionary<TreeNode, double> _nodeCatalogue;
-    private static readonly Random _rng = new();
+    private readonly Random _rng = new();
+    private IReadOnlyList<TreeNode> Nodes;
+
     public ChangeNodeMutation(double probability, Dictionary<TreeNode, double> nodeCatalogue): base(probability)
     {
         this._nodeCatalogue = nodeCatalogue;
+        this.Nodes = nodeCatalogue.Keys.ToArray();
     }
     private bool ShouldChange()
     => _rng.NextDouble() < this.MutationProbability;
     public override TreeChromosome Mutate(TreeChromosome ind, int genNum)
-    {
+    {   
+        // DFS
         var stack = new Stack<TreeNode>();
         var seenNodes = new HashSet<TreeNode>();
         stack.Push(ind._rootNode);
@@ -23,6 +25,29 @@ public class ChangeNodeMutation : Mutation<TreeChromosome>
                 continue;
             
             // TODO: continue here
+
+            double prob;
+            bool traverseChildren = true;
+            lock (this)
+            {
+                prob = this._rng.NextDouble();
+            }
+            if (prob < this.MutationProbability)
+            {
+                lock (this)
+                var newNode = this._rng.Choose()
+            }
+
+            if (traverseChildren)
+            {
+                // add nodes to stack
+                if (node.Children is null)
+                    continue;
+                foreach (var child in node.Children)
+                {
+                    stack.Push(child);
+                }
+            }
         }
     }
     private int IntegerPow(int baseNum, int power)

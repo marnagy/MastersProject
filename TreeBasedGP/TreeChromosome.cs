@@ -13,7 +13,6 @@ public class TreeChromosome : Chromosome<TreeChromosome>
     {
         throw new NotImplementedException();
     }
-
     public override bool IsValid()
     {
         throw new NotImplementedException();

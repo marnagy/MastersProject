@@ -1,4 +1,4 @@
-static class RandomExtensions
+public static class RandomExtensions
 {
     public static T Choose<T>(this Random rng, IReadOnlyList<T> arr, IList<double>? probabilities = null)
     {
