@@ -1,12 +1,18 @@
 public class ProductNode : BinaryNode
 {
-    public ProductNode(TreeNode?[] children): base(children) { }
+    public ProductNode(TreeNode[]? children): base(children) { }
     public override TreeNode Clone()
     => new ProductNode(this.Children);
 
-    public override TreeNode Clone(TreeNode?[] children)
+    public override TreeNode Clone(TreeNode[]? children)
     => new ProductNode(children);
 
     public override double Compute()
-    => this.Children[0].Compute() * this.Children[1].Compute();
+    {
+        if (this.Children is null)
+            throw new ArgumentNullException($"Argument {nameof(this.Children)} cannot be null for node {this.GetType()}");
+        return Enumerable.Range(0, this.Arity)
+            .Select(i => this.Children[i].Compute())
+            .Aggregate(0d, (a, b) => a * b);
+    }
 }

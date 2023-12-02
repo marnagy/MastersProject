@@ -5,7 +5,7 @@ public class ValueNode : TreeNode
     // {
     //     this._value = value;
     // }
-    public ValueNode(double value, TreeNode?[] children): base(children)
+    public ValueNode(double value, TreeNode[]? children): base(children)
     {
         this._value = value;
         this.Arity = 0;
@@ -14,7 +14,7 @@ public class ValueNode : TreeNode
     public override TreeNode Clone()
     => new ValueNode(this._value, this.Children);
 
-    public override TreeNode Clone(TreeNode?[] children)
+    public override TreeNode Clone(TreeNode[]? children)
     => new ValueNode(this._value, children);
 
     public override double Compute()
