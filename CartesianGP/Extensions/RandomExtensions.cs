@@ -1,6 +1,6 @@
 static class RandomExtensions
 {
-    public static T Choose<T>(this Random rng, IList<T> arr, IList<double>? probabilities = null)
+    public static T Choose<T>(this Random rng, IReadOnlyList<T> arr, IList<double>? probabilities = null)
     {
         if (probabilities is null)
         {

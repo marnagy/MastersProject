@@ -3,7 +3,7 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
     private readonly Random _rng = new Random();
     public double PercentageToChange { get; }
     private readonly IReadOnlyDictionary<int, IList<CartesianNode>> NodeCatalogue;
-    private readonly IList<CartesianNode> Nodes;
+    private readonly IReadOnlyList<CartesianNode> Nodes;
     public ChangeNodeMutation(double chromosomePercentageToChange, double probability, Dictionary<int, IList<CartesianNode>> nodeCatalogue) : base(probability)
     {
         this.PercentageToChange = chromosomePercentageToChange;

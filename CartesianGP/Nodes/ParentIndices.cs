@@ -22,7 +22,11 @@ public struct ParentIndices : IEquatable<ParentIndices>
         return this.LayerIndex == other.LayerIndex
             && this.Index == other.Index;
     }
-
+    public ParentIndices Clone()
+    => new ParentIndices(){
+        LayerIndex=this.LayerIndex,
+        Index=this.Index
+    };
     public int LayerIndex { get; init; }
     public int Index { get; init; }
 
