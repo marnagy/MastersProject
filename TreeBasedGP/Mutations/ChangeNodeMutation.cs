@@ -34,8 +34,25 @@ public class ChangeNodeMutation : Mutation<TreeChromosome>
             }
             if (prob < this.MutationProbability)
             {
+                TreeNode newNode;
                 lock (this)
-                var newNode = this._rng.Choose()
+                {
+                    newNode = this._rng.Choose(this.Nodes);
+                }
+                if (newNode.HasChildren != node.HasChildren)
+                {
+                    // if newNode has children and orig. node did not
+                    if (newNode.HasChildren)
+                    {
+                        // TODO
+                    }
+
+                    // if node has children and newNode did not
+                    if (node.HasChildren)
+                    {
+                        // TODO
+                    }
+                }
             }
 
             if (traverseChildren)
