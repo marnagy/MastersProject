@@ -1,10 +1,10 @@
 public class ChangeParentsMutation : Mutation<CartesianChromosome>
 {
-    private readonly Random _rng = new Random();
     public double PercentageToChange { get; }
     private readonly IReadOnlyDictionary<int, IList<CartesianNode>> NodeCatalogue;
     private readonly IList<CartesianNode> Nodes;
-    public ChangeParentsMutation(double chromosomePercentageToChange, double probability, Dictionary<int, IList<CartesianNode>> nodeCatalogue) : base(probability)
+    public ChangeParentsMutation(double chromosomePercentageToChange, double probability,
+            Dictionary<int, IList<CartesianNode>> nodeCatalogue, int? seed = null) : base(probability, seed)
     {
         this.PercentageToChange = chromosomePercentageToChange;
         this.NodeCatalogue = nodeCatalogue;

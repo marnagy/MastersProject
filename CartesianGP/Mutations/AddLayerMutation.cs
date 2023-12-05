@@ -1,10 +1,9 @@
 public class AddLayerMutation : Mutation<CartesianChromosome>
 {
     private const int _newLayerSize = 3;
-    private readonly Random _rng = new Random();
     private readonly IReadOnlyDictionary<int, IList<CartesianNode>> nodeCatalogue;
     private readonly IReadOnlyList<CartesianNode> Nodes;
-    public AddLayerMutation(double probability, Dictionary<int, IList<CartesianNode>> nodeCatalogue): base(probability)
+    public AddLayerMutation(double probability, Dictionary<int, IList<CartesianNode>> nodeCatalogue, int? seed = null): base(probability, seed)
     {
         this.nodeCatalogue = nodeCatalogue;
         this.Nodes = nodeCatalogue.Keys
