@@ -1,10 +1,10 @@
-public class AddNodeToLayerMutation : Mutation<CartesianChromosome>
+public class AddLayerMutation : Mutation<CartesianChromosome>
 {
     private const int _newLayerSize = 3;
     private readonly Random _rng = new Random();
     private readonly IReadOnlyDictionary<int, IList<CartesianNode>> nodeCatalogue;
     private readonly IReadOnlyList<CartesianNode> Nodes;
-    public AddNodeToLayerMutation(double probability, Dictionary<int, IList<CartesianNode>> nodeCatalogue): base(probability)
+    public AddLayerMutation(double probability, Dictionary<int, IList<CartesianNode>> nodeCatalogue): base(probability)
     {
         this.nodeCatalogue = nodeCatalogue;
         this.Nodes = nodeCatalogue.Keys
@@ -75,7 +75,7 @@ public class AddNodeToLayerMutation : Mutation<CartesianChromosome>
         );
 
         if (!newChromosome.IsValid())
-            throw new Exception("Created invalid choromosome in AddNodeToLayerMutation");
+            throw new Exception("Created invalid choromosome in AddLayerMutation");
 
         return newChromosome;
     }
