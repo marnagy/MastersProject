@@ -13,9 +13,9 @@ public class AddLayerMutation : Mutation<CartesianChromosome>
     public override CartesianChromosome Mutate(CartesianChromosome ind, int genNum)
     {
         double rand_value;
-        lock (_rng)
+        lock (this)
         {
-            rand_value = _rng.NextDouble();
+            rand_value = this._rng.NextDouble();
         }
 
         // don't mutate
