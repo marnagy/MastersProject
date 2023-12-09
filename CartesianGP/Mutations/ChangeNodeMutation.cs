@@ -30,7 +30,7 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
         {
             shouldNodeMutate = ind.GetLayerSizes()
                 .Select(layerSize => Enumerable.Range(0, layerSize)
-                    .Select(_ => _rng.NextDouble())
+                    .Select(_ => this._rng.NextDouble())
                     .Select(prob => prob < this.PercentageToChange)
                     .ToArray()
                 )
@@ -46,7 +46,10 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
                 {
                     // choose new random node, preserve parents
                     System.Console.Error.WriteLine($"PreviousParents: {layers[i][j].Parents.Stringify()}");
-                    layers[i][j] = _rng.Choose(this.Nodes).Clone(layers[i][j].Parents);
+                    lock (this)
+                    {
+                        layers[i][j] = this._rng.Choose(this.Nodes).Clone(layers[i][j].Parents);
+                    }
                     System.Console.Error.WriteLine($"Parents after mutation: {layers[i][j].Parents.Stringify()}");
                 }
             }

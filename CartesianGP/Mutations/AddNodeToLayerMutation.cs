@@ -31,19 +31,22 @@ public class AddNodeToLayerMutation : Mutation<CartesianChromosome>
             indexOfLayerAddNodeTo = _rng.Next(layers.Count - 1);
         }
 
-        var parents = Enumerable.Range(0, CartesianNode.ParentsAmount)
-            .Select(_ => { 
-                // include input layer
-                var parentLayerIndex = this._rng.Next(indexOfLayerAddNodeTo + 1);
-                return new ParentIndices(){
-                    LayerIndex=parentLayerIndex,
-                    Index=this._rng.Next(ind[parentLayerIndex].Count)
-                };
-            })
-            .ToArray();
-        layers[indexOfLayerAddNodeTo].Add(
-            this._rng.Choose(this.Nodes).Clone(parents)
-        );
+        lock (this)
+        {
+            var parents = Enumerable.Range(0, CartesianNode.ParentsAmount)
+                .Select(_ => { 
+                    // include input layer
+                    var parentLayerIndex = this._rng.Next(indexOfLayerAddNodeTo + 1);
+                    return new ParentIndices(){
+                        LayerIndex=parentLayerIndex,
+                        Index=this._rng.Next(ind[parentLayerIndex].Count)
+                    };
+                })
+                .ToArray();
+            layers[indexOfLayerAddNodeTo].Add(
+                this._rng.Choose(this.Nodes).Clone(parents)
+            );
+        }
 
         var newChromosome = new CartesianChromosome(
             ind.InputsAmount,

@@ -39,16 +39,17 @@ public class AddLayerMutation : Mutation<CartesianChromosome>
                     ParentIndices[] parents = Enumerable
                         .Range(0, CartesianNode.ParentsAmount)
                         .Select(_ => {
-                            // check if there's no need to add +1
-                            var LayerIndex = _rng.Next(indexToInsertLayerTo);
+                            // !: needed lock is 5 lines higher
+                            // Layer index includes Input layer
+                            int layerIndex = this._rng.Next(indexToInsertLayerTo + 1);
                             return new ParentIndices(){
-                                LayerIndex=LayerIndex,
+                                LayerIndex=layerIndex,
                                 // should be fine 
-                                Index=_rng.Next(ind[LayerIndex].Count)
+                                Index=this._rng.Next(ind[layerIndex].Count)
                             };
                         })
                         .ToArray();
-                    return _rng.Choose(this.Nodes).Clone(parents);
+                    return this._rng.Choose(this.Nodes).Clone(parents);
                 };
             })
             .ToList();

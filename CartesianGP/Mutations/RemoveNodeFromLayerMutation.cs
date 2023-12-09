@@ -47,17 +47,14 @@ public class RemoveNodeFromLayerMutation : Mutation<CartesianChromosome>
                             };
                         else // choose new random parent
                         {
-                            int newLayerIndex;
-                            int newNodeIndex; 
                             lock (this)
                             {
-                                newLayerIndex = this._rng.Next(layerToRemoveNodeFrom + 1);
-                                newNodeIndex = this._rng.Next(ind[newLayerIndex].Count);
+                                int newLayerIndex = this._rng.Next(layerToRemoveNodeFrom + 1);
+                                return new ParentIndices(){
+                                    LayerIndex=newLayerIndex,
+                                    Index=this._rng.Next(ind[newLayerIndex].Count)
+                                };
                             }
-                            return new ParentIndices(){
-                                LayerIndex=newLayerIndex,
-                                Index=newNodeIndex
-                            };
                         }
                     })
                     .ToArray();

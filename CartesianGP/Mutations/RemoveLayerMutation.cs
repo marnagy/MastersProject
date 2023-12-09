@@ -45,11 +45,14 @@ public class RemoveLayerMutation : Mutation<CartesianChromosome>
                         // choose new parent from NOT ALTERED layers
                         else if (parent.LayerIndex == indexOfLayerToDelete)
                         {
-                            var newLayerIndex = this._rng.Next(indexOfLayerToDelete + 1); // include input layer
-                            return new ParentIndices(){
-                                LayerIndex=newLayerIndex,
-                                Index=this._rng.Next(ind[newLayerIndex].Count)
-                            };
+                            lock (this)
+                            {
+                                var newLayerIndex = this._rng.Next(indexOfLayerToDelete + 1); // include input layer
+                                return new ParentIndices(){
+                                    LayerIndex=newLayerIndex,
+                                    Index=this._rng.Next(ind[newLayerIndex].Count)
+                                };
+                            }
                         }
                         // else leave index as previously
                         else

@@ -30,7 +30,7 @@ public class ChangeParentsMutation : Mutation<CartesianChromosome>
         {
             shouldNodeMutate = ind.GetLayerSizes()
                 .Select(layerSize => Enumerable.Range(0, layerSize)
-                    .Select(_ => _rng.NextDouble())
+                    .Select(_ => this._rng.NextDouble())
                     .Select(prob => prob < this.PercentageToChange)
                     .ToArray()
                 )
@@ -46,15 +46,19 @@ public class ChangeParentsMutation : Mutation<CartesianChromosome>
                 {
                     // choose new parent nodes
                     // choose layer and index within uniformly
-                    ParentIndices[] newParents = Enumerable.Range(0, CartesianNode.ParentsAmount)
-                        .Select(_ => this._rng.Next(j + 1))
-                        .Select(layerIndex => new ParentIndices
-                            {
-                                LayerIndex=layerIndex,
-                                Index=this._rng.Next(ind[layerIndex].Count)
-                            }
-                        )
-                        .ToArray();
+                    ParentIndices[] newParents;
+                    lock (this)
+                    {
+                        newParents = Enumerable.Range(0, CartesianNode.ParentsAmount)
+                            .Select(_ => this._rng.Next(j + 1))
+                            .Select(layerIndex => new ParentIndices
+                                {
+                                    LayerIndex=layerIndex,
+                                    Index=this._rng.Next(ind[layerIndex].Count)
+                                }
+                            )
+                            .ToArray();
+                    }
 
                     System.Console.Error.WriteLine($"PreviousParents: {layers[i][j].Parents.Stringify()}");
                     layers[i][j] =  layers[i][j].Clone(newParents);
