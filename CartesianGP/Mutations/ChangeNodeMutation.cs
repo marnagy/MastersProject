@@ -59,8 +59,8 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
 
         System.Console.Error.WriteLine($"ChangeNodeCreated valid chromosome? {CartesianChromosome.IsValid(newChromosome)}");
 
-        // if ( !CartesianChromosome.IsValid(newChromosome) )
-        //     throw new Exception($"Created invalid chromosome in {this.GetType()}!");
+        if ( !CartesianChromosome.IsValid(newChromosome) )
+            throw new Exception($"Created invalid chromosome in {this.GetType()}!");
 
         return newChromosome;
     }
