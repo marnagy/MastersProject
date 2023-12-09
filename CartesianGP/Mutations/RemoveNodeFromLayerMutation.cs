@@ -49,6 +49,7 @@ public class RemoveNodeFromLayerMutation : Mutation<CartesianChromosome>
                         {
                             lock (this)
                             {
+                                // include InputLayer
                                 int newLayerIndex = this._rng.Next(layerToRemoveNodeFrom + 1);
                                 return new ParentIndices(){
                                     LayerIndex=newLayerIndex,
