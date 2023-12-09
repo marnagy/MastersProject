@@ -18,7 +18,8 @@ public class RemoveLayerMutation : Mutation<CartesianChromosome>
         int indexOfLayerToDelete;
         lock (this)
         {
-            indexOfLayerToDelete = _rng.Next(layers.Count);
+            // don't remove output layer
+            indexOfLayerToDelete = _rng.Next(layers.Count - 1);
         }
 
         // remove layer

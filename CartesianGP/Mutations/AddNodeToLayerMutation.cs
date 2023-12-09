@@ -27,7 +27,8 @@ public class AddNodeToLayerMutation : Mutation<CartesianChromosome>
         int indexOfLayerAddNodeTo;
         lock (this)
         {
-            indexOfLayerAddNodeTo = _rng.Next(layers.Count);
+            // don't change output layer
+            indexOfLayerAddNodeTo = _rng.Next(layers.Count - 1);
         }
 
         var parents = Enumerable.Range(0, CartesianNode.ParentsAmount)

@@ -27,6 +27,8 @@ public class AddLayerMutation : Mutation<CartesianChromosome>
         int indexToInsertLayerTo;
         lock(this)
         {
+            // output layer cannot change
+            // if indexToInsertLayerTo == ^1 then output layer is moved by 1 index to the back
             indexToInsertLayerTo = _rng.Next(layers.Count);
         }
 
