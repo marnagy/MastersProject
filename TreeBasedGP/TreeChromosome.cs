@@ -89,4 +89,8 @@ public class TreeChromosome : Chromosome<TreeChromosome>
     {
         throw new NotImplementedException();
     }
+    public override string ToString()
+    {
+        return $"{this.GetType()}[ {this._rootNode} ]";
+    }
 }
