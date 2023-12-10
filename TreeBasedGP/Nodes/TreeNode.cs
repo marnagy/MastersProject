@@ -25,7 +25,7 @@ public abstract class TreeNode
         if (this.HasChildren)
         {
             sb.Append('[');
-            sb.Append(string.Join<TreeNode>(',', this.Children));
+            sb.Append(string.Join<TreeNode>(", ", this.Children));
             sb.Append(']');
         }
         return sb.ToString();

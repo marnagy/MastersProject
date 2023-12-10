@@ -6,25 +6,19 @@ public class TreeChromosome : Chromosome<TreeChromosome>
     private readonly Random _rng;
     private readonly int? _seed;
     public readonly IReadOnlyDictionary<TreeNode, double> TerminalNodesProbabilities;
-    public readonly IReadOnlyList<TreeNode> TerminalNodes;
     public readonly IReadOnlyDictionary<TreeNode, double> NonTerminalNodesProbabilities;
-    public readonly IReadOnlyList<TreeNode> NonTerminalNodes;
     public readonly double TerminalNodesProbability;
     public TreeChromosome(TreeNode rootNode, double terminalNodesProbability,
             IReadOnlyDictionary<TreeNode, double> terminalNodesProbabilities,
-            IReadOnlyList<TreeNode> terminalNodes,
             IReadOnlyDictionary<TreeNode, double> nonTerminalNodesProbabilities,
-            IReadOnlyList<TreeNode> nonTerminalNodes,
             int? seed = null)
     {
         this._rootNode = rootNode;
         this._seed = seed;
         this._rng = seed.HasValue ? new Random(seed.Value) : new Random();
         this.TerminalNodesProbability = terminalNodesProbability;
-        this.TerminalNodes = terminalNodes;
         this.TerminalNodesProbabilities = terminalNodesProbabilities;
         this.NonTerminalNodesProbabilities = nonTerminalNodesProbabilities;
-        this.NonTerminalNodes = nonTerminalNodes;
     }
     public override TreeChromosome Clone()
     => this.Clone(this._rootNode);
@@ -33,9 +27,7 @@ public class TreeChromosome : Chromosome<TreeChromosome>
         rootNode.Clone(),
         this.TerminalNodesProbability,
         this.TerminalNodesProbabilities,
-        this.TerminalNodes,
         this.NonTerminalNodesProbabilities,
-        this.NonTerminalNodes,
         this._seed
     );
     /// <summary>
@@ -58,7 +50,9 @@ public class TreeChromosome : Chromosome<TreeChromosome>
         if (depth == 1)
             lock (this)
             {
-                return this._rng.Choose(this.TerminalNodes)
+                return this._rng.Choose(
+                        this.TerminalNodesProbabilities.Keys.ToArray()
+                    )
                     .Clone(children: null);
             }
         
@@ -69,7 +63,7 @@ public class TreeChromosome : Chromosome<TreeChromosome>
             {
                 // choose a terminal node
                 return this._rng
-                    .Choose(this.TerminalNodes)
+                    .Choose(this.NonTerminalNodesProbabilities.Keys.ToArray())
                     .Clone(children: null);
             }
             else
@@ -79,7 +73,7 @@ public class TreeChromosome : Chromosome<TreeChromosome>
                     .Select(_ => this.CreateNewTreeFull(depth - 1))
                     .ToArray();
                 return this._rng
-                    .Choose(this.NonTerminalNodes)
+                    .Choose(this.NonTerminalNodesProbabilities.Keys.ToArray())
                     .Clone(children);
             }
         }
