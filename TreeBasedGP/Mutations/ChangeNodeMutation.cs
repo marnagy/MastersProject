@@ -1,84 +1,87 @@
 public class ChangeNodeMutation : Mutation<TreeChromosome>
 {
     private readonly Dictionary<TreeNode, double> _nodeCatalogue;
-    private readonly Random _rng = new();
     private IReadOnlyList<TreeNode> Nodes;
-
-    public ChangeNodeMutation(double probability, Dictionary<TreeNode, double> nodeCatalogue): base(probability)
+    public readonly double PercentageToChange;
+    public readonly IReadOnlyDictionary<TreeNode, double> TerminalNodesProbabilities;
+    public readonly IReadOnlyList<TreeNode> TerminalNodes;
+    public readonly IReadOnlyDictionary<TreeNode, double> NonTerminalNodesProbabilities;
+    public readonly IReadOnlyList<TreeNode> NonTerminalNodes;
+    public readonly double TerminalNodesProbability;
+    public ChangeNodeMutation(double probability, Dictionary<TreeNode, double> nodeCatalogue, 
+            double percentageToChange,
+            double terminalNodesProbability,
+            IReadOnlyDictionary<TreeNode, double> terminalNodesProbabilities,
+            IReadOnlyList<TreeNode> terminalNodes,
+            IReadOnlyDictionary<TreeNode, double> nonTerminalNodesProbabilities,
+            IReadOnlyList<TreeNode> nonTerminalNodes,
+            int? seed): base(probability, seed)
     {
         this._nodeCatalogue = nodeCatalogue;
+        this.PercentageToChange = percentageToChange;
         this.Nodes = nodeCatalogue.Keys.ToArray();
+        this.TerminalNodesProbability = terminalNodesProbability;
+        this.TerminalNodes = terminalNodes;
+        this.TerminalNodesProbabilities = terminalNodesProbabilities;
+        this.NonTerminalNodesProbabilities = nonTerminalNodesProbabilities;
+        this.NonTerminalNodes = nonTerminalNodes;
     }
     private bool ShouldChange()
     => _rng.NextDouble() < this.MutationProbability;
     public override TreeChromosome Mutate(TreeChromosome ind, int genNum)
-    {   
-        // DFS
-        var stack = new Stack<TreeNode>();
-        var seenNodes = new HashSet<TreeNode>();
-        stack.Push(ind._rootNode);
-
-        while (stack.Count > 0)
+    {
+        double rand_value;
+        lock (this)
         {
-            var node = stack.Pop();
-            if (seenNodes.Contains(node))
-                continue;
-            
-            // TODO: continue here
+            rand_value = this._rng.NextDouble();
+        }
 
-            double prob;
-            bool traverseChildren = true;
-            lock (this)
-            {
-                prob = this._rng.NextDouble();
-            }
-            if (prob < this.MutationProbability)
-            {
-                TreeNode newNode;
-                lock (this)
-                {
-                    newNode = this._rng.Choose(this.Nodes);
-                }
-                if (newNode.HasChildren != node.HasChildren)
-                {
-                    // if newNode has children and orig. node did not
-                    if (newNode.HasChildren)
-                    {
-                        // TODO
-                    }
+        if (rand_value < this.MutationProbability)
+            return ind.Clone();
 
-                    // if node has children and newNode did not
-                    if (node.HasChildren)
-                    {
-                        // TODO
-                    }
-                }
-            }
-
-            if (traverseChildren)
-            {
-                // add nodes to stack
-                if (node.Children is null)
-                    continue;
-                foreach (var child in node.Children)
-                {
-                    stack.Push(child);
-                }
-            }
+        lock (this)
+        {
+            return ind.Clone(
+                this.Mutate(ind._rootNode, ind, genNum)
+            );
         }
     }
-    private int IntegerPow(int baseNum, int power)
+    private TreeNode Mutate(TreeNode origNode, TreeChromosome ind, int genNum)
     {
-        if (power < 0)
-            throw new ArgumentOutOfRangeException($"Argument {nameof(power)} needs to be >= 0.");
-        if (baseNum <= 0)
-            throw new ArgumentOutOfRangeException($"Argument {nameof(baseNum)} needs to be > 0.");
-
-        int res = 1;
-        for (int i = 1; i <= power; i++)
+        TreeNode[]? children = null;
+        if (origNode.HasChildren)
         {
-            res = res * baseNum;
+            children = origNode.Children
+                .Select(childNode => this.Mutate(childNode, ind, genNum))
+                .ToArray();
         }
-        return res;
+
+        // don't mutate node
+        if ( !(this._rng.NextDouble() < this.PercentageToChange))
+            return origNode.Clone(children);
+
+        if (this._rng.NextDouble() < this.TerminalNodesProbability)
+        {
+            // choose new terminal node
+            return this._rng
+                .Choose(this.TerminalNodes)
+                .Clone(children: null);
+        }
+        else
+        {
+            // choose new non-terminal node
+            return this._rng
+                .Choose(this.NonTerminalNodes)
+                .Clone(
+                    origNode.HasChildren
+                        ? children
+                        // create new children
+                        : Enumerable.Range(0, TreeNode.ChildrenAmount)
+                            .Select(_ => ind.CreateNewTreeFull(depth: 2))
+                            .ToArray()
+
+                );
+        }
+
     }
 }
