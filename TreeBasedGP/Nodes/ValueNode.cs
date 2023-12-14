@@ -5,11 +5,12 @@
 public class ValueNode : TreeNode
 {
     public double _value { get; protected set; }
-    public ValueNode(double value, TreeNode[]? children): base(null)
+    public ValueNode(double value): base(null)
     {
         this._value = value;
         this.Arity = 0;
     }
+    public ValueNode(double value, TreeNode[]? _children): this(value) { }
 
     public override TreeNode Clone()
     => new ValueNode(this._value, this.Children);

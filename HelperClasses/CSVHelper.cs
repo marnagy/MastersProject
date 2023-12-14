@@ -29,14 +29,14 @@ public static class CSVHelper
                 
                 inputs.Add(
                     Enumerable.Range(0, inputColumnsAmount)
-                        .Select(i => double.TryParse(lineParts[i], CultureInfo.GetCultureInfo("en-US"), out double res)
+                        .Select(i => double.TryParse(lineParts[i], out double res)
                             ? res
                             : throw new Exception($"Invalid CSV format: Expected double, found {lineParts[i]}") )
                         .ToArray()
                 );
                 outputs.Add(
                     Enumerable.Range(inputColumnsAmount, linePartsAmount - inputColumnsAmount)
-                        .Select(i => double.TryParse(lineParts[i], CultureInfo.GetCultureInfo("en-US"), out double res)
+                        .Select(i => double.TryParse(lineParts[i], out double res)
                             ? res
                             : throw new Exception($"Invalid CSV format: Expected double, found {lineParts[i]}") )
                         .ToArray()
@@ -54,21 +54,18 @@ public static class CSVHelper
         double[,] outputsArr = new double[outputs.Count, outputsLength];
 
         // ?: is there a more efficient way?
-        for (int i = 0; i < inputs.Count; i++)
+        for (int row_i = 0; row_i < inputs.Count; row_i++)
         {
-            for (int j = 0; j < inputsLength; j++)
+            for (int col_i = 0; col_i < inputsLength; col_i++)
             {
-                inputsArr[i,j] = inputs[i][j];
+                inputsArr[row_i, col_i] = inputs[row_i][col_i];
             }
-            for (int j = 0; j < outputsLength; j++)
+            for (int col_i = 0; col_i < outputsLength; col_i++)
             {
-                outputsArr[i,j] = outputs[i][j];
+                outputsArr[row_i, col_i] = outputs[row_i][col_i];
             }
         }
 
-        return (
-            inputsArr,
-            outputsArr
-        );
+        return (inputsArr, outputsArr);
     }
 }

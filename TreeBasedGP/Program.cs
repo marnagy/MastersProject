@@ -1,10 +1,13 @@
-﻿using CommandLine;
-using Microsoft.Win32.SafeHandles;
+﻿using System.Globalization;
+using CommandLine;
 
 class Program
 {
     public static void Main(string[] args)
     {
+        // set to en-us culture -> interpret real number with decimal point instead of decimal comma
+        System.Threading.Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+
         Options cliArgs = Parser.Default.ParseArguments<Options>(args).Value;
         if (cliArgs == null)  // --help case
             return;
@@ -30,13 +33,13 @@ class Program
             .Select(i => new InputNode(1d + i, inputIndex: i))
             .ToArray();
         var terminalNodesProbabilities = new Dictionary<TreeNode, double> {
-            {new ValueNode(0d, null), 0.3d},
+            {new ValueNode(0d), 0.3d},
             {inputNodes[0], 0.3d},
             {inputNodes[1], 0.3d},
         };
         var nonTerminalNodesProbabilities = new Dictionary<TreeNode, double> {
             {new SumNode(
-                children: [inputNodes[1], inputNodes[0], new ValueNode(3d, null)]
+                children: [inputNodes[1], inputNodes[0], new ValueNode(3d)]
                 ), 0.4d}
         };
         int? seed = null;
@@ -46,7 +49,7 @@ class Program
         // for each input, update terminalNodesProbabilities dictionary (remove old inputs, add new ones)
         TreeChromosome baseChromosome = new TreeChromosome(
             new SumNode(
-                children: [inputNodes[1], inputNodes[0], new ValueNode(3d, null)]
+                children: [inputNodes[1], inputNodes[0], new ValueNode(3d)]
                 ),
             terminalNodesProbability,
             terminalNodesProbabilities,

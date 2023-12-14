@@ -1,7 +1,7 @@
 public class InputNode : ValueNode
 {
     public readonly int InputIndex;
-    public InputNode(double value, int inputIndex) : base(value, null)
+    public InputNode(double value, int inputIndex) : base(value)
     {
         this.InputIndex = inputIndex;
     }
