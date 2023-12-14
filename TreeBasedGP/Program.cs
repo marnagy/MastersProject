@@ -6,6 +6,16 @@ class Program
     public static void Main(string[] args)
     {
         Options cliArgs = Parser.Default.ParseArguments<Options>(args).Value;
+        if (cliArgs == null)  // --help case
+            return;
+
+        if (!CheckArgs(cliArgs))
+        {
+            System.Console.Error.WriteLine("Invalid arguments.");
+            System.Console.Error.WriteLine(cliArgs);
+        }
+        else
+            System.Console.Error.WriteLine(cliArgs);
 
         double terminalNodesProbability = cliArgs.TerminalNodesProbability;
 
@@ -50,5 +60,15 @@ class Program
         inputNodes[1].Update(20d);
 
         System.Console.WriteLine(baseChromosome);
+
+        for (int row_i = 0; row_i < inputs.GetLength(0); row_i++)
+        {
+            System.Console.WriteLine(string.Join(", ", inputs.GetRow(row_i)));
+        }
+    }
+    public static bool CheckArgs(Options args)
+    {
+        return args.CSVFilePath != null
+            && args.CSVInputsAmount > 0;
     }
 }
