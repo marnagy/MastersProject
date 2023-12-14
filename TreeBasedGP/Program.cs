@@ -67,7 +67,9 @@ class Program
 
         for (int row_i = 0; row_i < inputs.GetLength(0); row_i++)
         {
-            System.Console.WriteLine(string.Join(", ", inputs.GetRow(row_i)));
+            System.Console.Write(string.Join(", ", inputs.GetRow(row_i)));
+            System.Console.Write(" --- ");
+            System.Console.WriteLine(string.Join(", ", outputs.GetRow(row_i)));
         }
     }
     public static bool CheckArgs(Options args)
