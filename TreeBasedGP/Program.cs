@@ -6,6 +6,7 @@ class Program
     public static void Main(string[] args)
     {
         // set to en-us culture -> interpret real number with decimal point instead of decimal comma
+        // from https://stackoverflow.com/questions/2234492/is-it-possible-to-set-the-cultureinfo-for-an-net-application-or-just-a-thread#comment32681459_2247570
         System.Threading.Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
 
         Options cliArgs = Parser.Default.ParseArguments<Options>(args).Value;
