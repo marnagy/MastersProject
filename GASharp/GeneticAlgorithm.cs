@@ -61,7 +61,6 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
 
         for (int genNum = 0; genNum < MaxGenerations; genNum++)
         {
-
             // select parents
             var parents = Enumerable.Range(0, population.Length / 2)
                 .Select(_ => this.selectionStrategy.ChooseParents(population))
