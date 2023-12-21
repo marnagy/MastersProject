@@ -2,9 +2,7 @@ using CommandLine;
 
 public class Options
 {
-    [Option("single-threaded", Default = true, Required = false, Group = "threads", HelpText = "Run GP in single-thread.")]
-    public bool SingleThreaded { get; set; }
-    [Option("multi-threaded", Default = false, Required = false, Group = "threads", HelpText = "Run GP in multiple threads.")]
+    [Option("multi-threaded", Default = false, HelpText = "Run GP in multiple threads.")]
     public bool MultiThreaded { get; set; }
     [Option("json", Default = null, HelpText = "Input JSON for easier loading of hyperparameters.")]
     public string? JsonFilePath { get; set; }

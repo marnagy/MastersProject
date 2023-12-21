@@ -5,9 +5,7 @@ using System.Text.Json.Serialization;
 public class Options
 {
     // general
-    [Option("single-threaded", Default = true, Required = false, Group = "threads", HelpText = "Run GP in single-thread.")]
-    public bool SingleThreaded { get; set; }
-    [Option("multi-threaded", Default = false, Required = false, Group = "threads", HelpText = "Run GP in multiple threads.")]
+    [Option("multi-threaded", Default = false, HelpText = "Run GP in multiple threads.")]
     public bool MultiThreaded { get; set; }
     [Option("json", Default = null, HelpText = "Input JSON for easier loading of hyperparameters.")]
     public string? JsonFilePath { get; set; }
@@ -27,6 +25,10 @@ public class Options
     // specific for TreeBasedGP
     [Option("terminal-nodes-probability", Default = 0.2d, HelpText = "Probability of choosing from terminal nodes instead of non-terminal nodes.")]
     public double TerminalNodesProbability { get; set; }
+    [Option("depth", Default = 3, HelpText = "Maximum depth of starting trees.")]
+    public int DefaultTreeDepth { get; set; }
+    [Option("change-node-mutation-probability", Default = 0d, HelpText = "Probability of using ChangeNodeMutation class.")]
+    public double ChangeNodeMutationProbability { get; set; }
     public override string ToString()
     {
         return JsonSerializer.Serialize(this);
