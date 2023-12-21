@@ -38,12 +38,37 @@ public class TreeChromosome : Chromosome<TreeChromosome>
     => this.Clone(
         this.CreateNewTreeFull(TreeChromosome.DefaultDepth)
     );
+    public TreeNode CreateNewTreeFull(int depth)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(depth);
+
+        if (depth == 1)
+            lock (this)
+            {
+                return this._rng.Choose(
+                        this.TerminalNodesProbabilities.Keys.ToArray()
+                    )
+                    .Clone(children: null);
+            }
+        
+        // else
+        lock (this)
+        {
+            // choose non-terminal node
+            TreeNode[] children = Enumerable.Range(0, TreeNode.ChildrenAmount)
+                .Select(_ => this.CreateNewTreeGrow(depth - 1))
+                .ToArray();
+            return this._rng
+                .Choose(this.NonTerminalNodesProbabilities.Keys.ToArray())
+                .Clone(children);
+        }
+    }
     /// <summary>
     /// Recursive function that creates tertiary tree with max depth of argument depth.
     /// </summary>
     /// <param name="depth">Maximum depth of Tree. <b>Root node is considered a layer 1.</b></param>
     /// <returns></returns>
-    public TreeNode CreateNewTreeFull(int depth)
+    public TreeNode CreateNewTreeGrow(int depth)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(depth);
 
@@ -70,15 +95,20 @@ public class TreeChromosome : Chromosome<TreeChromosome>
             {
                 // choose non-terminal node
                 TreeNode[] children = Enumerable.Range(0, TreeNode.ChildrenAmount)
-                    .Select(_ => this.CreateNewTreeFull(depth - 1))
+                    .Select(_ => this.CreateNewTreeGrow(depth - 1))
                     .ToArray();
                 return this._rng
                     .Choose(this.NonTerminalNodesProbabilities.Keys.ToArray())
                     .Clone(children);
             }
         }
-
     }
+    /// <summary>
+    /// Expects InputNodes to be set accordingly to 1 input
+    /// </summary>
+    /// <returns></returns>
+    public double ComputeResult()
+    => this._rootNode.Compute();
     public override bool IsValid()
     {
         throw new NotImplementedException();

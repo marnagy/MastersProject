@@ -1,14 +1,12 @@
 public class ChangeNodeMutation : Mutation<TreeChromosome>
 {
-    private readonly Dictionary<TreeNode, double> _nodeCatalogue;
-    private IReadOnlyList<TreeNode> Nodes;
     public readonly double PercentageToChange;
     public readonly IReadOnlyDictionary<TreeNode, double> TerminalNodesProbabilities;
     public readonly IReadOnlyList<TreeNode> TerminalNodes;
     public readonly IReadOnlyDictionary<TreeNode, double> NonTerminalNodesProbabilities;
     public readonly IReadOnlyList<TreeNode> NonTerminalNodes;
     public readonly double TerminalNodesProbability;
-    public ChangeNodeMutation(double probability, Dictionary<TreeNode, double> nodeCatalogue, 
+    public ChangeNodeMutation(double probability, 
             double percentageToChange,
             double terminalNodesProbability,
             IReadOnlyDictionary<TreeNode, double> terminalNodesProbabilities,
@@ -17,9 +15,7 @@ public class ChangeNodeMutation : Mutation<TreeChromosome>
             IReadOnlyList<TreeNode> nonTerminalNodes,
             int? seed): base(probability, seed)
     {
-        this._nodeCatalogue = nodeCatalogue;
         this.PercentageToChange = percentageToChange;
-        this.Nodes = nodeCatalogue.Keys.ToArray();
         this.TerminalNodesProbability = terminalNodesProbability;
         this.TerminalNodes = terminalNodes;
         this.TerminalNodesProbabilities = terminalNodesProbabilities;

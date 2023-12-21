@@ -5,6 +5,10 @@ public class InputNode : ValueNode
     {
         this.InputIndex = inputIndex;
     }
+    /// <summary>
+    /// Update value of node inplace.
+    /// </summary>
+    /// <param name="value">Value to change the value of the InputNode to.</param>
     public void Update(double value)
     {
         this._value = value;
