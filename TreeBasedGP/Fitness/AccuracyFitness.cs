@@ -16,7 +16,7 @@ public class AccuracyFitness : Fitness<TreeChromosome>
     }
     public override double ComputeFitness(TreeChromosome ind)
     {
-        int correctAmount = 0;
+        double totalDiff = 0d;
         for (int rowIndex = 0; rowIndex < this.Inputs.GetRowsAmount(); rowIndex++)
         {
             // set input nodes to values from row
@@ -34,10 +34,9 @@ public class AccuracyFitness : Fitness<TreeChromosome>
             var computedResult = ind.ComputeResult();
             var wantedResult = this.Outputs[rowIndex, this.OutputIndex];
 
-            if ( Math.Abs(wantedResult - computedResult) < this.Tolerance )
-                correctAmount += 1;
+            totalDiff += Math.Abs(wantedResult - computedResult);
         }
 
-        return correctAmount / this.InputsAmount;
+        return totalDiff;
     }
 }

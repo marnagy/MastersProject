@@ -88,7 +88,7 @@ public class TreeChromosome : Chromosome<TreeChromosome>
             {
                 // choose a terminal node
                 return this._rng
-                    .Choose(this.NonTerminalNodesProbabilities.Keys.ToArray())
+                    .Choose(this.TerminalNodesProbabilities.Keys.ToArray())
                     .Clone(children: null);
             }
             else
@@ -110,8 +110,18 @@ public class TreeChromosome : Chromosome<TreeChromosome>
     public double ComputeResult()
     => this._rootNode.Compute();
     public override bool IsValid()
+    => TreeChromosome.IsValid(this._rootNode);
+    private static bool IsValid(TreeNode node)
     {
-        throw new NotImplementedException();
+        if (node is ValueNode valNode)
+        {
+            return !node.HasChildren;
+        }
+        else
+            return
+                node.HasChildren &&
+                    node.Children
+                        .All(childNode => TreeChromosome.IsValid(childNode));
     }
     public override string ToString()
     {
