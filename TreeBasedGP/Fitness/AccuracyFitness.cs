@@ -6,7 +6,7 @@ public class AccuracyFitness : Fitness<TreeChromosome>
     private readonly int OutputIndex;
     private readonly InputNode[] InputNodes;
     private readonly double Tolerance;
-    private AccuracyFitness(double[,] inputs, double[,] outputs, int outputIndex, InputNode[] inputNodes, double tolerance = 0.1)
+    public AccuracyFitness(double[,] inputs, double[,] outputs, int outputIndex, InputNode[] inputNodes, double tolerance = 0.1)
     {
         this.Inputs = inputs;
         this.Outputs = outputs;

@@ -1,1 +1,1 @@
-call dotnet run --project ./TreeBasedGP
+call dotnet run --project ./TreeBasedGP -- --input-csv prepared_Iris.csv --input-csv-inputs-amount 4
