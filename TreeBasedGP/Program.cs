@@ -43,7 +43,10 @@ class Program
         var nonTerminalNodesProbabilities = new Dictionary<TreeNode, double> {
             {new SumNode(
                 children: [inputNodes[0], inputNodes[1], new ValueNode(3d)]
-                ), 0.4d}
+            ), 0.4d},
+            {new ProductNode(
+                children: [inputNodes[0], inputNodes[1], new ValueNode(3d)]
+            ), 0.4d}
         };
         // rng for creating first population
         var rng = cliArgs.Seed.HasValue
@@ -73,30 +76,48 @@ class Program
         for (int outputIndex = 0; outputIndex < outputsAmount; outputIndex++)
         {
             var treeBasedGA = new GeneticAlgorithm<TreeChromosome>(
+                // ramped half-and-half
                 createNewFunc: () => dummyTreeChromosome.Clone(
                     rng.NextDouble() < 0.5
                         ? dummyTreeChromosome.CreateNewTreeFull(cliArgs.DefaultTreeDepth)
                         : dummyTreeChromosome.CreateNewTreeGrow(cliArgs.DefaultTreeDepth)
                 ),
-                [ mutation ],
-                [ new DummyCrossover() ],
+                [mutation],
+                [new DummyCrossover()],
                 new AccuracyFitness(
                     inputs,
                     outputs,
                     outputIndex,
                     inputNodes
                 ),
-                new DummySelection(),
+                new ReversedRouletteWheelSelection<TreeChromosome>(cliArgs.Seed),
                 new TakeNewCombination(),
-                callback: (genNum, population) => {
+                callback: (genNum, population) =>
+                {
                     System.Console.WriteLine($"Computed {genNum}th generation.");
+                    System.Console.WriteLine($"Lowest fitness: {population.Min(ind => ind.Fitness)}");
+                    System.Console.WriteLine($"Mean fitness: {population.Select(ind => ind.Fitness).Average()}");
+                    System.Console.WriteLine();
+                    // System.Console.WriteLine($"Highest fitness: {population.Max(ind => ind.Fitness)}");
                 }
-            );
+            ){
+                MaxGenerations = 500,
+                CrossoverProbability = 0d,
+                PopulationSize = 500,
+                MutationProbability = 0.3d
+            };
 
             GAs[outputIndex] = treeBasedGA;
         }
 
         System.Console.WriteLine($"{GAs.Length} GAs created.");
+
+        for (int i = 0; i < GAs.Length; i++)
+        {
+            System.Console.Error.WriteLine($"Running GA number {i}...");
+            GAs[i].StartSingleThreaded();
+            System.Console.Error.WriteLine($"GA {i} done.");
+        }
     }
     public static bool CheckArgs(Options args)
     {
