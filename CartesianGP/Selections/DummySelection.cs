@@ -1,6 +1,6 @@
 public class DummySelection : Selection<CartesianChromosome>
 {
-    private Random _rng = new Random();
+    public DummySelection(int? seed = null): base(seed) {}
     public override Tuple<CartesianChromosome, CartesianChromosome> ChooseParents(IReadOnlyList<CartesianChromosome> population)
         => new Tuple<CartesianChromosome, CartesianChromosome>(
             population[_rng.Next(population.Count)].Clone(),
