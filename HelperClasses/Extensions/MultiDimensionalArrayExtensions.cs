@@ -14,4 +14,7 @@ public static class MultiDimensionalArrayExtensions
         return Enumerable.Range(0, arr.GetLength(0))
                .Select(x => arr[x, colIndex]);
     }
+    public static IEnumerable<IEnumerable<T>> IterateRows<T>(this T[,] arr)
+    => Enumerable.Range(0, arr.GetRowsAmount())
+        .Select(rowIndex => arr.GetRow(rowIndex));
 }
