@@ -61,7 +61,7 @@ class Program
         );
         var mutation = new ChangeNodeMutation(
             cliArgs.ChangeNodeMutationProbability,
-            percentageToChange: 0.25d,
+            percentageToChange: 0.1d,
             terminalNodesProbability=cliArgs.TerminalNodesProbability,
             terminalNodesProbabilities,
             terminalNodes: terminalNodesProbabilities.Keys.ToArray(),
@@ -95,13 +95,14 @@ class Program
                 callback: (genNum, population) =>
                 {
                     System.Console.WriteLine($"Computed {genNum}th generation.");
-                    System.Console.WriteLine($"Lowest fitness: {population.Select(ind => ind.Fitness).Min()}");
-                    System.Console.WriteLine($"Mean fitness: {population.Select(ind => ind.Fitness).Average()}");
+                    // System.Console.WriteLine($"Lowest fitness: {population.Select(ind => ind.Fitness).Min()}");
+                    // System.Console.WriteLine($"Representation of lowest fitness: {population.MinBy(ind => ind.Fitness).GetRepresentation()}");
+                    // System.Console.WriteLine($"Mean fitness: {population.Select(ind => ind.Fitness).Average()}");
                     // foreach (var ind in population)
                     // {
                     //     System.Console.WriteLine($"{ind.Fitness} ==> {ind}");
                     // }
-                    System.Console.WriteLine();
+                    // System.Console.WriteLine();
                     // System.Console.WriteLine($"Highest fitness: {population.Max(ind => ind.Fitness)}");
                 }
             ){
@@ -116,11 +117,19 @@ class Program
 
         System.Console.WriteLine($"{GAs.Length} GAs created.");
 
+        TreeChromosome[][] resultPopulations = new TreeChromosome[GAs.Length][];
         for (int i = 0; i < GAs.Length; i++)
         {
             System.Console.Error.WriteLine($"Running GA number {i}...");
-            GAs[i].StartSingleThreaded();
+            resultPopulations[i] = GAs[i].StartSingleThreaded();
             System.Console.Error.WriteLine($"GA {i} done.");
+        }
+
+        for (int i = 0; i < resultPopulations.Length; i++)
+        {
+            System.Console.WriteLine($"Best individual for output #{i} (Fitness = {resultPopulations[i].Min(ind => ind.Fitness)}):");
+            System.Console.WriteLine(resultPopulations[i].MinBy(ind => ind.Fitness).GetRepresentation());
+            System.Console.WriteLine();
         }
     }
     public static bool CheckArgs(Options args)
