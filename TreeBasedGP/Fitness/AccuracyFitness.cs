@@ -21,7 +21,6 @@ public class AccuracyFitness : Fitness<TreeChromosome>
         {
             // set input nodes to values from row
             // fitness is calculated in single thread sequentially - so don't fear changing InputNodes
-            IEnumerable<double> rowValues = this.Inputs.GetRow(rowIndex);
             foreach (
                 (InputNode node, double newValue)
                     in Enumerable.Zip(this.InputNodes, this.Inputs.GetRow(rowIndex))
@@ -31,8 +30,13 @@ public class AccuracyFitness : Fitness<TreeChromosome>
                 node.Update(newValue);
             }
 
-            var computedResult = ind.ComputeResult();
-            var wantedResult = this.Outputs[rowIndex, this.OutputIndex];
+            double computedResult = ind.ComputeResult();
+            double wantedResult = this.Outputs[rowIndex, this.OutputIndex];
+
+            if (wantedResult == 0d && computedResult < 0d)
+                computedResult = 0d;
+            if (wantedResult == 1d && computedResult > 1d)
+                computedResult = 1d;
 
             totalDiff += Math.Abs(wantedResult - computedResult);
         }

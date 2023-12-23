@@ -61,7 +61,7 @@ class Program
         );
         var mutation = new ChangeNodeMutation(
             cliArgs.ChangeNodeMutationProbability,
-            percentageToChange: 0.1d,
+            percentageToChange: 0.25d,
             terminalNodesProbability=cliArgs.TerminalNodesProbability,
             terminalNodesProbabilities,
             terminalNodes: terminalNodesProbabilities.Keys.ToArray(),
@@ -95,15 +95,19 @@ class Program
                 callback: (genNum, population) =>
                 {
                     System.Console.WriteLine($"Computed {genNum}th generation.");
-                    System.Console.WriteLine($"Lowest fitness: {population.Min(ind => ind.Fitness)}");
+                    System.Console.WriteLine($"Lowest fitness: {population.Select(ind => ind.Fitness).Min()}");
                     System.Console.WriteLine($"Mean fitness: {population.Select(ind => ind.Fitness).Average()}");
+                    // foreach (var ind in population)
+                    // {
+                    //     System.Console.WriteLine($"{ind.Fitness} ==> {ind}");
+                    // }
                     System.Console.WriteLine();
                     // System.Console.WriteLine($"Highest fitness: {population.Max(ind => ind.Fitness)}");
                 }
             ){
-                MaxGenerations = 500,
+                MaxGenerations = cliArgs.MaxGenerations,
                 CrossoverProbability = 0d,
-                PopulationSize = 500,
+                PopulationSize = cliArgs.PopulationSize,
                 MutationProbability = 0.3d
             };
 

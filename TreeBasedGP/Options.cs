@@ -21,13 +21,17 @@ public class Options
     public int MaxThreads { get; set; }
     [Option("seed", HelpText = "Seed for the random number generator used in the GP algorithm.")]
     public int? Seed { get; set; } = null;
+    [Option("population-size", Default = 50, HelpText = "Size of population in each generation.")]
+    public int PopulationSize { get; set; }
+    [Option("max-generations", Default = 100, HelpText = "Maximum amount of generations to evolve.")]
+    public int MaxGenerations { get; set; }
 
     // specific for TreeBasedGP
     [Option("terminal-nodes-probability", Default = 0.2d, HelpText = "Probability of choosing from terminal nodes instead of non-terminal nodes.")]
     public double TerminalNodesProbability { get; set; }
     [Option("depth", Default = 3, HelpText = "Maximum depth of starting trees.")]
     public int DefaultTreeDepth { get; set; }
-    [Option("change-node-mutation-probability", Default = 0d, HelpText = "Probability of using ChangeNodeMutation class.")]
+    [Option("change-node-mutation-probability", Default = 0.2d, HelpText = "Probability of using ChangeNodeMutation class.")]
     public double ChangeNodeMutationProbability { get; set; }
     public override string ToString()
     {
