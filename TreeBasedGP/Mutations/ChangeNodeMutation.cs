@@ -6,6 +6,7 @@ public class ChangeNodeMutation : Mutation<TreeChromosome>
     public readonly IReadOnlyDictionary<TreeNode, double> NonTerminalNodesProbabilities;
     public readonly IReadOnlyList<TreeNode> NonTerminalNodes;
     public readonly double TerminalNodesProbability;
+    private const int DefaultNewDepth = 2;
     public ChangeNodeMutation(double probability, 
             double percentageToChange,
             double terminalNodesProbability,
@@ -26,6 +27,8 @@ public class ChangeNodeMutation : Mutation<TreeChromosome>
     => _rng.NextDouble() < this.MutationProbability;
     public override TreeChromosome Mutate(TreeChromosome ind, int genNum)
     {
+        // TODO: Mutation is slowing down the GA
+        // !: HOW?
         double rand_value;
         lock (this)
         {
@@ -44,13 +47,9 @@ public class ChangeNodeMutation : Mutation<TreeChromosome>
     }
     private TreeNode Mutate(TreeNode origNode, TreeChromosome ind, int genNum)
     {
-        TreeNode[]? children = null;
-        if (origNode.HasChildren)
-        {
-            children = origNode.Children
-                .Select(childNode => this.Mutate(childNode, ind, genNum))
-                .ToArray();
-        }
+        TreeNode[]? children = origNode.Children?
+            .Select(childNode => this.Mutate(childNode, ind, genNum))
+            .ToArray();
 
         // don't mutate node
         if ( !(this._rng.NextDouble() < this.PercentageToChange))
@@ -73,7 +72,7 @@ public class ChangeNodeMutation : Mutation<TreeChromosome>
                         ? children
                         // create new children
                         : Enumerable.Range(0, TreeNode.ChildrenAmount)
-                            .Select(_ => ind.CreateNewTreeFull(depth: 2))
+                            .Select(_ => ind.CreateNewTreeFull(ChangeNodeMutation.DefaultNewDepth))
                             .ToArray()
 
                 );
