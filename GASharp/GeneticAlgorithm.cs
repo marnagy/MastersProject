@@ -39,12 +39,11 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
         this.callback = callback;
     }
     
-    public void Start()
+    public T[] Start()
     {
         if (MinThreads == 1 && MaxThreads == 1)
         {
-            this.StartSingleThreaded();
-            return;
+            return this.StartSingleThreaded();
         }
 
         ThreadPool.SetMinThreads(MinThreads, MinThreads);
@@ -97,8 +96,9 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
                 .ForEach(ind => ind.UpdateFitness(this.fitnessFunction));
             this.callback(genNum, population);
         }
+        return population;
     }
-    public void StartSingleThreaded()
+    public T[] StartSingleThreaded()
     {
         var population = Enumerable.Range(0, PopulationSize)
             .Select(_ => this.createNewInd() )
@@ -151,5 +151,6 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
 
             this.callback(genNum, population);
         }
+        return population;
     }
 }
