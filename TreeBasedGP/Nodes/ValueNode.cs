@@ -22,4 +22,7 @@ public class ValueNode : TreeNode
     => this._value;
     public override string ToString()
     => $"{this.GetType()}[{this._value}]";
+
+    public override string Representation()
+    => this._value.ToString();
 }

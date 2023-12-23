@@ -2,7 +2,7 @@ public class TreeChromosome : Chromosome<TreeChromosome>
 {
     public readonly TreeNode _rootNode;
     public readonly int Depth;
-    public const int DefaultDepth = 3;
+    public static int DefaultDepth = 2;
     private readonly Random _rng;
     private readonly int? _seed;
     public readonly IReadOnlyDictionary<TreeNode, double> TerminalNodesProbabilities;
@@ -123,6 +123,8 @@ public class TreeChromosome : Chromosome<TreeChromosome>
                     node.Children
                         .All(childNode => TreeChromosome.IsValid(childNode));
     }
+    public string GetRepresentation()
+    => this._rootNode.Representation();
     public override string ToString()
     {
         return $"{this.GetType()}[ {this._rootNode} ]";

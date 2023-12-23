@@ -18,6 +18,7 @@ public abstract class TreeNode
     public abstract TreeNode Clone();
     public abstract TreeNode Clone(TreeNode[]? children);
     public abstract double Compute();
+    public abstract string Representation();
     public override string ToString()
     {
         var sb = new StringBuilder();

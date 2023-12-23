@@ -17,4 +17,7 @@ public class UnaryMinusNode : TreeNode
             throw new ArgumentNullException($"Argument {nameof(this.Children)} cannot be null for node {this.GetType()}");
         return - this.Children[0].Compute();
     }
+
+    public override string Representation()
+    => $"-({this.Children[0].Representation()})";
 }

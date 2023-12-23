@@ -29,4 +29,6 @@ public class InputNode : ValueNode
     => this.Clone();
     public override string ToString()
     => $"{this.GetType()}[Index:{this.InputIndex}, Value:{this._value}]";
+    public override string Representation()
+    => $"x_{this.InputIndex}";
 }

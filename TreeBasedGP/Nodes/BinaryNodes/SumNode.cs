@@ -27,4 +27,7 @@ public class SumNode : BinaryNode
             .Select(i => this.Children[i].Compute())
             .Aggregate(0d, (a, b) => a + b);
     }
+
+    public override string Representation()
+    => $"(({this.Children[0].Representation()}) + ({this.Children[1].Representation()}))";
 }
