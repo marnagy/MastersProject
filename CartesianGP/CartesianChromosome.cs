@@ -33,7 +33,6 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
         // !: Fix creation of chromosome
         // invalid LayerIndex in nodes
         var now = DateTime.UtcNow;
-        var rng = new Random(now.GetTimestamp());
 
         int inputsAmount = layerSizes[0];
         List<List<CartesianNode>> layers = new List<List<CartesianNode>>();
@@ -46,17 +45,17 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
                 List<ParentIndices> parents = new List<ParentIndices>(CartesianNode.ParentsAmount);
                 for (int k = 0; k < CartesianNode.ParentsAmount; k++)
                 {
-                    int layerIndex = rng.Next(currentLayer);
+                    int layerIndex = Random.Shared.Next(currentLayer);
                     int nodeIndex;
                     if (layerIndex == 0)
                     {
                         // random from input layer
-                        nodeIndex = rng.Next(inputsAmount);
+                        nodeIndex = Random.Shared.Next(inputsAmount);
                     }
                     else
                     {
                         // random from other layers
-                        nodeIndex = rng.Next(layers[layerIndex - 1].Count);
+                        nodeIndex = Random.Shared.Next(layers[layerIndex - 1].Count);
                     }
                     System.Console.Error.WriteLine($"Choosing parent LayerIndex {layerIndex} with Index {nodeIndex}");
                     parents.Add(new ParentIndices
@@ -68,8 +67,8 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
                 // choose node and create clone with new parents
                 // choose random arity
                 var arities = nodeCatalogue.Keys.ToArray();
-                var arityIndex = rng.Choose(arities);
-                CartesianNode templateNode = rng.Choose(nodeCatalogue[
+                var arityIndex = Random.Shared.Choose(arities);
+                CartesianNode templateNode = Random.Shared.Choose(nodeCatalogue[
                     arityIndex
                 ]);
                 CartesianNode newNode = templateNode.Clone(
