@@ -31,27 +31,36 @@ class Program
         var inputNodes = Enumerable.Range(0, cliArgs.CSVInputsAmount)
             .Select(index => new InputNode(0, index))
             .ToArray();
-        var terminalNodesProbabilities = new Dictionary<TreeNode, double> {
-            {new ValueNode(0d), 0.1d},
-            {new ValueNode(1d), 0.1d},
-            {new ValueNode(2d), 0.1d}
+        var terminalNodesProbabilities = new Dictionary<TreeNode, double>
+        {
+            { new ValueNode(0), 0.4d }
         };
+        for (int i = 1; i <= 5; i++)
+        {
+            terminalNodesProbabilities.Add(new ValueNode(i), 0.4d);
+            terminalNodesProbabilities.Add(new ValueNode(-i), 0.4d);
+        }
+            // {new ValueNode(0d), 0.4d},
+            // {new ValueNode(1d), 0.4d},
+            // {new ValueNode(2d), 0.4d}
         foreach (var inputNode in inputNodes)
         {
             terminalNodesProbabilities.Add(inputNode, 0.2d);
         }
+        TreeNode[] baseChildren = Enumerable.Range(0, TreeNode.ChildrenAmount)
+            .Select(i => new ValueNode(-i))
+            .ToArray();
         var nonTerminalNodesProbabilities = new Dictionary<TreeNode, double> {
-            {new SumNode(
-                children: [inputNodes[0], inputNodes[1], new ValueNode(3d)]
-            ), 0.4d},
-            {new ProductNode(
-                children: [inputNodes[0], inputNodes[1], new ValueNode(3d)]
-            ), 0.4d}
+            {new SumNode(baseChildren), 1d},
+            {new ProductNode(baseChildren), 1d},
+            {new UnaryMinusNode(baseChildren), 1d},
+            {new SinNode(baseChildren), 0.5d},
+            {new SigmoidNode(baseChildren), 0.2d}
         };
         // rng for creating first population
-        var rng = cliArgs.Seed.HasValue
-            ? new Random(cliArgs.Seed.Value)
-            : new Random();
+        var rng = Random.Shared;
+        TreeChromosome.DefaultDepth = cliArgs.DefaultTreeDepth;
+
         var dummyTreeChromosome = new TreeChromosome(
             new ValueNode(5),
             cliArgs.TerminalNodesProbability,
@@ -67,70 +76,74 @@ class Program
             nonTerminalNodesProbabilities,
             nonTerminalNodes: nonTerminalNodesProbabilities.Keys.ToArray()
         );
+        Func<TreeChromosome> newChromosomeFunc = () => dummyTreeChromosome.Clone(
+            rng.NextDouble() < 0.5
+                ? dummyTreeChromosome.CreateNewTreeFull(cliArgs.DefaultTreeDepth)
+                : dummyTreeChromosome.CreateNewTreeGrow(cliArgs.DefaultTreeDepth)
+        );
 
         var outputsAmount = outputs.GetColumnsAmount();
         var GAs = new GeneticAlgorithm<TreeChromosome>[outputsAmount];
         // TODO: create GA for each of the output columns (expecting one-hot encoding)
         for (int outputIndex = 0; outputIndex < outputsAmount; outputIndex++)
         {
+            var fitness = new AccuracyFitness(
+                inputs,
+                outputs,
+                outputIndex,
+                inputNodes
+            );
             var treeBasedGA = new GeneticAlgorithm<TreeChromosome>(
                 // ramped half-and-half
-                createNewFunc: () => dummyTreeChromosome.Clone(
-                    rng.NextDouble() < 0.5
-                        ? dummyTreeChromosome.CreateNewTreeFull(cliArgs.DefaultTreeDepth)
-                        : dummyTreeChromosome.CreateNewTreeGrow(cliArgs.DefaultTreeDepth)
-                ),
+                newChromosomeFunc,
                 [mutation],
                 [new DummyCrossover()],
-                new AccuracyFitness(
-                    inputs,
-                    outputs,
-                    outputIndex,
-                    inputNodes
+                fitness,
+                new ReversedRouletteWheelSelection<TreeChromosome>(),
+                //new TakeNewCombination(),
+                new ElitismCombination<TreeChromosome>(
+                    bestAmount: cliArgs.PopulationSize / 10,
+                    newIndividuals: cliArgs.PopulationSize / 10,
+                    fitnessFunc: fitness
                 ),
-                new ReversedRouletteWheelSelection<TreeChromosome>(cliArgs.Seed),
-                new TakeNewCombination(),
                 callback: (genNum, population) =>
                 {
-                    System.Console.WriteLine($"Computed {genNum}th generation.");
-                    // System.Console.WriteLine($"Lowest fitness: {population.Select(ind => ind.Fitness).Min()}");
-                    // System.Console.WriteLine($"Representation of lowest fitness: {population.MinBy(ind => ind.Fitness).GetRepresentation()}");
-                    // System.Console.WriteLine($"Mean fitness: {population.Select(ind => ind.Fitness).Average()}");
-                    // foreach (var ind in population)
-                    // {
-                    //     System.Console.WriteLine($"{ind.Fitness} ==> {ind}");
-                    // }
-                    // System.Console.WriteLine();
-                    // System.Console.WriteLine($"Highest fitness: {population.Max(ind => ind.Fitness)}");
+                    System.Console.WriteLine($"Computed {genNum}th generation. " +
+                        $"Lowest Fitness: {population.Select(ind => ind.Fitness).Min()} " +
+                        $"Average Fitness: {population.Select(ind => ind.Fitness).Average()} ");
                 }
             ){
                 MaxGenerations = cliArgs.MaxGenerations,
                 CrossoverProbability = 0d,
                 PopulationSize = cliArgs.PopulationSize,
-                MutationProbability = 0.3d
+                MutationProbability = cliArgs.MutationProbability
             };
 
             GAs[outputIndex] = treeBasedGA;
         }
 
-        System.Console.WriteLine($"{GAs.Length} GAs created.");
+        System.Console.Error.WriteLine($"{GAs.Length} GAs created.");
 
         TreeChromosome[][] resultPopulations = new TreeChromosome[GAs.Length][];
         TreeChromosome[] bestIndividuals = new TreeChromosome[GAs.Length];
         for (int i = 0; i < GAs.Length; i++)
         {
             System.Console.Error.WriteLine($"Running GA number {i}...");
-            resultPopulations[i] = GAs[i].StartSingleThreaded();
+            if (!cliArgs.MultiThreaded)
+                resultPopulations[i] = GAs[i].StartSingleThreaded();
+            else
+                resultPopulations[i] = GAs[i].Start();
             System.Console.Error.WriteLine($"GA {i} done.");
         }
 
+        System.Console.Error.WriteLine();
 
         for (int i = 0; i < resultPopulations.Length; i++)
         {
-            System.Console.WriteLine($"Best individual for output #{i} (Fitness = {resultPopulations[i].Min(ind => ind.Fitness)}):");
+            System.Console.Error.WriteLine($"Best individual for output #{i} (Fitness = {resultPopulations[i].Min(ind => ind.Fitness)}):");
             bestIndividuals[i] = resultPopulations[i].MinBy(ind => ind.Fitness);
-            System.Console.WriteLine(bestIndividuals[i].GetRepresentation());
-            System.Console.WriteLine();
+            System.Console.Error.WriteLine(bestIndividuals[i].GetRepresentation());
+            System.Console.Error.WriteLine();
         }
 
         System.Console.WriteLine("Calculating prediction accuracy...");
@@ -138,6 +151,7 @@ class Program
         int goodPredictionCounter = 0;
         foreach ((var row_inputs, var row_outputs) in Enumerable.Zip(inputs.IterateRows(), outputs.IterateRows()))
         {
+            var output_row = row_outputs.ToArray();
             foreach ((var inputNode, var inputValue) in Enumerable.Zip(inputNodes, row_inputs))
             {
                 inputNode.Update(inputValue);
@@ -147,12 +161,14 @@ class Program
             double bestPrediction = predictions.Max();
             // choose max as predicted class
             int[] predictedClass = predictions.Select(pred => pred == bestPrediction ? 1 : 0).ToArray();
+            // System.Console.WriteLine($"Wanted output: {output_row.Stringify()}");
+            // System.Console.WriteLine($"Predicted: {predictions.Stringify()}");
 
-            if (Enumerable.Zip(predictedClass, row_outputs).All(tup => tup.First == tup.Second))
+            if (Enumerable.Zip(predictedClass, output_row).All(tup => tup.First == tup.Second))
                 goodPredictionCounter += 1;
         }
         double accuracyScore = (double)goodPredictionCounter / inputs.GetRowsAmount();
-        System.Console.WriteLine($"Accuracy score: {accuracyScore * 100 :.3f}%");
+        System.Console.WriteLine($"Accuracy score: {accuracyScore * 100 :0.00} %");
     }
     public static bool CheckArgs(Options args)
     {
