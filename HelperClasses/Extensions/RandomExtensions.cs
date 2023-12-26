@@ -29,10 +29,7 @@ public static class RandomExtensions
             throw new ArgumentException("All weights have to be non-negative numbers.");
 
         double randValue;
-        lock (rng)
-        {
-            randValue = rng.NextDouble();
-        }
+        randValue = rng.NextDouble();
 
         // normalize
         var probsSum = weights.Sum();

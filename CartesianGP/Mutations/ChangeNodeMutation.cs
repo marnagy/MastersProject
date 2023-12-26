@@ -4,7 +4,7 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
     private readonly IReadOnlyDictionary<int, IReadOnlyList<CartesianNode>> NodeCatalogue;
     private readonly IReadOnlyList<CartesianNode> Nodes;
     public ChangeNodeMutation(double chromosomePercentageToChange, double probability,
-            IReadOnlyDictionary<int, IReadOnlyList<CartesianNode>> nodeCatalogue, int? seed = null) : base(probability, seed)
+            IReadOnlyDictionary<int, IReadOnlyList<CartesianNode>> nodeCatalogue) : base(probability)
     {
         this.PercentageToChange = chromosomePercentageToChange;
         this.NodeCatalogue = nodeCatalogue;
@@ -15,10 +15,7 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
     public override CartesianChromosome Mutate(CartesianChromosome ind, int genNum)
     {
         double rand_value;
-        lock (_rng)
-        {
-            rand_value = _rng.NextDouble();
-        }
+        rand_value = Random.Shared.NextDouble();
 
         // don't mutate
         if (rand_value > this.MutationProbability)
@@ -26,16 +23,13 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
 
         // mutate
         IList<IList<bool>> shouldNodeMutate;
-        lock (_rng)
-        {
-            shouldNodeMutate = ind.GetLayerSizes()
-                .Select(layerSize => Enumerable.Range(0, layerSize)
-                    .Select(_ => this._rng.NextDouble())
-                    .Select(prob => prob < this.PercentageToChange)
-                    .ToArray()
-                )
-                .ToArray();
-        }
+        shouldNodeMutate = ind.GetLayerSizes()
+            .Select(layerSize => Enumerable.Range(0, layerSize)
+                .Select(_ => Random.Shared.NextDouble())
+                .Select(prob => prob < this.PercentageToChange)
+                .ToArray()
+            )
+            .ToArray();
 
         var layers = ind.DeepCopyLayers();
         for (int i = 0; i < layers.Count; i++)
@@ -46,10 +40,7 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
                 {
                     // choose new random node, preserve parents
                     System.Console.Error.WriteLine($"PreviousParents: {layers[i][j].Parents.Stringify()}");
-                    lock (this)
-                    {
-                        layers[i][j] = this._rng.Choose(this.Nodes).Clone(layers[i][j].Parents);
-                    }
+                    layers[i][j] = Random.Shared.Choose(this.Nodes).Clone(layers[i][j].Parents);
                     System.Console.Error.WriteLine($"Parents after mutation: {layers[i][j].Parents.Stringify()}");
                 }
             }

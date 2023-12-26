@@ -3,7 +3,7 @@ public class AddLayerMutation : Mutation<CartesianChromosome>
     private const int _newLayerSize = 3;
     private readonly IReadOnlyDictionary<int, IList<CartesianNode>> nodeCatalogue;
     private readonly IReadOnlyList<CartesianNode> Nodes;
-    public AddLayerMutation(double probability, Dictionary<int, IList<CartesianNode>> nodeCatalogue, int? seed = null): base(probability, seed)
+    public AddLayerMutation(double probability, Dictionary<int, IList<CartesianNode>> nodeCatalogue): base(probability)
     {
         this.nodeCatalogue = nodeCatalogue;
         this.Nodes = nodeCatalogue.Keys
@@ -13,10 +13,7 @@ public class AddLayerMutation : Mutation<CartesianChromosome>
     public override CartesianChromosome Mutate(CartesianChromosome ind, int genNum)
     {
         double rand_value;
-        lock (this)
-        {
-            rand_value = this._rng.NextDouble();
-        }
+        rand_value = Random.Shared.NextDouble();
 
         // don't mutate
         if (rand_value > this.MutationProbability)
@@ -25,32 +22,25 @@ public class AddLayerMutation : Mutation<CartesianChromosome>
         var layers = ind.DeepCopyLayers();
 
         int indexToInsertLayerTo;
-        lock(this)
-        {
-            // output layer cannot change
-            // if indexToInsertLayerTo == ^1 then output layer is moved by 1 index to the back
-            indexToInsertLayerTo = _rng.Next(layers.Count);
-        }
+        // output layer cannot change
+        // if indexToInsertLayerTo == ^1 then output layer is moved by 1 index to the back
+        indexToInsertLayerTo = Random.Shared.Next(layers.Count);
 
         var newLayer = Enumerable.Range(0, _newLayerSize)
             .Select(_ => {
-                lock(this)
-                {
-                    ParentIndices[] parents = Enumerable
-                        .Range(0, CartesianNode.ParentsAmount)
-                        .Select(_ => {
-                            // !: needed lock is 5 lines higher
-                            // Layer index includes Input layer
-                            int layerIndex = this._rng.Next(indexToInsertLayerTo + 1);
-                            return new ParentIndices(){
-                                LayerIndex=layerIndex,
-                                // should be fine 
-                                Index=this._rng.Next(ind[layerIndex].Count)
-                            };
-                        })
-                        .ToArray();
-                    return this._rng.Choose(this.Nodes).Clone(parents);
-                };
+                ParentIndices[] parents = Enumerable
+                    .Range(0, CartesianNode.ParentsAmount)
+                    .Select(_ => {
+                        // Layer index includes Input layer
+                        int layerIndex = Random.Shared.Next(indexToInsertLayerTo + 1);
+                        return new ParentIndices(){
+                            LayerIndex=layerIndex,
+                            // should be fine 
+                            Index=Random.Shared.Next(ind[layerIndex].Count)
+                        };
+                    })
+                    .ToArray();
+                return Random.Shared.Choose(this.Nodes).Clone(parents);
             })
             .ToList();
 

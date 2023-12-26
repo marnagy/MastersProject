@@ -13,8 +13,7 @@ public class ChangeNodeMutation : Mutation<TreeChromosome>
             IReadOnlyDictionary<TreeNode, double> terminalNodesProbabilities,
             IReadOnlyList<TreeNode> terminalNodes,
             IReadOnlyDictionary<TreeNode, double> nonTerminalNodesProbabilities,
-            IReadOnlyList<TreeNode> nonTerminalNodes,
-            int? seed): base(probability, seed)
+            IReadOnlyList<TreeNode> nonTerminalNodes): base(probability)
     {
         this.PercentageToChange = percentageToChange;
         this.TerminalNodesProbability = terminalNodesProbability;
@@ -24,26 +23,20 @@ public class ChangeNodeMutation : Mutation<TreeChromosome>
         this.NonTerminalNodes = nonTerminalNodes;
     }
     private bool ShouldChange()
-    => _rng.NextDouble() < this.MutationProbability;
+    => Random.Shared.NextDouble() < this.MutationProbability;
     public override TreeChromosome Mutate(TreeChromosome ind, int genNum)
     {
         // TODO: Mutation is slowing down the GA
         // !: HOW?
         double rand_value;
-        lock (this)
-        {
-            rand_value = this._rng.NextDouble();
-        }
+        rand_value = Random.Shared.NextDouble();
 
         if (rand_value < this.MutationProbability)
             return ind.Clone();
 
-        lock (this)
-        {
-            return ind.Clone(
-                this.Mutate(ind._rootNode, ind, genNum)
-            );
-        }
+        return ind.Clone(
+            this.Mutate(ind._rootNode, ind, genNum)
+        );
     }
     private TreeNode Mutate(TreeNode origNode, TreeChromosome ind, int genNum)
     {
@@ -52,20 +45,20 @@ public class ChangeNodeMutation : Mutation<TreeChromosome>
             .ToArray();
 
         // don't mutate node
-        if ( !(this._rng.NextDouble() < this.PercentageToChange))
+        if ( !(Random.Shared.NextDouble() < this.PercentageToChange))
             return origNode.Clone(children);
 
-        if (this._rng.NextDouble() < this.TerminalNodesProbability)
+        if (Random.Shared.NextDouble() < this.TerminalNodesProbability)
         {
             // choose new terminal node
-            return this._rng
+            return Random.Shared
                 .Choose(this.TerminalNodes)
                 .Clone(children: null);
         }
         else
         {
             // choose new non-terminal node
-            return this._rng
+            return Random.Shared
                 .Choose(this.NonTerminalNodes)
                 .Clone(
                     origNode.HasChildren

@@ -1,13 +1,10 @@
 public class RemoveLayerMutation : Mutation<CartesianChromosome>
 {
-    public RemoveLayerMutation(double probability, int? seed): base(probability, seed) { }
+    public RemoveLayerMutation(double probability): base(probability) { }
     public override CartesianChromosome Mutate(CartesianChromosome ind, int genNum)
     {
         double rand_value;
-        lock (this)
-        {
-            rand_value = this._rng.NextDouble();
-        }
+        rand_value = Random.Shared.NextDouble();
 
         // don't mutate
         if (rand_value > this.MutationProbability)
@@ -16,11 +13,8 @@ public class RemoveLayerMutation : Mutation<CartesianChromosome>
         var layers = ind.DeepCopyLayers();
 
         int indexOfLayerToDelete;
-        lock (this)
-        {
-            // don't remove output layer
-            indexOfLayerToDelete = _rng.Next(layers.Count - 1);
-        }
+        // don't remove output layer
+        indexOfLayerToDelete = Random.Shared.Next(layers.Count - 1);
 
         // remove layer
         layers.RemoveAt(indexOfLayerToDelete);
@@ -45,14 +39,11 @@ public class RemoveLayerMutation : Mutation<CartesianChromosome>
                         // choose new parent from NOT ALTERED layers
                         else if (parent.LayerIndex == indexOfLayerToDelete)
                         {
-                            lock (this)
-                            {
-                                var newLayerIndex = this._rng.Next(indexOfLayerToDelete + 1); // include input layer
-                                return new ParentIndices(){
-                                    LayerIndex=newLayerIndex,
-                                    Index=this._rng.Next(ind[newLayerIndex].Count)
-                                };
-                            }
+                            var newLayerIndex = Random.Shared.Next(indexOfLayerToDelete + 1); // include input layer
+                            return new ParentIndices(){
+                                LayerIndex=newLayerIndex,
+                                Index=Random.Shared.Next(ind[newLayerIndex].Count)
+                            };
                         }
                         // else leave index as previously
                         else

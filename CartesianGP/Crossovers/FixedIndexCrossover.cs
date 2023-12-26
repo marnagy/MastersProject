@@ -3,7 +3,6 @@
 /// </summary>
 public class FixedIndexCrossover : Crossover<CartesianChromosome>
 {
-    private static Random _rng = new();
     public override Tuple<CartesianChromosome, CartesianChromosome> Cross(CartesianChromosome ind1, CartesianChromosome ind2)
     {
         // TODO: choose index to split chromosomes (single for both)
@@ -15,10 +14,7 @@ public class FixedIndexCrossover : Crossover<CartesianChromosome>
         int maxCommonIndex = Math.Min(count1, count2) - 1;
 
         int splittingIndex;
-        lock (_rng)
-        {
-            splittingIndex = _rng.Next(maxCommonIndex);
-        }
+        splittingIndex = Random.Shared.Next(maxCommonIndex);
 
         var layers1 = ind1.DeepCopyLayers();
         var layers2 = ind2.DeepCopyLayers();

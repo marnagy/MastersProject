@@ -56,8 +56,7 @@ class Program
             new ValueNode(5),
             cliArgs.TerminalNodesProbability,
             terminalNodesProbabilities,
-            nonTerminalNodesProbabilities,
-            seed: cliArgs.Seed
+            nonTerminalNodesProbabilities
         );
         var mutation = new ChangeNodeMutation(
             cliArgs.ChangeNodeMutationProbability,
@@ -66,8 +65,7 @@ class Program
             terminalNodesProbabilities,
             terminalNodes: terminalNodesProbabilities.Keys.ToArray(),
             nonTerminalNodesProbabilities,
-            nonTerminalNodes: nonTerminalNodesProbabilities.Keys.ToArray(),
-            seed: cliArgs.Seed
+            nonTerminalNodes: nonTerminalNodesProbabilities.Keys.ToArray()
         );
 
         var outputsAmount = outputs.GetColumnsAmount();

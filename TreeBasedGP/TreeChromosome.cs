@@ -3,19 +3,15 @@ public class TreeChromosome : Chromosome<TreeChromosome>
     public readonly TreeNode _rootNode;
     public readonly int Depth;
     public static int DefaultDepth = 2;
-    private readonly Random _rng;
     private readonly int? _seed;
     public readonly IReadOnlyDictionary<TreeNode, double> TerminalNodesProbabilities;
     public readonly IReadOnlyDictionary<TreeNode, double> NonTerminalNodesProbabilities;
     public readonly double TerminalNodesProbability;
     public TreeChromosome(TreeNode rootNode, double terminalNodesProbability,
             IReadOnlyDictionary<TreeNode, double> terminalNodesProbabilities,
-            IReadOnlyDictionary<TreeNode, double> nonTerminalNodesProbabilities,
-            int? seed = null)
+            IReadOnlyDictionary<TreeNode, double> nonTerminalNodesProbabilities)
     {
         this._rootNode = rootNode;
-        this._seed = seed;
-        this._rng = seed.HasValue ? new Random(seed.Value) : new Random();
         this.TerminalNodesProbability = terminalNodesProbability;
         this.TerminalNodesProbabilities = terminalNodesProbabilities;
         this.NonTerminalNodesProbabilities = nonTerminalNodesProbabilities;
@@ -27,8 +23,7 @@ public class TreeChromosome : Chromosome<TreeChromosome>
         rootNode.Clone(),
         this.TerminalNodesProbability,
         this.TerminalNodesProbabilities,
-        this.NonTerminalNodesProbabilities,
-        this._seed
+        this.NonTerminalNodesProbabilities
     );
     /// <summary>
     /// this method creates full tree with depth DefaultDepth by default by default.
@@ -43,25 +38,18 @@ public class TreeChromosome : Chromosome<TreeChromosome>
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(depth);
 
         if (depth == 1)
-            lock (this)
-            {
-                return this._rng.Choose(
-                        this.TerminalNodesProbabilities.Keys.ToArray()
-                    )
-                    .Clone(children: null);
-            }
+            return Random.Shared.Choose(
+                this.TerminalNodesProbabilities.Keys.ToArray()
+            )
+            .Clone(children: null);
         
-        // else
-        lock (this)
-        {
-            // choose non-terminal node
-            TreeNode[] children = Enumerable.Range(0, TreeNode.ChildrenAmount)
-                .Select(_ => this.CreateNewTreeGrow(depth - 1))
-                .ToArray();
-            return this._rng
-                .Choose(this.NonTerminalNodesProbabilities.Keys.ToArray())
-                .Clone(children);
-        }
+        // choose non-terminal node
+        TreeNode[] children = Enumerable.Range(0, TreeNode.ChildrenAmount)
+            .Select(_ => this.CreateNewTreeGrow(depth - 1))
+            .ToArray();
+        return Random.Shared
+            .Choose(this.NonTerminalNodesProbabilities.Keys.ToArray())
+            .Clone(children);
     }
     /// <summary>
     /// Recursive function that creates tertiary tree with max depth of argument depth.
@@ -73,34 +61,28 @@ public class TreeChromosome : Chromosome<TreeChromosome>
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(depth);
 
         if (depth == 1)
-            lock (this)
-            {
-                return this._rng.Choose(
-                        this.TerminalNodesProbabilities.Keys.ToArray()
-                    )
-                    .Clone(children: null);
-            }
-        
+            return Random.Shared.Choose(
+                    this.TerminalNodesProbabilities.Keys.ToArray()
+            )
+            .Clone(children: null);
+
         // else
-        lock (this)
+        if (Random.Shared.NextDouble() < this.TerminalNodesProbability)
         {
-            if (this._rng.NextDouble() < this.TerminalNodesProbability)
-            {
-                // choose a terminal node
-                return this._rng
-                    .Choose(this.TerminalNodesProbabilities.Keys.ToArray())
-                    .Clone(children: null);
-            }
-            else
-            {
-                // choose non-terminal node
-                TreeNode[] children = Enumerable.Range(0, TreeNode.ChildrenAmount)
-                    .Select(_ => this.CreateNewTreeGrow(depth - 1))
-                    .ToArray();
-                return this._rng
-                    .Choose(this.NonTerminalNodesProbabilities.Keys.ToArray())
-                    .Clone(children);
-            }
+            // choose a terminal node
+            return Random.Shared
+                .Choose(this.TerminalNodesProbabilities.Keys.ToArray())
+                .Clone(children: null);
+        }
+        else
+        {
+            // choose non-terminal node
+            TreeNode[] children = Enumerable.Range(0, TreeNode.ChildrenAmount)
+                .Select(_ => this.CreateNewTreeGrow(depth - 1))
+                .ToArray();
+            return Random.Shared
+                .Choose(this.NonTerminalNodesProbabilities.Keys.ToArray())
+                .Clone(children);
         }
     }
     /// <summary>

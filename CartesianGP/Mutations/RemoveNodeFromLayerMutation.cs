@@ -1,13 +1,10 @@
 public class RemoveNodeFromLayerMutation : Mutation<CartesianChromosome>
 {
-    public RemoveNodeFromLayerMutation(double probability, int? seed): base(probability, seed) { }
+    public RemoveNodeFromLayerMutation(double probability): base(probability) { }
     public override CartesianChromosome Mutate(CartesianChromosome ind, int genNum)
     {
         double rand_value;
-        lock (_rng)
-        {
-            rand_value = _rng.NextDouble();
-        }
+        rand_value = Random.Shared.NextDouble();
 
         // don't mutate
         if (rand_value > this.MutationProbability)
@@ -17,12 +14,9 @@ public class RemoveNodeFromLayerMutation : Mutation<CartesianChromosome>
         
         int layerToRemoveNodeFrom;
         int indexOfNodeToRemove;
-        lock (this)
-        {   
-            // don't remove from output layer
-            layerToRemoveNodeFrom = this._rng.Next(layers.Count - 1);
-            indexOfNodeToRemove = this._rng.Next(layers[layerToRemoveNodeFrom].Count);
-        }
+        // don't remove from output layer
+        layerToRemoveNodeFrom = Random.Shared.Next(layers.Count - 1);
+        indexOfNodeToRemove = Random.Shared.Next(layers[layerToRemoveNodeFrom].Count);
 
         // remove node
         layers[layerToRemoveNodeFrom].RemoveAt(indexOfNodeToRemove);
@@ -47,15 +41,12 @@ public class RemoveNodeFromLayerMutation : Mutation<CartesianChromosome>
                             };
                         else // choose new random parent
                         {
-                            lock (this)
-                            {
-                                // include InputLayer
-                                int newLayerIndex = this._rng.Next(layerToRemoveNodeFrom + 1);
-                                return new ParentIndices(){
-                                    LayerIndex=newLayerIndex,
-                                    Index=this._rng.Next(ind[newLayerIndex].Count)
-                                };
-                            }
+                            // include InputLayer
+                            int newLayerIndex = Random.Shared.Next(layerToRemoveNodeFrom + 1);
+                            return new ParentIndices(){
+                                LayerIndex=newLayerIndex,
+                                Index=Random.Shared.Next(ind[newLayerIndex].Count)
+                            };
                         }
                     })
                     .ToArray();
