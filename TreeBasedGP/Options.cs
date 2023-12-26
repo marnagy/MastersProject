@@ -25,6 +25,10 @@ public class Options
     public int PopulationSize { get; set; }
     [Option("max-generations", Default = 100, HelpText = "Maximum amount of generations to evolve.")]
     public int MaxGenerations { get; set; }
+    [Option("mutation-probability", Default = 0.2d, HelpText = "Probability of each mutation taking action.")]
+    public double MutationProbability { get; set; }
+    [Option("repeat-amount", Default = 5, HelpText = "Amount of times to repeat the training of GPs.")]
+    public int RepeatAmount { get; set; }
 
     // specific for TreeBasedGP
     [Option("terminal-nodes-probability", Default = 0.2d, HelpText = "Probability of choosing from terminal nodes instead of non-terminal nodes.")]
