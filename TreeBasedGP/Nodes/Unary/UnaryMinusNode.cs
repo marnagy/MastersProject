@@ -1,4 +1,4 @@
-public class UnaryMinusNode : TreeNode
+public class UnaryMinusNode : UnaryNode
 {
     public UnaryMinusNode(TreeNode[]? children): base(children)
     {
