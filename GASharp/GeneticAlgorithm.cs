@@ -104,10 +104,10 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
             .Select(_ => this.createNewInd() )
             .ToArray();
         
-        foreach (var ind in population)
-        {
-            System.Console.Error.WriteLine($"Is initial individual valid? {ind.IsValid()}");
-        }
+        // foreach (var ind in population)
+        // {
+        //     System.Console.Error.WriteLine($"Is initial individual valid? {ind.IsValid()}");
+        // }
         
         // update Fitness
         population
@@ -122,7 +122,7 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
 
             // crossover
             // TODO: choose only 1 using GA.
-            var next_population = parents
+            var nextPopulation = parents
                 .Select(p => (p, prob: Random.Shared.NextDouble()))
                 .Select(parents => {
                     if (parents.prob < this.CrossoverProbability)
@@ -136,17 +136,19 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
             // mutation
             foreach (var mut in this.mutations)
             {
-                next_population = next_population
+                nextPopulation = nextPopulation
                     .Select(x => mut.Mutate(x, genNum) )
                     .ToArray();
             }
 
             // update Fitness
-            population
-                .ForEach(ind => ind.UpdateFitness(this.fitnessFunction)  );
+            foreach (var ind in nextPopulation)
+            {
+                ind.UpdateFitness(this.fitnessFunction);
+            }
 
             // combine populations (elitism, ...)
-            population = populationStrategy.Combine(population, next_population);
+            population = populationStrategy.Combine(population, nextPopulation);
 
             this.callback(genNum, population);
         }
