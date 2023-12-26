@@ -22,7 +22,7 @@ class Program
         double terminalNodesProbability = cliArgs.TerminalNodesProbability;
 
         // prepare CSV
-        (double[,] inputs, double[,] outputs) = CSVHelper.PrepareCSV(
+        (double[,] inputs, int[,] outputs) = CSVHelper.PrepareCSV(
             cliArgs.CSVFilePath,
             cliArgs.CSVInputsAmount,
             cliArgs.CSVDelimiter
@@ -118,6 +118,7 @@ class Program
         System.Console.WriteLine($"{GAs.Length} GAs created.");
 
         TreeChromosome[][] resultPopulations = new TreeChromosome[GAs.Length][];
+        TreeChromosome[] bestIndividuals = new TreeChromosome[GAs.Length];
         for (int i = 0; i < GAs.Length; i++)
         {
             System.Console.Error.WriteLine($"Running GA number {i}...");
@@ -125,12 +126,35 @@ class Program
             System.Console.Error.WriteLine($"GA {i} done.");
         }
 
+
         for (int i = 0; i < resultPopulations.Length; i++)
         {
             System.Console.WriteLine($"Best individual for output #{i} (Fitness = {resultPopulations[i].Min(ind => ind.Fitness)}):");
-            System.Console.WriteLine(resultPopulations[i].MinBy(ind => ind.Fitness).GetRepresentation());
+            bestIndividuals[i] = resultPopulations[i].MinBy(ind => ind.Fitness);
+            System.Console.WriteLine(bestIndividuals[i].GetRepresentation());
             System.Console.WriteLine();
         }
+
+        System.Console.WriteLine("Calculating prediction accuracy...");
+
+        int goodPredictionCounter = 0;
+        foreach ((var row_inputs, var row_outputs) in Enumerable.Zip(inputs.IterateRows(), outputs.IterateRows()))
+        {
+            foreach ((var inputNode, var inputValue) in Enumerable.Zip(inputNodes, row_inputs))
+            {
+                inputNode.Update(inputValue);
+            }
+
+            double[] predictions = bestIndividuals.Select(ind => ind.ComputeResult()).ToArray();
+            double bestPrediction = predictions.Max();
+            // choose max as predicted class
+            int[] predictedClass = predictions.Select(pred => pred == bestPrediction ? 1 : 0).ToArray();
+
+            if (Enumerable.Zip(predictedClass, row_outputs).All(tup => tup.First == tup.Second))
+                goodPredictionCounter += 1;
+        }
+        double accuracyScore = (double)goodPredictionCounter / inputs.GetRowsAmount();
+        System.Console.WriteLine($"Accuracy score: {accuracyScore * 100 :.3f}%");
     }
     public static bool CheckArgs(Options args)
     {

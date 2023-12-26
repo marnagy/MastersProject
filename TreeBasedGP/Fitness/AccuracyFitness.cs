@@ -2,11 +2,11 @@ public class AccuracyFitness : Fitness<TreeChromosome>
 {
     private readonly double[,] Inputs;
     private int InputsAmount => this.Inputs.GetRowsAmount();
-    private readonly double[,] Outputs;
+    private readonly int[,] Outputs;
     private readonly int OutputIndex;
     private readonly InputNode[] InputNodes;
     private readonly double Tolerance;
-    public AccuracyFitness(double[,] inputs, double[,] outputs, int outputIndex, InputNode[] inputNodes, double tolerance = 0.1)
+    public AccuracyFitness(double[,] inputs, int[,] outputs, int outputIndex, InputNode[] inputNodes, double tolerance = 0.1)
     {
         this.Inputs = inputs;
         this.Outputs = outputs;
@@ -31,7 +31,7 @@ public class AccuracyFitness : Fitness<TreeChromosome>
             }
 
             double computedResult = ind.ComputeResult();
-            double wantedResult = this.Outputs[rowIndex, this.OutputIndex];
+            int wantedResult = this.Outputs[rowIndex, this.OutputIndex];
 
             if (wantedResult == 0d && computedResult < 0d)
                 computedResult = 0d;

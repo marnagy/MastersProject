@@ -2,12 +2,12 @@ using System.Globalization;
 
 public static class CSVHelper
 {
-    public static (double[,], double[,]) PrepareCSV(
+    public static (double[,], int[,]) PrepareCSV(
             string CSVFilePath, int inputColumnsAmount, char delimiter
         )
     {
         var inputs = new List<double[]>();
-        var outputs = new List<double[]>();
+        var outputs = new List<int[]>();
         using ( var sr = new StreamReader(File.OpenRead(CSVFilePath)))
         {
             string? line;
@@ -36,7 +36,7 @@ public static class CSVHelper
                 );
                 outputs.Add(
                     Enumerable.Range(inputColumnsAmount, linePartsAmount - inputColumnsAmount)
-                        .Select(i => double.TryParse(lineParts[i], out double res)
+                        .Select(i => int.TryParse(lineParts[i], out int res)
                             ? res
                             : throw new Exception($"Invalid CSV format: Expected double, found {lineParts[i]}") )
                         .ToArray()
@@ -51,7 +51,7 @@ public static class CSVHelper
         int inputsLength = inputs[0].Length;
         int outputsLength = outputs[0].Length;
         double[,] inputsArr = new double[inputs.Count, inputsLength];
-        double[,] outputsArr = new double[outputs.Count, outputsLength];
+        int[,] outputsArr = new int[outputs.Count, outputsLength];
 
         // ?: is there a more efficient way?
         for (int row_i = 0; row_i < inputs.Count; row_i++)
