@@ -41,4 +41,44 @@ public class AccuracyFitness : Fitness<TreeChromosome>
 
         return totalDiff;
     }
+
+    public override void ComputeFitnessPopulation(TreeChromosome[] population)
+    {
+        int totalRows = this.Inputs.GetRowsAmount();
+        double[] diffCounters = new double[population.Length];
+        for (int i = 0; i < totalRows; i++)
+        {
+            // update input nodes
+            foreach (
+                (var inputNode, double inputValue)
+                    in Enumerable.Zip(this.InputNodes, this.Inputs.GetRow(i))
+                )
+            {
+                inputNode.Update(inputValue);
+            }
+
+            int wantedResult = this.Outputs[i, this.OutputIndex];
+
+            Enumerable.Range(0, population.Length)
+                .Select(i => (index: i, ind: population[i]))
+                .AsParallel()
+                .Select(tup => (tup.index, computedResult: tup.ind.ComputeResult()))
+                .ForAll(tup => {
+                    if (wantedResult == 0 && tup.computedResult < 0d)
+                        tup.computedResult = 0d;
+                    if (wantedResult == 1 && tup.computedResult > 1d)
+                        tup.computedResult = 1d;
+
+                    double diff = Math.Abs(wantedResult - tup.computedResult);
+
+                    diffCounters[tup.index] += diff;
+                });
+        }
+
+        for (int j = 0; j < population.Length; j++)
+        {
+            diffCounters[j] = diffCounters[j] / totalRows;
+            population[j].Fitness = diffCounters[j];
+        }
+    }
 }

@@ -51,23 +51,24 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
 
 
         var population = Enumerable.Range(0, PopulationSize)
+            .AsParallel()
             .Select(_ => this.createNewInd() )
             .ToArray();
         
         // update Fitness
-        population
-            .ForEach(ind => ind.UpdateFitness(this.fitnessFunction)  );
+        this.fitnessFunction.ComputeFitnessPopulation(population);
 
         for (int genNum = 0; genNum < MaxGenerations; genNum++)
         {
             // select parents
             var parents = Enumerable.Range(0, population.Length / 2)
+                .AsParallel()
                 .Select(_ => this.selectionStrategy.ChooseParents(population))
                 .ToArray();
 
             // crossover
             // TODO: choose only 1 using GA.
-            var next_population = parents
+            var nextPopulation = parents
                 .Select(p => (p, prob: Random.Shared.NextDouble()))
                 .AsParallel()
                 .Select(parents => {
@@ -82,18 +83,18 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
             // mutation
             foreach (var mut in this.mutations)
             {
-                next_population = next_population
+                nextPopulation = nextPopulation
                     .AsParallel()
                     .Select(x => mut.Mutate(x, genNum) )
                     .ToArray();
             }
 
-            // combine populations (elitism, ...)
-            population = populationStrategy.Combine(population, next_population);
-            
             // update Fitness
-            population
-                .ForEach(ind => ind.UpdateFitness(this.fitnessFunction));
+            this.fitnessFunction.ComputeFitnessPopulation(nextPopulation);
+
+            // combine populations (elitism, ...)
+            population = populationStrategy.Combine(population, nextPopulation);
+
             this.callback(genNum, population);
         }
         return population;
