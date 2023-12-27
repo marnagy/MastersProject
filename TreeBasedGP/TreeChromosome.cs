@@ -1,7 +1,7 @@
 public class TreeChromosome : Chromosome<TreeChromosome>
 {
     public readonly TreeNode _rootNode;
-    public readonly int Depth;
+    public readonly int Depth = -1;
     public static int DefaultDepth = 2;
     private readonly int? _seed;
     public readonly IReadOnlyDictionary<TreeNode, double> TerminalNodesProbabilities;

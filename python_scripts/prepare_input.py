@@ -27,7 +27,10 @@ def main() -> None:
     args = get_args()
     print(args)
 
-    df = pd.read_csv(args.filepath, delimiter=args.delimiter, index_col='Id')
+    df = pd.read_csv(args.filepath, delimiter=args.delimiter, index_col=args.index_col)
+
+    last_column_name = df.columns[-1]
+    df[last_column_name] = df[last_column_name].apply(str)
 
     column_index = 0
     last_column_converted_to_columns_amount = 1

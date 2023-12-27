@@ -1,0 +1,1 @@
+call dotnet run --project ./TreeBasedGP -- --input-csv prepared_updated_mnist_train.csv --input-csv-inputs-amount 784 --population-size 50 --max-generations 50 --depth 7
