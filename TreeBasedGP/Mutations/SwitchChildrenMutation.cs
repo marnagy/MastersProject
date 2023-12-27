@@ -30,15 +30,18 @@ public class SwitchChildrenMutation : Mutation<TreeChromosome>
     {
         if (!(Random.Shared.NextDouble() < this.PercentageToChange))
             return origNode.Clone(
-                origNode.Children
+                origNode.Children?
                     .Select(childNode => this.Mutate(childNode, ind, genNum))
                     .ToArray()
             );
         
-        var childrenArr = origNode.Children
+        var childrenArr = origNode.Children?
             .Select(childNode => childNode.Clone())
             .ToArray();
-        Random.Shared.Shuffle(childrenArr);
+
+        if (childrenArr != null)
+            Random.Shared.Shuffle(childrenArr);
+
         return origNode.Clone(
             childrenArr
         );
