@@ -1,23 +1,24 @@
 import pandas as pd
+import numpy as np
+from sklearn.datasets import load_digits
 import os
 
 
 # preparing dataset from https://www.kaggle.com/datasets/oddrationale/mnist-in-csv
 def main() -> None:
-    dir_name = 'MNIST'
-    for file in os.listdir(dir_name):
-        print(f'Processing {file} ...')
-        path = os.path.join(dir_name, file)
-        df = pd.read_csv(path, index_col=None)
-        column_to_move = df.pop('label')
-        df.insert(len(df.columns), 'label', column_to_move)
-        df.to_csv(
-            os.path.join(
-                dir_name,
-                f'updated_{file}'
-            ),
-            index=False
-        )
+    digits = load_digits()
+    df = pd.DataFrame(
+        np.hstack((digits.data, digits.target.reshape(-1, 1))),
+        dtype=np.uint8
+    )
+    # add outputs
+
+    df.to_csv(
+        os.path.join(
+            f'mnist_sklearn.csv'
+        ),
+        index=False
+    )
 
 if __name__ == '__main__':
     main()

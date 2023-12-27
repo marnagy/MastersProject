@@ -67,7 +67,7 @@ class Program
             terminalNodesProbabilities,
             nonTerminalNodesProbabilities
         );
-        var mutation = new ChangeNodeMutation(
+        var mutationChange = new ChangeNodeMutation(
             cliArgs.ChangeNodeMutationProbability,
             percentageToChange: 0.1d,
             terminalNodesProbability=cliArgs.TerminalNodesProbability,
@@ -76,6 +76,11 @@ class Program
             nonTerminalNodesProbabilities,
             nonTerminalNodes: nonTerminalNodesProbabilities.Keys.ToArray()
         );
+        var mutationShuffle = new SwitchChildrenMutation(
+            cliArgs.ChangeNodeMutationProbability,
+            percentageToChange: 0.1d
+        );
+        Mutation<TreeChromosome>[] mutations = [mutationChange, mutationShuffle];
         Func<TreeChromosome> newChromosomeFunc = () => dummyTreeChromosome.Clone(
             rng.NextDouble() < 0.5
                 ? dummyTreeChromosome.CreateNewTreeFull(cliArgs.DefaultTreeDepth)
@@ -96,7 +101,7 @@ class Program
             var treeBasedGA = new GeneticAlgorithm<TreeChromosome>(
                 // ramped half-and-half
                 newChromosomeFunc,
-                [mutation],
+                mutations,
                 [new DummyCrossover()],
                 fitness,
                 new ReversedRouletteWheelSelection<TreeChromosome>(),
@@ -116,7 +121,9 @@ class Program
                 MaxGenerations = cliArgs.MaxGenerations,
                 CrossoverProbability = 0d,
                 PopulationSize = cliArgs.PopulationSize,
-                MutationProbability = cliArgs.MutationProbability
+                MutationProbability = cliArgs.MutationProbability,
+                MinThreads = cliArgs.MinThreads,
+                MaxThreads = cliArgs.MaxThreads
             };
 
             GAs[outputIndex] = treeBasedGA;
