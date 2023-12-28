@@ -51,8 +51,10 @@ class Program
             .Select(i => new ValueNode(-i))
             .ToArray();
         var nonTerminalNodesProbabilities = new Dictionary<TreeNode, double> {
+            {new ConditionNode(baseChildren), 1d},
             {new SumNode(baseChildren), 1d},
             {new ProductNode(baseChildren), 1d},
+            {new PowerNode(baseChildren), 0.5d},
             {new UnaryMinusNode(baseChildren), 1d},
             {new SinNode(baseChildren), 0.5d},
             {new SigmoidNode(baseChildren), 0.2d}
@@ -108,7 +110,7 @@ class Program
                 //new TakeNewCombination(),
                 new ElitismCombination<TreeChromosome>(
                     bestAmount: cliArgs.PopulationSize / 10,
-                    newIndividuals: cliArgs.PopulationSize / 10,
+                    newIndividuals: cliArgs.PopulationSize / 4,
                     fitnessFunc: fitness
                 ),
                 callback: (genNum, population) =>
