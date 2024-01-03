@@ -23,7 +23,7 @@ public class SwitchChildrenMutation : Mutation<TreeChromosome>
             return ind.Clone();
 
         return ind.Clone(
-            this.Mutate(ind._rootNode, ind, genNum)
+            this.Mutate(ind.RootNode, ind, genNum)
         );
     }
     private TreeNode Mutate(TreeNode origNode, TreeChromosome ind, int genNum)

@@ -1,6 +1,6 @@
 public class TreeChromosome : Chromosome<TreeChromosome>
 {
-    public readonly TreeNode _rootNode;
+    public readonly TreeNode RootNode;
     public readonly int Depth = -1;
     public static int DefaultDepth = 2;
     private readonly int? _seed;
@@ -11,13 +11,13 @@ public class TreeChromosome : Chromosome<TreeChromosome>
             IReadOnlyDictionary<TreeNode, double> terminalNodesProbabilities,
             IReadOnlyDictionary<TreeNode, double> nonTerminalNodesProbabilities)
     {
-        this._rootNode = rootNode;
+        this.RootNode = rootNode;
         this.TerminalNodesProbability = terminalNodesProbability;
         this.TerminalNodesProbabilities = terminalNodesProbabilities;
         this.NonTerminalNodesProbabilities = nonTerminalNodesProbabilities;
     }
     public override TreeChromosome Clone()
-    => this.Clone(this._rootNode);
+    => this.Clone(this.RootNode);
     public TreeChromosome Clone(TreeNode rootNode)
     => new TreeChromosome(
         rootNode.Clone(),
@@ -90,9 +90,9 @@ public class TreeChromosome : Chromosome<TreeChromosome>
     /// </summary>
     /// <returns></returns>
     public double ComputeResult()
-    => this._rootNode.Compute();
+    => this.RootNode.Compute();
     public override bool IsValid()
-    => TreeChromosome.IsValid(this._rootNode);
+    => TreeChromosome.IsValid(this.RootNode);
     private static bool IsValid(TreeNode node)
     {
         if (node is ValueNode valNode)
@@ -106,9 +106,9 @@ public class TreeChromosome : Chromosome<TreeChromosome>
                         .All(childNode => TreeChromosome.IsValid(childNode));
     }
     public string GetRepresentation()
-    => this._rootNode.Representation();
+    => this.RootNode.Representation();
     public override string ToString()
     {
-        return $"{this.GetType()}[ {this._rootNode} ]";
+        return $"{this.GetType()}[ {this.RootNode} ]";
     }
 }
