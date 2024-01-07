@@ -1,23 +1,27 @@
-public class ConditionNode: TertiaryNode
+using System.Text;
+
+public class ConditionNode: NodeFunctionality
 {
-    public ConditionNode(TreeNode[]? children): base(children)
+    public ConditionNode(): base(arity: 3) { }
+    public override double Compute(TreeNodeMaster[]? children)
     {
         ArgumentNullException.ThrowIfNull(children);
+
+        return children[0].Compute() > 0d ?
+            children[1].Compute() :
+            children[2].Compute();
     }
 
-    public override TreeNode Clone()
-    => this.Clone(this.Children);
+    public override void GetRepresentation(StringBuilder sb, TreeNodeMaster[]? children)
+    {
+        ArgumentNullException.ThrowIfNull(children);
 
-    public override TreeNode Clone(TreeNode[]? children)
-    => new ConditionNode(children);
-
-    public override double Compute()
-    => this.Children[0].Compute() < 0
-        ? this.Children[1].Compute()
-        : this.Children[2].Compute();
-    public override string ToString()
-    => $"{this.GetType()}[Condition (<0): {this.Children[0]}, TrueBranch: {this.Children[1]}, FalseBranch: {this.Children[2]}]";
-
-    public override string Representation()
-    => $"if ({this.Children[0].Representation()} < 0) then {this.Children[1].Representation()} else {this.Children[2].Representation()}";
+        sb.Append("if (");
+        children[0].GetRepresentation(sb);
+        sb.Append(" > 0) then [");
+        children[1].GetRepresentation(sb);
+        sb.Append("] else [");
+        children[2].GetRepresentation(sb);
+        sb.Append(']');
+    }
 }

@@ -1,18 +1,22 @@
-public class SigmoidNode : UnaryNode
+using System.Text;
+
+public class SigmoidNode : NodeFunctionality
 {
-    public SigmoidNode(TreeNode[]? children): base(children)
+    public SigmoidNode(): base(arity: 1) { }
+
+    public override double Compute(TreeNodeMaster[]? children)
     {
         ArgumentNullException.ThrowIfNull(children);
+
+        return 1 / (1 + Math.Exp(-children[0].Compute()));
     }
-    public override TreeNode Clone()
-    => this.Clone(this.Children);
 
-    public override TreeNode Clone(TreeNode[]? children)
-    => new SinNode(children);
+    public override void GetRepresentation(StringBuilder sb, TreeNodeMaster[]? children)
+    {
+        ArgumentNullException.ThrowIfNull(children);
 
-    public override double Compute()
-    => 1 / (1 + Math.Exp(-this.Children[0].Compute()));
-
-    public override string Representation()
-    => $"sigmoid({this.Children[0].Representation()})";
+        sb.Append("sigmoid(");
+        children[0].GetRepresentation(sb);
+        sb.Append(')');
+    }
 }

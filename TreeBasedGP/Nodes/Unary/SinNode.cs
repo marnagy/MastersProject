@@ -1,18 +1,22 @@
-public class SinNode : UnaryNode
+using System.Text;
+
+public class SinNode : NodeFunctionality
 {
-    public SinNode(TreeNode[]? children): base(children)
+    public SinNode(): base(arity: 1) { }
+
+    public override double Compute(TreeNodeMaster[]? children)
     {
         ArgumentNullException.ThrowIfNull(children);
+
+        return Math.Sin(children[0].Compute());
     }
-    public override TreeNode Clone()
-    => this.Clone(this.Children);
 
-    public override TreeNode Clone(TreeNode[]? children)
-    => new SinNode(children);
+    public override void GetRepresentation(StringBuilder sb, TreeNodeMaster[]? children)
+    {
+        ArgumentNullException.ThrowIfNull(children);
 
-    public override double Compute()
-    => Math.Sin(this.Children[0].Compute());
-
-    public override string Representation()
-    => $"sin({this.Children[0].Representation()})";
+        sb.Append("sin(");
+        children[0].GetRepresentation(sb);
+        sb.Append(')');
+    }
 }

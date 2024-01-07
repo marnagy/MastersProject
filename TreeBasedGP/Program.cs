@@ -29,16 +29,16 @@ class Program
         );
         
         var inputNodes = Enumerable.Range(0, cliArgs.CSVInputsAmount)
-            .Select(index => new InputNode(0, index))
+            .Select(index => new InputFunctionality(index))
             .ToArray();
-        var terminalNodesProbabilities = new Dictionary<TreeNode, double>
+        var terminalNodesProbabilities = new Dictionary<NodeFunctionality, double>
         {
-            { new ValueNode(0), 0.4d }
+            { new ValueFunctionality(0), 0.4d }
         };
         for (int i = 1; i <= 5; i++)
         {
-            terminalNodesProbabilities.Add(new ValueNode(i), 0.4d);
-            terminalNodesProbabilities.Add(new ValueNode(-i), 0.4d);
+            terminalNodesProbabilities.Add(new ValueFunctionality(i), 0.4d);
+            terminalNodesProbabilities.Add(new ValueFunctionality(-i), 0.4d);
         }
             // {new ValueNode(0d), 0.4d},
             // {new ValueNode(1d), 0.4d},
@@ -47,28 +47,30 @@ class Program
         {
             terminalNodesProbabilities.Add(inputNode, 0.2d);
         }
-        TreeNode[] baseChildren = Enumerable.Range(0, TreeNode.ChildrenAmount)
-            .Select(i => new ValueNode(-i))
-            .ToArray();
-        var nonTerminalNodesProbabilities = new Dictionary<TreeNode, double> {
-            {new ConditionNode(baseChildren), 1d},
-            {new SumNode(baseChildren), 1d},
-            {new ProductNode(baseChildren), 1d},
-            {new PowerNode(baseChildren), 0.5d},
-            {new UnaryMinusNode(baseChildren), 1d},
-            {new SinNode(baseChildren), 0.5d},
-            {new SigmoidNode(baseChildren), 0.2d}
+        var nonTerminalNodesProbabilities = new Dictionary<NodeFunctionality, double> {
+            {new ConditionNode(), 0.5d},
+            {new SumNode(), 1d},
+            {new ProductNode(), 1d},
+            {new PowerNode(), 0.1d},
+            {new UnaryMinusNode(), 1d},
+            {new SinNode(), 0.5d},
+            {new SigmoidNode(), 0.2d}
         };
         // rng for creating first population
         var rng = Random.Shared;
         TreeChromosome.DefaultDepth = cliArgs.DefaultTreeDepth;
 
         var dummyTreeChromosome = new TreeChromosome(
-            new ValueNode(5),
+            new TreeNodeMaster(new ValueFunctionality(0d), children: null),
             cliArgs.TerminalNodesProbability,
             terminalNodesProbabilities,
             nonTerminalNodesProbabilities
         );
+        // var secondChromosome = dummyTreeChromosome.Clone();
+
+        // int a = 5;
+
+        // return;
         var mutationChange = new ChangeNodeMutation(
             cliArgs.ChangeNodeMutationProbability,
             percentageToChange: 0.1d,
@@ -78,11 +80,11 @@ class Program
             nonTerminalNodesProbabilities,
             nonTerminalNodes: nonTerminalNodesProbabilities.Keys.ToArray()
         );
-        var mutationShuffle = new SwitchChildrenMutation(
-            cliArgs.ChangeNodeMutationProbability,
-            percentageToChange: 0.1d
-        );
-        Mutation<TreeChromosome>[] mutations = [mutationChange, mutationShuffle];
+        // var mutationShuffle = new SwitchChildrenMutation(
+        //     cliArgs.ChangeNodeMutationProbability,
+        //     percentageToChange: 0.1d
+        // );
+        Mutation<TreeChromosome>[] mutations = [mutationChange]; //, mutationShuffle];
         Func<TreeChromosome> newChromosomeFunc = () => dummyTreeChromosome.Clone(
             rng.NextDouble() < 0.5
                 ? dummyTreeChromosome.CreateNewTreeFull(cliArgs.DefaultTreeDepth)
@@ -104,24 +106,26 @@ class Program
                 // ramped half-and-half
                 newChromosomeFunc,
                 mutations,
-                [new DummyCrossover()],
+                //[new DummyCrossover()],
+                [new SwitchNodesCrossover()],
                 fitness,
                 new ReversedRouletteWheelSelection<TreeChromosome>(),
                 //new TakeNewCombination(),
                 new ElitismCombination<TreeChromosome>(
-                    bestAmount: cliArgs.PopulationSize / 10,
-                    newIndividuals: cliArgs.PopulationSize / 4,
+                    bestAmount: 2,
+                    newIndividuals: cliArgs.PopulationSize / 10,
                     fitnessFunc: fitness
                 ),
                 callback: (genNum, population) =>
                 {
                     System.Console.WriteLine($"Computed {genNum}th generation. " +
-                        $"Lowest Fitness: {population.Select(ind => ind.Fitness).Min()} " +
-                        $"Average Fitness: {population.Select(ind => ind.Fitness).Average()} ");
+                        $"Lowest Fitness: {population.Where(ind => double.IsNormal(ind.Fitness)).Select(ind => ind.Fitness).Min()} " +
+                        $"Average Fitness: {population.Where(ind => double.IsNormal(ind.Fitness)).Select(ind => ind.Fitness).Average()} ");
+                    // System.Console.WriteLine(population.Select(ind => ind.Fitness).Stringify());
                 }
             ){
                 MaxGenerations = cliArgs.MaxGenerations,
-                CrossoverProbability = 0d,
+                CrossoverProbability = 0.8d,
                 PopulationSize = cliArgs.PopulationSize,
                 MutationProbability = cliArgs.MutationProbability,
                 MinThreads = cliArgs.MinThreads,
@@ -137,12 +141,13 @@ class Program
         TreeChromosome[] bestIndividuals = new TreeChromosome[GAs.Length];
         for (int i = 0; i < GAs.Length; i++)
         {
-            System.Console.Error.WriteLine($"Running GA number {i}...");
+            int gaNum = i+1;
+            System.Console.Error.WriteLine($"Running GA number {gaNum}...");
             if (!cliArgs.MultiThreaded)
                 resultPopulations[i] = GAs[i].StartSingleThreaded();
             else
                 resultPopulations[i] = GAs[i].Start();
-            System.Console.Error.WriteLine($"GA {i} done.");
+            System.Console.Error.WriteLine($"GA {gaNum} done.");
         }
 
         System.Console.Error.WriteLine();
@@ -163,7 +168,7 @@ class Program
             var output_row = row_outputs.ToArray();
             foreach ((var inputNode, var inputValue) in Enumerable.Zip(inputNodes, row_inputs))
             {
-                inputNode.Update(inputValue);
+                inputNode.Value = inputValue;
             }
 
             double[] predictions = bestIndividuals.Select(ind => ind.ComputeResult()).ToArray();

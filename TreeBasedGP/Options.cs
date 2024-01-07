@@ -35,7 +35,7 @@ public class Options
     public double TerminalNodesProbability { get; set; }
     [Option("depth", Default = 3, HelpText = "Maximum depth of starting trees.")]
     public int DefaultTreeDepth { get; set; }
-    [Option("change-node-mutation-probability", Default = 0.2d, HelpText = "Probability of using ChangeNodeMutation class.")]
+    [Option("change-node-mutation-probability", Default = 0.1d, HelpText = "Probability of using ChangeNodeMutation class.")]
     public double ChangeNodeMutationProbability { get; set; }
     public override string ToString()
     {

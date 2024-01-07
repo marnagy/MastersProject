@@ -119,6 +119,7 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
             // select parents
             var parents = Enumerable.Range(0, population.Length / 2)
                 .Select(_ => this.selectionStrategy.ChooseParents(population))
+                .Select(par => new Tuple<T, T>(par.Item1.Clone(), par.Item2.Clone()))
                 .ToArray();
 
             // crossover
@@ -129,7 +130,7 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
                     if (parents.prob < this.CrossoverProbability)
                         return this.crossovers[0].Cross(parents.p.Item1, parents.p.Item2);
                     else
-                        return parents.p;
+                        return new Tuple<T, T>(parents.p.Item1, parents.p.Item2);
                 })
                 .SelectMany(tup => new[] {tup.Item1, tup.Item2})
                 .ToArray();
@@ -138,7 +139,7 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
             foreach (var mut in this.mutations)
             {
                 nextPopulation = nextPopulation
-                    .Select(x => mut.Mutate(x, genNum) )
+                    .Select(x => mut.Mutate(x, genNum))
                     .ToArray();
             }
 

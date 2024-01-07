@@ -1,23 +1,22 @@
-public class UnaryMinusNode : UnaryNode
+using System.Text;
+
+public class UnaryMinusNode : NodeFunctionality
 {
-    public UnaryMinusNode(TreeNode[]? children): base(children)
-    {
-        if (children is null)
-            throw new ArgumentNullException($"Argument {nameof(children)} cannot be null for node {this.GetType()}");
-    }
-    public override TreeNode Clone()
-    => new UnaryMinusNode(this.Children);
+    public UnaryMinusNode(): base(arity: 1) { }
 
-    public override TreeNode Clone(TreeNode[]? children)
-    => new UnaryMinusNode(children);
-
-    public override double Compute()
+    public override double Compute(TreeNodeMaster[]? children)
     {
-        if (this.Children is null)
-            throw new ArgumentNullException($"Argument {nameof(this.Children)} cannot be null for node {this.GetType()}");
-        return - this.Children[0].Compute();
+        ArgumentNullException.ThrowIfNull(children);
+
+        return - children[0].Compute();
     }
 
-    public override string Representation()
-    => $"-({this.Children[0].Representation()})";
+    public override void GetRepresentation(StringBuilder sb, TreeNodeMaster[]? children)
+    {
+        ArgumentNullException.ThrowIfNull(children);
+
+        sb.Append("-(");
+        children[0].GetRepresentation(sb);
+        sb.Append(')');
+    }
 }

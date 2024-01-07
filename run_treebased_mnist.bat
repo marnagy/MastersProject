@@ -1,1 +1,1 @@
-call dotnet run --project ./TreeBasedGP -- --multi-threaded --input-csv prepared_mnist_sklearn.csv --input-csv-inputs-amount 64 --population-size 100 --max-generations 500 --depth 12 --min-threads 2 --max-threads 6
+call dotnet run --project ./TreeBasedGP -- --multi-threaded --input-csv prepared_mnist_sklearn.csv --input-csv-inputs-amount 64 --population-size 50 --max-generations 100 --depth 10 --min-threads 4 --max-threads 6

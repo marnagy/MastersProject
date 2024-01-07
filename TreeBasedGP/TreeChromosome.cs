@@ -1,15 +1,17 @@
+using System.Text;
+
 public class TreeChromosome : Chromosome<TreeChromosome>
 {
-    public readonly TreeNode RootNode;
+    public readonly TreeNodeMaster RootNode;
     public readonly int Depth = -1;
     public static int DefaultDepth = 2;
     private readonly int? _seed;
-    public readonly IReadOnlyDictionary<TreeNode, double> TerminalNodesProbabilities;
-    public readonly IReadOnlyDictionary<TreeNode, double> NonTerminalNodesProbabilities;
+    public readonly IReadOnlyDictionary<NodeFunctionality, double> TerminalNodesProbabilities;
+    public readonly IReadOnlyDictionary<NodeFunctionality, double> NonTerminalNodesProbabilities;
     public readonly double TerminalNodesProbability;
-    public TreeChromosome(TreeNode rootNode, double terminalNodesProbability,
-            IReadOnlyDictionary<TreeNode, double> terminalNodesProbabilities,
-            IReadOnlyDictionary<TreeNode, double> nonTerminalNodesProbabilities)
+    public TreeChromosome(TreeNodeMaster rootNode, double terminalNodesProbability,
+            IReadOnlyDictionary<NodeFunctionality, double> terminalNodesProbabilities,
+            IReadOnlyDictionary<NodeFunctionality, double> nonTerminalNodesProbabilities)
     {
         this.RootNode = rootNode;
         this.TerminalNodesProbability = terminalNodesProbability;
@@ -18,7 +20,7 @@ public class TreeChromosome : Chromosome<TreeChromosome>
     }
     public override TreeChromosome Clone()
     => this.Clone(this.RootNode);
-    public TreeChromosome Clone(TreeNode rootNode)
+    public TreeChromosome Clone(TreeNodeMaster rootNode)
     => new TreeChromosome(
         rootNode.Clone(),
         this.TerminalNodesProbability,
@@ -33,56 +35,65 @@ public class TreeChromosome : Chromosome<TreeChromosome>
     => this.Clone(
         this.CreateNewTreeFull(TreeChromosome.DefaultDepth)
     );
-    public TreeNode CreateNewTreeFull(int depth)
+    public TreeNodeMaster CreateNewTreeFull(int depth)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(depth);
 
         if (depth == 1)
-            return Random.Shared.Choose(
-                this.TerminalNodesProbabilities.Keys.ToArray()
-            )
-            .Clone(children: null);
+            return new TreeNodeMaster(
+                Random.Shared.Choose(
+                   this.TerminalNodesProbabilities.Keys.ToArray()
+                ),
+                children: null
+            );
         
         // choose non-terminal node
-        TreeNode[] children = Enumerable.Range(0, TreeNode.ChildrenAmount)
-            .Select(_ => this.CreateNewTreeGrow(depth - 1))
-            .ToArray();
-        return Random.Shared
-            .Choose(this.NonTerminalNodesProbabilities.Keys.ToArray())
-            .Clone(children);
+        return new TreeNodeMaster(
+            Random.Shared
+                .Choose(this.NonTerminalNodesProbabilities.Keys.ToArray()),
+            children: Enumerable.Range(0, TreeNodeMaster.ChildrenAmount)
+                .Select(_ => this.CreateNewTreeGrow(depth - 1))
+                .ToArray()
+        );
     }
     /// <summary>
     /// Recursive function that creates tertiary tree with max depth of argument depth.
     /// </summary>
     /// <param name="depth">Maximum depth of Tree. <b>Root node is considered a layer 1.</b></param>
     /// <returns></returns>
-    public TreeNode CreateNewTreeGrow(int depth)
+    public TreeNodeMaster CreateNewTreeGrow(int depth)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(depth);
 
         if (depth == 1)
-            return Random.Shared.Choose(
-                    this.TerminalNodesProbabilities.Keys.ToArray()
-            )
-            .Clone(children: null);
+            return new TreeNodeMaster(
+                Random.Shared.Choose(
+                   this.TerminalNodesProbabilities.Keys.ToArray()
+                ),
+                children: null
+            );
 
         // else
         if (Random.Shared.NextDouble() < this.TerminalNodesProbability)
         {
             // choose a terminal node
-            return Random.Shared
-                .Choose(this.TerminalNodesProbabilities.Keys.ToArray())
-                .Clone(children: null);
+            return new TreeNodeMaster(
+                Random.Shared.Choose(
+                   this.TerminalNodesProbabilities.Keys.ToArray()
+                ),
+                children: null
+            );
         }
         else
         {
             // choose non-terminal node
-            TreeNode[] children = Enumerable.Range(0, TreeNode.ChildrenAmount)
-                .Select(_ => this.CreateNewTreeGrow(depth - 1))
-                .ToArray();
-            return Random.Shared
-                .Choose(this.NonTerminalNodesProbabilities.Keys.ToArray())
-                .Clone(children);
+            return new TreeNodeMaster(
+                Random.Shared
+                    .Choose(this.NonTerminalNodesProbabilities.Keys.ToArray()),
+                children: Enumerable.Range(0, TreeNodeMaster.ChildrenAmount)
+                    .Select(_ => this.CreateNewTreeGrow(depth - 1))
+                    .ToArray()
+            );
         }
     }
     /// <summary>
@@ -93,20 +104,24 @@ public class TreeChromosome : Chromosome<TreeChromosome>
     => this.RootNode.Compute();
     public override bool IsValid()
     => TreeChromosome.IsValid(this.RootNode);
-    private static bool IsValid(TreeNode node)
+    private static bool IsValid(TreeNodeMaster node)
     {
-        if (node is ValueNode valNode)
+        if (node.Functionality is ValueFunctionality)
         {
             return !node.HasChildren;
         }
-        else
-            return
-                node.HasChildren &&
-                    node.Children
-                        .All(childNode => TreeChromosome.IsValid(childNode));
+
+        return
+            node.HasChildren &&
+                node.Children
+                    .All(childNode => TreeChromosome.IsValid(childNode));
     }
     public string GetRepresentation()
-    => this.RootNode.Representation();
+    {
+        var sb = new StringBuilder();
+        this.RootNode.GetRepresentation(sb);
+        return sb.ToString();
+    }
     public override string ToString()
     {
         return $"{this.GetType()}[ {this.RootNode} ]";

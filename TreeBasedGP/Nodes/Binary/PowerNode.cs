@@ -1,19 +1,26 @@
-public class PowerNode : BinaryNode
+using System.Text;
+
+public class PowerNode : NodeFunctionality
 {
-    public PowerNode(TreeNode[]? children): base(children) { }
-    public override TreeNode Clone()
-    => new PowerNode(this.Children);
-
-    public override TreeNode Clone(TreeNode[]? children)
-    => new PowerNode(children);
-
-    public override double Compute()
+    public PowerNode(): base(arity: 2) { }
+    public override double Compute(TreeNodeMaster[]? children)
     {
-        if (this.Children is null)
-            throw new ArgumentNullException($"Argument {nameof(this.Children)} cannot be null for node {this.GetType()}");
-        return Math.Pow(this.Children[0].Compute(), this.Children[1].Compute());
+        ArgumentNullException.ThrowIfNull(children);
+
+        var res1 = children[0].Compute();
+        var res2 = children[1].Compute();
+
+        return Math.Pow(res1, res2);
     }
 
-    public override string Representation()
-    => $"(({this.Children[0].Representation()})**({this.Children[1].Representation()}))";
+    public override void GetRepresentation(StringBuilder sb, TreeNodeMaster[]? children)
+    {
+        ArgumentNullException.ThrowIfNull(children);
+
+        sb.Append('(');
+        children[0].GetRepresentation(sb);
+        sb.Append(")^(");
+        children[1].GetRepresentation(sb);
+        sb.Append(')');
+    }
 }

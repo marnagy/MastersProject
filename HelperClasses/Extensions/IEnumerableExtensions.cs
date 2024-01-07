@@ -1,8 +1,8 @@
 using System.Text;
 
-public static class IListExtensions
+public static class IEnumerableExtensions
 {
-    public static string Stringify<T>(this IList<T> arr)
+    public static string Stringify<T>(this IEnumerable<T> arr)
     {
         var sb = new StringBuilder();
         sb.Append('[');

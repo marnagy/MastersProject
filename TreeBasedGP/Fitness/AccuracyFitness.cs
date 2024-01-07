@@ -4,8 +4,8 @@ public class AccuracyFitness : Fitness<TreeChromosome>
     private int InputsAmount => this.Inputs.GetRowsAmount();
     private readonly int[,] Outputs;
     private readonly int OutputIndex;
-    private readonly InputNode[] InputNodes;
-    public AccuracyFitness(double[,] inputs, int[,] outputs, int outputIndex, InputNode[] inputNodes)
+    private readonly InputFunctionality[] InputNodes;
+    public AccuracyFitness(double[,] inputs, int[,] outputs, int outputIndex, InputFunctionality[] inputNodes)
     {
         this.Inputs = inputs;
         this.Outputs = outputs;
@@ -20,15 +20,15 @@ public class AccuracyFitness : Fitness<TreeChromosome>
             // set input nodes to values from row
             // fitness is calculated in single thread sequentially - so don't fear changing InputNodes
             foreach (
-                (InputNode node, double newValue)
+                (InputFunctionality node, double newValue)
                     in Enumerable.Zip(this.InputNodes, this.Inputs.GetRow(rowIndex))
                 )
             {
-                // TODO: check
-                node.Update(newValue);
+                node.Value = newValue;
             }
 
             double computedResult = ind.ComputeResult();
+            // System.Console.Error.WriteLine($"Computed result: {computedResult}");
             int wantedResult = this.Outputs[rowIndex, this.OutputIndex];
 
             if (wantedResult == 0 && computedResult < 0d)
@@ -38,6 +38,9 @@ public class AccuracyFitness : Fitness<TreeChromosome>
 
             totalDiff += Math.Abs(wantedResult - computedResult);
         }
+
+        if (double.IsNaN(totalDiff))
+            totalDiff = double.PositiveInfinity;
 
         return totalDiff;
     }
@@ -50,11 +53,11 @@ public class AccuracyFitness : Fitness<TreeChromosome>
         {
             // update input nodes
             foreach (
-                (var inputNode, double inputValue)
+                (InputFunctionality inputNode, double inputValue)
                     in Enumerable.Zip(this.InputNodes, this.Inputs.GetRow(i))
                 )
             {
-                inputNode.Update(inputValue);
+                inputNode.Value = inputValue;
             }
 
             int wantedResult = this.Outputs[i, this.OutputIndex];
@@ -78,6 +81,10 @@ public class AccuracyFitness : Fitness<TreeChromosome>
         for (int j = 0; j < population.Length; j++)
         {
             diffCounters[j] = diffCounters[j] / totalRows;
+
+            if (double.IsNaN(diffCounters[j]))
+                diffCounters[j] = double.PositiveInfinity;
+
             population[j].Fitness = diffCounters[j];
         }
     }
