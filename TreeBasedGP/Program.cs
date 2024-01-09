@@ -106,8 +106,8 @@ class Program
                 // ramped half-and-half
                 newChromosomeFunc,
                 mutations,
-                //[new DummyCrossover()],
-                [new SwitchNodesCrossover()],
+                [new DummyCrossover()],
+                //[new SwitchNodesCrossover()],
                 fitness,
                 new ReversedRouletteWheelSelection<TreeChromosome>(),
                 //new TakeNewCombination(),

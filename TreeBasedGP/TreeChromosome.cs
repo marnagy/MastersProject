@@ -17,6 +17,7 @@ public class TreeChromosome : Chromosome<TreeChromosome>
         this.TerminalNodesProbability = terminalNodesProbability;
         this.TerminalNodesProbabilities = terminalNodesProbabilities;
         this.NonTerminalNodesProbabilities = nonTerminalNodesProbabilities;
+        this.Fitness = -1d;
     }
     public override TreeChromosome Clone()
     => this.Clone(this.RootNode);

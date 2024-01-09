@@ -14,6 +14,10 @@ public class AccuracyFitness : Fitness<TreeChromosome>
     }
     public override double ComputeFitness(TreeChromosome ind)
     {
+        // don't compute fitness again
+        if (ind.Fitness != -1d)
+            return ind.Fitness;
+
         double totalDiff = 0d;
         for (int rowIndex = 0; rowIndex < this.Inputs.GetRowsAmount(); rowIndex++)
         {
@@ -64,6 +68,8 @@ public class AccuracyFitness : Fitness<TreeChromosome>
 
             Enumerable.Range(0, population.Length)
                 .Select(i => (index: i, ind: population[i]))
+                // don't compute fitness again
+                .Where(tup => tup.ind.Fitness != -1d)
                 .AsParallel()
                 .Select(tup => (tup.index, computedResult: tup.ind.ComputeResult()))
                 .ForAll(tup => {
@@ -84,6 +90,9 @@ public class AccuracyFitness : Fitness<TreeChromosome>
 
             if (double.IsNaN(diffCounters[j]))
                 diffCounters[j] = double.PositiveInfinity;
+
+            if (population[j].Fitness == -1d)
+                continue;
 
             population[j].Fitness = diffCounters[j];
         }
