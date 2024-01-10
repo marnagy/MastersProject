@@ -3,6 +3,7 @@ using System.Text;
 public class TreeChromosome : Chromosome<TreeChromosome>
 {
     public readonly TreeNodeMaster RootNode;
+    public const double DefaultFitness = -1d;
     public readonly int Depth = -1;
     public static int DefaultDepth = 2;
     private readonly int? _seed;
@@ -17,7 +18,7 @@ public class TreeChromosome : Chromosome<TreeChromosome>
         this.TerminalNodesProbability = terminalNodesProbability;
         this.TerminalNodesProbabilities = terminalNodesProbabilities;
         this.NonTerminalNodesProbabilities = nonTerminalNodesProbabilities;
-        this.Fitness = -1d;
+        this.Fitness = TreeChromosome.DefaultFitness;
     }
     public override TreeChromosome Clone()
     => this.Clone(this.RootNode);

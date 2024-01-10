@@ -9,7 +9,7 @@ public class InputFunctionality: ValueFunctionality
     }
     public override void GetRepresentation(StringBuilder sb, TreeNodeMaster[]? children)
     {
-        sb.Append($"x_{this}");
+        sb.Append($"x_{this.InputIndex}");
     }
     public override string ToString()
     => $"InputNode(Index:{this.InputIndex})";

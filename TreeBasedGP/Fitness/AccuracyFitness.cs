@@ -69,7 +69,7 @@ public class AccuracyFitness : Fitness<TreeChromosome>
             Enumerable.Range(0, population.Length)
                 .Select(i => (index: i, ind: population[i]))
                 // don't compute fitness again
-                .Where(tup => tup.ind.Fitness != -1d)
+                .Where(tup => tup.ind.Fitness != TreeChromosome.DefaultFitness)
                 .AsParallel()
                 .Select(tup => (tup.index, computedResult: tup.ind.ComputeResult()))
                 .ForAll(tup => {

@@ -37,24 +37,24 @@ class Program
         };
         for (int i = 1; i <= 5; i++)
         {
-            terminalNodesProbabilities.Add(new ValueFunctionality(i), 0.4d);
-            terminalNodesProbabilities.Add(new ValueFunctionality(-i), 0.4d);
+            terminalNodesProbabilities.Add(new ValueFunctionality(i), 1d);
+            terminalNodesProbabilities.Add(new ValueFunctionality(-i), 1d);
         }
             // {new ValueNode(0d), 0.4d},
             // {new ValueNode(1d), 0.4d},
             // {new ValueNode(2d), 0.4d}
         foreach (var inputNode in inputNodes)
         {
-            terminalNodesProbabilities.Add(inputNode, 0.2d);
+            terminalNodesProbabilities.Add(inputNode, 0.5d);
         }
         var nonTerminalNodesProbabilities = new Dictionary<NodeFunctionality, double> {
-            {new ConditionNode(), 0.5d},
+            {new ConditionNode(), 0.2d},
             {new SumNode(), 1d},
             {new ProductNode(), 1d},
-            {new PowerNode(), 0.1d},
+            // {new PowerNode(), 0.1d},
             {new UnaryMinusNode(), 1d},
             {new SinNode(), 0.5d},
-            {new SigmoidNode(), 0.2d}
+            // {new SigmoidNode(), 0.2d}
         };
         // rng for creating first population
         var rng = Random.Shared;
@@ -73,7 +73,7 @@ class Program
         // return;
         var mutationChange = new ChangeNodeMutation(
             cliArgs.ChangeNodeMutationProbability,
-            percentageToChange: 0.1d,
+            percentageToChange: 0.2d,
             terminalNodesProbability=cliArgs.TerminalNodesProbability,
             terminalNodesProbabilities,
             terminalNodes: terminalNodesProbabilities.Keys.ToArray(),
@@ -92,6 +92,7 @@ class Program
         );
 
         var outputsAmount = outputs.GetColumnsAmount();
+        double previousMinFitness = -1d;
         var GAs = new GeneticAlgorithm<TreeChromosome>[outputsAmount];
         // TODO: create GA for each of the output columns (expecting one-hot encoding)
         for (int outputIndex = 0; outputIndex < outputsAmount; outputIndex++)
@@ -112,15 +113,29 @@ class Program
                 new ReversedRouletteWheelSelection<TreeChromosome>(),
                 //new TakeNewCombination(),
                 new ElitismCombination<TreeChromosome>(
-                    bestAmount: 2,
+                    bestAmount: 1,
                     newIndividuals: cliArgs.PopulationSize / 10,
                     fitnessFunc: fitness
                 ),
                 callback: (genNum, population) =>
                 {
+                    var currentMinFitness = population
+                        // .Where(ind => double.IsNormal(ind.Fitness))
+                        .Select(ind => ind.Fitness)
+                        .Min();
+                    var currentAvgFitness = population
+                        // .Where(ind => double.IsNormal(ind.Fitness))
+                        .Select(ind => ind.Fitness)
+                        .Average();
+
+                    if (currentMinFitness > previousMinFitness)
+                        throw new Exception("Weird elitism...");
+                    
+                    previousMinFitness = currentMinFitness;
+
                     System.Console.WriteLine($"Computed {genNum}th generation. " +
-                        $"Lowest Fitness: {population.Where(ind => double.IsNormal(ind.Fitness)).Select(ind => ind.Fitness).Min()} " +
-                        $"Average Fitness: {population.Where(ind => double.IsNormal(ind.Fitness)).Select(ind => ind.Fitness).Average()} ");
+                        $"Lowest Fitness: {currentMinFitness} " +
+                        $"Average Fitness: {currentAvgFitness} ");
                     // System.Console.WriteLine(population.Select(ind => ind.Fitness).Stringify());
                 }
             ){
