@@ -90,9 +90,10 @@ class Program
                 ? dummyTreeChromosome.CreateNewTreeFull(cliArgs.DefaultTreeDepth)
                 : dummyTreeChromosome.CreateNewTreeGrow(cliArgs.DefaultTreeDepth)
         );
+        Crossover<TreeChromosome>[] crossovers = [new DummyCrossover()];
 
         var outputsAmount = outputs.GetColumnsAmount();
-        double previousMinFitness = -1d;
+        double previousMinFitness = double.PositiveInfinity;
         var GAs = new GeneticAlgorithm<TreeChromosome>[outputsAmount];
         // TODO: create GA for each of the output columns (expecting one-hot encoding)
         for (int outputIndex = 0; outputIndex < outputsAmount; outputIndex++)
@@ -107,7 +108,7 @@ class Program
                 // ramped half-and-half
                 newChromosomeFunc,
                 mutations,
-                [new DummyCrossover()],
+                crossovers,
                 //[new SwitchNodesCrossover()],
                 fitness,
                 new ReversedRouletteWheelSelection<TreeChromosome>(),
@@ -158,11 +159,13 @@ class Program
         {
             int gaNum = i+1;
             System.Console.Error.WriteLine($"Running GA number {gaNum}...");
+            previousMinFitness = double.PositiveInfinity;
             if (!cliArgs.MultiThreaded)
                 resultPopulations[i] = GAs[i].StartSingleThreaded();
             else
                 resultPopulations[i] = GAs[i].Start();
             System.Console.Error.WriteLine($"GA {gaNum} done.");
+
         }
 
         System.Console.Error.WriteLine();

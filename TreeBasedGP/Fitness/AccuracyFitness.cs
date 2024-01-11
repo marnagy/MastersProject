@@ -15,7 +15,7 @@ public class AccuracyFitness : Fitness<TreeChromosome>
     public override double ComputeFitness(TreeChromosome ind)
     {
         // don't compute fitness again
-        if (ind.Fitness != -1d)
+        if (ind.Fitness != TreeChromosome.DefaultFitness)
             return ind.Fitness;
 
         double totalDiff = 0d;
