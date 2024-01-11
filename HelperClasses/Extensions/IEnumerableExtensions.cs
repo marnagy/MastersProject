@@ -10,4 +10,11 @@ public static class IEnumerableExtensions
         sb.Append(']');
         return sb.ToString();
     }
+    public static void ForEach<T>(this IEnumerable<T> arr, Action<T> action)
+    {
+        foreach (var item in arr)
+        {
+            action(item);
+        }
+    }
 }

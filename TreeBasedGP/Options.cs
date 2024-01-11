@@ -31,7 +31,7 @@ public class Options
     public int RepeatAmount { get; set; }
 
     // specific for TreeBasedGP
-    [Option("terminal-nodes-probability", Default = 0.2d, HelpText = "Probability of choosing from terminal nodes instead of non-terminal nodes.")]
+    [Option("terminal-nodes-probability", Default = 0.1d, HelpText = "Probability of choosing from terminal nodes instead of non-terminal nodes.")]
     public double TerminalNodesProbability { get; set; }
     [Option("depth", Default = 3, HelpText = "Maximum depth of starting trees.")]
     public int DefaultTreeDepth { get; set; }

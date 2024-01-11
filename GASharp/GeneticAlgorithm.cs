@@ -52,7 +52,7 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
 
         var population = Enumerable.Range(0, PopulationSize)
             .AsParallel()
-            .Select(_ => this.createNewInd() )
+            .Select(_ => this.createNewInd())
             .ToArray();
         
         // update Fitness
@@ -102,13 +102,8 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
     public T[] StartSingleThreaded()
     {
         var population = Enumerable.Range(0, PopulationSize)
-            .Select(_ => this.createNewInd() )
+            .Select(_ => this.createNewInd())
             .ToArray();
-        
-        // foreach (var ind in population)
-        // {
-        //     System.Console.Error.WriteLine($"Is initial individual valid? {ind.IsValid()}");
-        // }
         
         // update Fitness
         population

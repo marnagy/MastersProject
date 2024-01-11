@@ -33,28 +33,25 @@ class Program
             .ToArray();
         var terminalNodesProbabilities = new Dictionary<NodeFunctionality, double>
         {
-            { new ValueFunctionality(0), 0.4d }
+            {new ValueFunctionality(0d), 0.4d}
         };
         for (int i = 1; i <= 5; i++)
         {
-            terminalNodesProbabilities.Add(new ValueFunctionality(i), 1d);
-            terminalNodesProbabilities.Add(new ValueFunctionality(-i), 1d);
+            terminalNodesProbabilities.Add(new ValueFunctionality(i), 0.5d);
+            terminalNodesProbabilities.Add(new ValueFunctionality(-i), 0.5d);
         }
-            // {new ValueNode(0d), 0.4d},
-            // {new ValueNode(1d), 0.4d},
-            // {new ValueNode(2d), 0.4d}
         foreach (var inputNode in inputNodes)
         {
-            terminalNodesProbabilities.Add(inputNode, 0.5d);
+            terminalNodesProbabilities.Add(inputNode, 1d);
         }
         var nonTerminalNodesProbabilities = new Dictionary<NodeFunctionality, double> {
-            {new ConditionNode(), 0.2d},
+            {new ConditionNode(), 0.5d},
             {new SumNode(), 1d},
             {new ProductNode(), 1d},
-            // {new PowerNode(), 0.1d},
+            {new PowerNode(), 0.1d},
             {new UnaryMinusNode(), 1d},
             {new SinNode(), 0.5d},
-            // {new SigmoidNode(), 0.2d}
+            {new SigmoidNode(), 0.2d}
         };
         // rng for creating first population
         var rng = Random.Shared;
@@ -80,17 +77,20 @@ class Program
             nonTerminalNodesProbabilities,
             nonTerminalNodes: nonTerminalNodesProbabilities.Keys.ToArray()
         );
-        // var mutationShuffle = new SwitchChildrenMutation(
-        //     cliArgs.ChangeNodeMutationProbability,
-        //     percentageToChange: 0.1d
-        // );
-        Mutation<TreeChromosome>[] mutations = [mutationChange]; //, mutationShuffle];
+        var mutationShuffle = new SwitchChildrenMutation(
+            cliArgs.ChangeNodeMutationProbability,
+            percentageToChange: 0.1d
+        );
+        Mutation<TreeChromosome>[] mutations = [
+            //mutationChange,
+            mutationShuffle,
+        ]; //, ];
         Func<TreeChromosome> newChromosomeFunc = () => dummyTreeChromosome.Clone(
             rng.NextDouble() < 0.5
                 ? dummyTreeChromosome.CreateNewTreeFull(cliArgs.DefaultTreeDepth)
                 : dummyTreeChromosome.CreateNewTreeGrow(cliArgs.DefaultTreeDepth)
         );
-        Crossover<TreeChromosome>[] crossovers = [new DummyCrossover()];
+        Crossover<TreeChromosome>[] crossovers = [new SwitchNodesCrossover()];
 
         var outputsAmount = outputs.GetColumnsAmount();
         double previousMinFitness = double.PositiveInfinity;
@@ -109,14 +109,16 @@ class Program
                 newChromosomeFunc,
                 mutations,
                 crossovers,
-                //[new SwitchNodesCrossover()],
                 fitness,
                 new ReversedRouletteWheelSelection<TreeChromosome>(),
-                //new TakeNewCombination(),
+                // new TakeNewCombination(),
                 new ElitismCombination<TreeChromosome>(
-                    bestAmount: 1,
+                    bestAmount: 10,
                     newIndividuals: cliArgs.PopulationSize / 10,
-                    fitnessFunc: fitness
+                    fitnessFunc: fitness,
+                    createNewChrom: () => dummyTreeChromosome.Clone(
+                        dummyTreeChromosome.CreateNewTreeFull(cliArgs.DefaultTreeDepth)
+                    )
                 ),
                 callback: (genNum, population) =>
                 {
@@ -125,7 +127,8 @@ class Program
                         .Select(ind => ind.Fitness)
                         .Min();
                     var currentAvgFitness = population
-                        // .Where(ind => double.IsNormal(ind.Fitness))
+                        // fitness can be +inf
+                        .Where(ind => double.IsNormal(ind.Fitness))
                         .Select(ind => ind.Fitness)
                         .Average();
 
@@ -136,12 +139,13 @@ class Program
 
                     System.Console.WriteLine($"Computed {genNum}th generation. " +
                         $"Lowest Fitness: {currentMinFitness} " +
-                        $"Average Fitness: {currentAvgFitness} ");
+                        $"Average Fitness: {currentAvgFitness} " +
+                        $"Average depth: {population.Select(ind => ind.GetDepth()).Average()}");
                     // System.Console.WriteLine(population.Select(ind => ind.Fitness).Stringify());
                 }
             ){
                 MaxGenerations = cliArgs.MaxGenerations,
-                CrossoverProbability = 0.8d,
+                CrossoverProbability = 0.5d,
                 PopulationSize = cliArgs.PopulationSize,
                 MutationProbability = cliArgs.MutationProbability,
                 MinThreads = cliArgs.MinThreads,
@@ -160,10 +164,10 @@ class Program
             int gaNum = i+1;
             System.Console.Error.WriteLine($"Running GA number {gaNum}...");
             previousMinFitness = double.PositiveInfinity;
-            if (!cliArgs.MultiThreaded)
-                resultPopulations[i] = GAs[i].StartSingleThreaded();
-            else
+            if (cliArgs.MultiThreaded)
                 resultPopulations[i] = GAs[i].Start();
+            else
+                resultPopulations[i] = GAs[i].StartSingleThreaded();
             System.Console.Error.WriteLine($"GA {gaNum} done.");
 
         }

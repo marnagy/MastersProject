@@ -35,10 +35,10 @@ public class AccuracyFitness : Fitness<TreeChromosome>
             // System.Console.Error.WriteLine($"Computed result: {computedResult}");
             int wantedResult = this.Outputs[rowIndex, this.OutputIndex];
 
-            if (wantedResult == 0 && computedResult < 0d)
-                computedResult = 0d;
-            if (wantedResult == 1 && computedResult > 1d)
-                computedResult = 1d;
+            // if (wantedResult == 0 && computedResult < 0d)
+            //     computedResult = 0d;
+            // if (wantedResult == 1 && computedResult > 1d)
+            //     computedResult = 1d;
 
             totalDiff += Math.Abs(wantedResult - computedResult);
         }
@@ -69,16 +69,17 @@ public class AccuracyFitness : Fitness<TreeChromosome>
             Enumerable.Range(0, population.Length)
                 .Select(i => (index: i, ind: population[i]))
                 // don't compute fitness again
-                .Where(tup => tup.ind.Fitness != TreeChromosome.DefaultFitness)
+                .Where(tup => tup.ind.Fitness == TreeChromosome.DefaultFitness)
                 .AsParallel()
                 .Select(tup => (tup.index, computedResult: tup.ind.ComputeResult()))
-                .ForAll(tup => {
-                    if (wantedResult == 0 && tup.computedResult < 0d)
-                        tup.computedResult = 0d;
-                    if (wantedResult == 1 && tup.computedResult > 1d)
-                        tup.computedResult = 1d;
+                .ForEach(tup => {
+                    double computedResult = tup.computedResult;
+                    // if (wantedResult == 0 && tup.computedResult < 0d)
+                    //         computedResult = 0d;
+                    // if (wantedResult == 1 && tup.computedResult > 1d)
+                    //     computedResult = 1d;
 
-                    double diff = Math.Abs(wantedResult - tup.computedResult);
+                    double diff = Math.Abs(wantedResult - computedResult);
 
                     diffCounters[tup.index] += diff;
                 });
@@ -90,9 +91,6 @@ public class AccuracyFitness : Fitness<TreeChromosome>
 
             if (double.IsNaN(diffCounters[j]))
                 diffCounters[j] = double.PositiveInfinity;
-
-            if (population[j].Fitness == -1d)
-                continue;
 
             population[j].Fitness = diffCounters[j];
         }

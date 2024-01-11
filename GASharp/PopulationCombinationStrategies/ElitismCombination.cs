@@ -3,11 +3,13 @@ public class ElitismCombination<T> : PopulationCombinationStrategy<T> where T: C
     private int BestAmount;
     private int NewIndividuals;
     private Fitness<T> Fitness;
-    public ElitismCombination(int bestAmount, int newIndividuals, Fitness<T> fitnessFunc)
+    private Func<T> CreateNewChromosome;
+    public ElitismCombination(int bestAmount, int newIndividuals, Fitness<T> fitnessFunc, Func<T> createNewChrom)
     {
         this.BestAmount = bestAmount;
         this.NewIndividuals = newIndividuals;
         this.Fitness = fitnessFunc;
+        this.CreateNewChromosome = createNewChrom;
     }
     public override T[] Combine(T[] oldPopulation, T[] newPopulation)
     {
@@ -27,7 +29,7 @@ public class ElitismCombination<T> : PopulationCombinationStrategy<T> where T: C
         int newIndividualsStartIndex = newPopulation.Length - this.NewIndividuals;
         for (int i = 0; i < this.NewIndividuals; i++)
         {
-            result[newIndividualsStartIndex + i] = newPopulation[0].CreateNew();
+            result[newIndividualsStartIndex + i] = this.CreateNewChromosome();
             result[newIndividualsStartIndex + i].UpdateFitness(this.Fitness);
         }
 

@@ -4,8 +4,7 @@ public class TreeChromosome : Chromosome<TreeChromosome>
 {
     public readonly TreeNodeMaster RootNode;
     public const double DefaultFitness = -1d;
-    public readonly int Depth = -1;
-    public static int DefaultDepth = 2;
+    public static int DefaultDepth = 4;
     private readonly int? _seed;
     public readonly IReadOnlyDictionary<NodeFunctionality, double> TerminalNodesProbabilities;
     public readonly IReadOnlyDictionary<NodeFunctionality, double> NonTerminalNodesProbabilities;
@@ -104,6 +103,17 @@ public class TreeChromosome : Chromosome<TreeChromosome>
     /// <returns></returns>
     public double ComputeResult()
     => this.RootNode.Compute();
+    public int GetDepth()
+    => this.GetDepth(this.RootNode);
+    public int GetDepth(TreeNodeMaster node)
+    {
+        if (node.Functionality.Arity == 0)
+            return 1;
+        
+        return 1 + node.Children[..node.Functionality.Arity]
+            .Select(childNode => this.GetDepth(childNode))
+            .Max();
+    }
     public override bool IsValid()
     => TreeChromosome.IsValid(this.RootNode);
     private static bool IsValid(TreeNodeMaster node)

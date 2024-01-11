@@ -1,1 +1,1 @@
-call dotnet run --project ./TreeBasedGP -- --input-csv prepared_Iris.csv --input-csv-inputs-amount 4 --population-size 100 --max-generations 500 --depth 5 --mutation-probability 0.2 --change-node-mutation-probability 0.2
+call dotnet run --project ./TreeBasedGP -- --input-csv prepared_Iris.csv --input-csv-inputs-amount 4 --population-size 100 --max-generations 500 --depth 5
