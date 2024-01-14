@@ -1,9 +1,9 @@
 public class AccuracyFitness : Fitness<TreeChromosome>
 {
     private readonly double[,] Inputs;
-    private int InputsAmount => this.Inputs.GetRowsAmount();
     private readonly int[,] Outputs;
     private readonly int OutputIndex;
+    private bool UseClip = true;
     private readonly InputFunctionality[] InputNodes;
     public AccuracyFitness(double[,] inputs, int[,] outputs, int outputIndex, InputFunctionality[] inputNodes)
     {
@@ -12,6 +12,8 @@ public class AccuracyFitness : Fitness<TreeChromosome>
         this.OutputIndex = outputIndex;
         this.InputNodes = inputNodes;
     }
+    private double MagicNormalizationCoefficient(TreeChromosome ind)
+    => 1d/Math.Pow(2, ind.GetDepth());
     public override double ComputeFitness(TreeChromosome ind)
     {
         // don't compute fitness again
@@ -34,19 +36,22 @@ public class AccuracyFitness : Fitness<TreeChromosome>
             double computedResult = ind.ComputeResult();
             // System.Console.Error.WriteLine($"Computed result: {computedResult}");
             int wantedResult = this.Outputs[rowIndex, this.OutputIndex];
-
-            // if (wantedResult == 0 && computedResult < 0d)
-            //     computedResult = 0d;
-            // if (wantedResult == 1 && computedResult > 1d)
-            //     computedResult = 1d;
+            
+            if (this.UseClip)
+            {
+                if (wantedResult == 0 && computedResult < 0d)
+                    computedResult = 0d;
+                if (wantedResult == 1 && computedResult > 1d)
+                    computedResult = 1d;
+            }
 
             totalDiff += Math.Abs(wantedResult - computedResult);
         }
 
-        if (double.IsNaN(totalDiff))
-            totalDiff = double.PositiveInfinity;
+        if (double.IsNaN(totalDiff) || !this.HasInputNode(ind))
+            return double.PositiveInfinity;
 
-        return totalDiff;
+        return totalDiff * this.MagicNormalizationCoefficient(ind) / this.CountInputNodes(ind);
     }
 
     public override void ComputeFitnessPopulation(TreeChromosome[] population)
@@ -74,10 +79,14 @@ public class AccuracyFitness : Fitness<TreeChromosome>
                 .Select(tup => (tup.index, computedResult: tup.ind.ComputeResult()))
                 .ForEach(tup => {
                     double computedResult = tup.computedResult;
-                    // if (wantedResult == 0 && tup.computedResult < 0d)
-                    //         computedResult = 0d;
-                    // if (wantedResult == 1 && tup.computedResult > 1d)
-                    //     computedResult = 1d;
+
+                    if (this.UseClip)
+                    {
+                        if (wantedResult == 0 && tup.computedResult < 0d)
+                                computedResult = 0d;
+                        if (wantedResult == 1 && tup.computedResult > 1d)
+                            computedResult = 1d;
+                    }
 
                     double diff = Math.Abs(wantedResult - computedResult);
 
@@ -89,10 +98,37 @@ public class AccuracyFitness : Fitness<TreeChromosome>
         {
             diffCounters[j] = diffCounters[j] / totalRows;
 
-            if (double.IsNaN(diffCounters[j]))
-                diffCounters[j] = double.PositiveInfinity;
-
-            population[j].Fitness = diffCounters[j];
+            if (double.IsNaN(diffCounters[j]) || !this.HasInputNode(population[j]))
+                population[j].Fitness = double.PositiveInfinity;
+            else
+                population[j].Fitness = diffCounters[j] * this.MagicNormalizationCoefficient(population[j]) / this.CountInputNodes(population[j]); //* this.MagicNormalizationCoefficient(population[j]);
+        }
+    }
+    private bool HasInputNode(TreeChromosome ind)
+    => this.HasInputNode(ind.RootNode);
+    private bool HasInputNode(TreeNodeMaster node)
+    => node.Functionality is InputFunctionality
+        || (
+            node.Functionality.Arity > 0
+            && node.Children[..node.Functionality.Arity]
+                .Any(childNode => this.HasInputNode(childNode))
+        );
+    private int CountInputNodes(TreeChromosome ind)
+    => this.CountInputNodes(ind.RootNode);
+    private int CountInputNodes(TreeNodeMaster node)
+    {
+        if (node.Functionality is InputFunctionality)
+            return 1;
+        else
+        {
+            int counter = 0;
+            if (node.Functionality.Arity > 0)
+            {
+                counter += node.Children[..node.Functionality.Arity]
+                    .Select(this.CountInputNodes)
+                    .Sum();
+            }
+            return counter;
         }
     }
 }

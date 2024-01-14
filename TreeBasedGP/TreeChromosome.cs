@@ -2,7 +2,7 @@ using System.Text;
 
 public class TreeChromosome : Chromosome<TreeChromosome>
 {
-    public readonly TreeNodeMaster RootNode;
+    public TreeNodeMaster RootNode;
     public const double DefaultFitness = -1d;
     public static int DefaultDepth = 4;
     private readonly int? _seed;

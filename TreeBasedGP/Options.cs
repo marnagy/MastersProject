@@ -25,18 +25,22 @@ public class Options
     public int PopulationSize { get; set; }
     [Option("max-generations", Default = 100, HelpText = "Maximum amount of generations to evolve.")]
     public int MaxGenerations { get; set; }
-    [Option("mutation-probability", Default = 0.2d, HelpText = "Probability of each mutation taking action.")]
+    [Option("mutation-probability", Default = 0.3d, HelpText = "Probability of each mutation taking action.")]
     public double MutationProbability { get; set; }
     [Option("repeat-amount", Default = 5, HelpText = "Amount of times to repeat the training of GPs.")]
     public int RepeatAmount { get; set; }
+    [Option("crossover-probability", Default = 0.5d, HelpText = "Probability of each mutation taking action.")]
+    public double CrossoverProbability { get; set; }
 
     // specific for TreeBasedGP
-    [Option("terminal-nodes-probability", Default = 0.1d, HelpText = "Probability of choosing from terminal nodes instead of non-terminal nodes.")]
+    [Option("terminal-nodes-probability", Default = 0.2d, HelpText = "Probability of choosing from terminal nodes instead of non-terminal nodes.")]
     public double TerminalNodesProbability { get; set; }
     [Option("depth", Default = 3, HelpText = "Maximum depth of starting trees.")]
     public int DefaultTreeDepth { get; set; }
-    [Option("change-node-mutation-probability", Default = 0.1d, HelpText = "Probability of using ChangeNodeMutation class.")]
+    [Option("change-node-mutation-probability", Default = 0.3d, HelpText = "Probability of using ChangeNodeMutation class.")]
     public double ChangeNodeMutationProbability { get; set; }
+    [Option("percentage-to-change", Default = 0.2d, HelpText = "How much of 1 individual should mutation change.")]
+    public double PercentageToChange { get; set; }
     public override string ToString()
     {
         return JsonSerializer.Serialize(this);

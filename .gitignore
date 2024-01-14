@@ -8,4 +8,6 @@
 *.err
 *.out
 
+2024*
+
 python/venv

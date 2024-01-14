@@ -88,7 +88,13 @@ class Program
             accuracy,
             new RandomFavoredSelection(),
             //new DummySelection(),
-            new TakeNewCombination(),
+            new TakeNewCombination()
+        );
+
+        ga.MaxGenerations = 1_000;
+        ga.PopulationSize = 100;
+
+        ga.StartSingleThreaded(
             (genNum, population) =>
             {
                 System.Console.WriteLine($"Generation {genNum} has finished.");
@@ -100,13 +106,9 @@ class Program
                     System.Console.WriteLine(ind);
                     System.Console.WriteLine();
                 }
-            }
+            },
+            _ => false
         );
-
-        ga.MaxGenerations = 1_000;
-        ga.PopulationSize = 100;
-
-        ga.StartSingleThreaded();
 
         // System.Threading.Thread.Sleep(5_000);
     }

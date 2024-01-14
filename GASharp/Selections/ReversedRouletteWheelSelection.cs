@@ -10,7 +10,7 @@ public class ReversedRouletteWheelSelection<T> : Selection<T> where T: Chromosom
     public override Tuple<T, T> ChooseParents(IReadOnlyList<T> population)
     {
         double[] fitnessValues = population
-            .Select(ind => 1/(1+ind.Fitness))
+            .Select(ind => 1/(ind.Fitness+1))
             .ToArray();
 
         return new Tuple<T, T>(

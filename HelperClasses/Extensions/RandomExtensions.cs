@@ -26,7 +26,13 @@ public static class RandomExtensions
             throw new ArgumentException("Array of individuals and weights have to have the same length.");
 
         if (weights.Any(p => p < 0))
-            throw new ArgumentException("All weights have to be non-negative numbers.");
+        {
+            throw new ArgumentException("Array of weights cannot contain negative values.");
+            // double minWeight = weights.Min();
+            // weights = weights
+            //     .Select(w => w - minWeight + 1)
+            //     .ToArray();
+        }
 
         double randValue;
         randValue = rng.NextDouble();

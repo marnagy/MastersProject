@@ -3,12 +3,18 @@ public class SwitchNodesCrossover : Crossover<TreeChromosome>
 {
     public override Tuple<TreeChromosome, TreeChromosome> Cross(TreeChromosome ind1, TreeChromosome ind2)
     {
+        // System.Console.WriteLine(ind1.GetDepth());
+        // System.Console.WriteLine(ind2.GetDepth());
+
         List<TreeNodeMaster> nodes1 = new();
         List<TreeNodeMaster> nodes2 = new();
 
         // DFS to get all nodes that have children
-        this.LoadNodes(ind1.RootNode, nodes1);
-        this.LoadNodes(ind2.RootNode, nodes2);
+        lock (this)
+        {
+            this.LoadNodes(ind1.RootNode, nodes1);
+            this.LoadNodes(ind2.RootNode, nodes2);
+        }
 
         // no nodes with children found
         if (nodes1.Count == 0 || nodes2.Count == 0)
@@ -27,8 +33,8 @@ public class SwitchNodesCrossover : Crossover<TreeChromosome>
         var childIndex2 = Random.Shared.Next(TreeNodeMaster.ChildrenAmount);
 
         // !: this requires in-place changes
-        var temp = chosenParent1.Children[childIndex1];
-        chosenParent1.Children[childIndex1] = chosenParent2.Children[childIndex2];
+        var temp = chosenParent1.Children[childIndex1].Clone();
+        chosenParent1.Children[childIndex1] = chosenParent2.Children[childIndex2].Clone();
         chosenParent2.Children[childIndex2] = temp;
 
         return new Tuple<TreeChromosome, TreeChromosome>(
@@ -38,11 +44,11 @@ public class SwitchNodesCrossover : Crossover<TreeChromosome>
 
     private void LoadNodes(TreeNodeMaster node, List<TreeNodeMaster> nodes)
     {
-        if (!node.HasChildren)
+        if (node.Functionality.Arity == 0)
             return;
 
         nodes.Add(node);
-        foreach (var childNode in node.Children)
+        foreach (var childNode in node.Children[..node.Functionality.Arity])
         {
             this.LoadNodes(childNode, nodes);
         }

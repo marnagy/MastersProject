@@ -17,7 +17,6 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
     /// Function called after every generation.
     /// Can be used for collecting metadata for analysis after run.
     /// </summary>
-    private Action<int, IReadOnlyList<T>> callback;
     public double CrossoverProbability;
     public double MutationProbability;
     public int MaxGenerations = 500;
@@ -28,7 +27,7 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
     public GeneticAlgorithm(Func<T> createNewFunc,
         IEnumerable<Mutation<T>> mutations,
         Crossover<T>[] crossovers, Fitness<T> fitness, Selection<T> selection,
-        PopulationCombinationStrategy<T> popCombination, Action<int, IReadOnlyList<T>> callback)
+        PopulationCombinationStrategy<T> popCombination) //, Action<int, IReadOnlyList<T>> callback)
     {
         this.createNewInd = createNewFunc;
         this.mutations = mutations.ToArray();
@@ -36,14 +35,15 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
         this.fitnessFunction = fitness;
         this.populationStrategy = popCombination;
         this.selectionStrategy = selection;
-        this.callback = callback;
     }
     
-    public T[] Start()
+    public T[] Start(
+        Action<int, IReadOnlyList<T>> callback,
+        Func<IReadOnlyList<T>, bool> stopCondition)
     {
         if (MinThreads == 1 && MaxThreads == 1)
         {
-            return this.StartSingleThreaded();
+            return this.StartSingleThreaded(callback, stopCondition);
         }
 
         ThreadPool.SetMinThreads(MinThreads, MinThreads);
@@ -95,11 +95,16 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
             // combine populations (elitism, ...)
             population = populationStrategy.Combine(population, nextPopulation);
 
-            this.callback(genNum, population);
+            callback(genNum, population);
+
+            if (stopCondition(population))
+                break;
         }
         return population;
     }
-    public T[] StartSingleThreaded()
+    public T[] StartSingleThreaded(
+        Action<int, IReadOnlyList<T>> callback,
+        Func<IReadOnlyList<T>, bool> stopCondition)
     {
         var population = Enumerable.Range(0, PopulationSize)
             .Select(_ => this.createNewInd())
@@ -147,7 +152,10 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
             // combine populations (elitism, ...)
             population = populationStrategy.Combine(population, nextPopulation);
 
-            this.callback(genNum, population);
+            callback(genNum, population);
+
+            if (stopCondition(population))
+                break;
         }
         return population;
     }
