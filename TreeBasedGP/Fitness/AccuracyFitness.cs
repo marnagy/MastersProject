@@ -45,7 +45,13 @@ public class AccuracyFitness : Fitness<TreeChromosome>
                     computedResult = 1d;
             }
 
-            totalDiff += Math.Abs(wantedResult - computedResult);
+            double diff = Math.Abs(wantedResult - computedResult);
+            
+            // make correct class more significant
+            if (wantedResult == 1d && diff > 0)
+                        diff *= this.Inputs.GetColumnsAmount();
+
+            totalDiff += diff;
         }
 
         if (double.IsNaN(totalDiff) || !this.HasInputNode(ind))
@@ -69,7 +75,6 @@ public class AccuracyFitness : Fitness<TreeChromosome>
                 inputNode.Value = inputValue;
             }
 
-            int wantedResult = this.Outputs[i, this.OutputIndex];
 
             Enumerable.Range(0, population.Length)
                 .Select(i => (index: i, ind: population[i]))
@@ -78,6 +83,7 @@ public class AccuracyFitness : Fitness<TreeChromosome>
                 .AsParallel()
                 .Select(tup => (tup.index, computedResult: tup.ind.ComputeResult()))
                 .ForEach(tup => {
+                    int wantedResult = this.Outputs[i, this.OutputIndex];
                     double computedResult = tup.computedResult;
 
                     if (this.UseClip)
@@ -90,9 +96,25 @@ public class AccuracyFitness : Fitness<TreeChromosome>
 
                     double diff = Math.Abs(wantedResult - computedResult);
 
+                    if (wantedResult == 1 && diff > 0)
+                        diff *= this.Inputs.GetColumnsAmount();
+
                     diffCounters[tup.index] += diff;
                 });
         }
+
+        // Enumerable.Range(0, population.Length)
+        //     .Select(i => (i, ind: population[i]))
+        //     .Where(tup => tup.ind.Fitness != TreeChromosome.DefaultFitness)
+        //     .AsParallel()
+        //     .ForEach(tup => {
+        //         diffCounters[tup.i] = diffCounters[tup.i] / totalRows;
+
+        //         if (double.IsNaN(diffCounters[tup.i]) || !this.HasInputNode(population[tup.i]))
+        //             population[tup.i].Fitness = double.PositiveInfinity;
+        //         else
+        //             population[tup.i].Fitness = diffCounters[tup.i] * this.MagicNormalizationCoefficient(population[tup.i]) / this.CountInputNodes(population[tup.i]); //* this.MagicNormalizationCoefficient(population[j]);
+        //     });
 
         for (int j = 0; j < population.Length; j++)
         {

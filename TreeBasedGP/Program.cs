@@ -1,5 +1,8 @@
 ﻿using System.Globalization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using CommandLine;
+using Microsoft.VisualBasic;
 
 class Program
 {
@@ -138,122 +141,139 @@ class Program
         System.Console.Error.WriteLine($"{GAs.Length} GAs created.");
 
         var dt = DateTime.UtcNow;
-        var directory = Directory.CreateDirectory($"{dt.Year}-{dt.Month}-{dt.Day}_{dt.Hour}-{dt.Minute}-{dt.Second}");
 
-        TreeChromosome[][] resultPopulations = new TreeChromosome[GAs.Length][];
-        TreeChromosome[] bestIndividuals = new TreeChromosome[GAs.Length];
-        for (int i = 0; i < GAs.Length; i++)
+
+        var masterDirectory = Directory.CreateDirectory($"{dt.Year}-{dt.Month}-{dt.Day}_{dt.Hour}-{dt.Minute}-{dt.Second}");
+        var baseDirectory = masterDirectory;
+
+        //save cliArgs
+        File.WriteAllText(
+            Path.Combine(masterDirectory.FullName, "args.json"),
+            JsonSerializer.Serialize(cliArgs, new JsonSerializerOptions(){
+                WriteIndented=true
+            })
+        );
+
+        for (int j = 0; j < cliArgs.RepeatAmount; j++)
         {
-            int gaNum = i+1;
-            System.Console.Error.WriteLine($"Running GA number {gaNum}...");
-            previousMinFitness = double.PositiveInfinity;
-            string[] columnNames = [
-                "gen",
-                "minFitness",
-                "averageFitness",
-                "minDepth",
-                "averageDepth",
-            ];
-            using (var sw = new StreamWriter(File.OpenWrite(directory.FullName + "/" + $"run_{gaNum}.csv")))
+            if (cliArgs.RepeatAmount > 1)
+                baseDirectory = masterDirectory.CreateSubdirectory($"run_{j}");
+
+            TreeChromosome[][] resultPopulations = new TreeChromosome[GAs.Length][];
+            TreeChromosome[] bestIndividuals = new TreeChromosome[GAs.Length];
+            for (int i = 0; i < GAs.Length; i++)
             {
-                sw.WriteLine(string.Join(',', columnNames));
-                Action<int, IReadOnlyList<TreeChromosome>> callback = (genNum, population) =>
+                int gaNum = i+1;
+                System.Console.Error.WriteLine($"Running GA number {gaNum}...");
+                previousMinFitness = double.PositiveInfinity;
+                string[] columnNames = [
+                    "gen",
+                    "minFitness",
+                    "averageFitness",
+                    "minDepth",
+                    "averageDepth",
+                ];
+                using (var sw = new StreamWriter(File.OpenWrite(Path.Combine(baseDirectory.FullName, $"run_{gaNum}.csv"))))
                 {
-                    var currentMinFitness = population
-                        // .Where(ind => double.IsNormal(ind.Fitness))
-                        .Select(ind => ind.Fitness)
-                        .Min();
-                    var currentAvgFitness = population
-                        // fitness can be +inf
-                        .Where(ind => double.IsNormal(ind.Fitness) || ind.Fitness == 0d)
-                        .Select(ind => ind.Fitness)
-                        .Average();
+                    sw.WriteLine(string.Join(',', columnNames));
+                    Action<int, IReadOnlyList<TreeChromosome>> callback = (genNum, population) =>
+                    {
+                        var currentMinFitness = population
+                            .Select(ind => ind.Fitness)
+                            .Min();
+                        var currentAvgFitness = population
+                            // fitness can be +inf
+                            .Where(ind => double.IsNormal(ind.Fitness) || ind.Fitness == 0d)
+                            .Select(ind => ind.Fitness)
+                            .Average();
 
-                    // if (currentMinFitness > previousMinFitness)
-                    //     throw new Exception("Weird elitism...");
-                    
-                    previousMinFitness = currentMinFitness;
+                        // if (currentMinFitness > previousMinFitness)
+                        //     throw new Exception("Weird elitism...");
+                        
+                        previousMinFitness = currentMinFitness;
 
-                    var depthsFunc = population.Select(ind => ind.GetDepth());
-                    var minDepth = depthsFunc.Min();
-                    var averageDepth = depthsFunc.Average();
-                    sw.WriteLine(string.Join(',', new[]{
-                        genNum,
-                        currentMinFitness,
-                        currentAvgFitness,
-                        minDepth,
-                        averageDepth
-                    }));
+                        var depthsFunc = population.Select(ind => ind.GetDepth());
+                        var minDepth = depthsFunc.Min();
+                        var averageDepth = depthsFunc.Average();
+                        sw.WriteLine(string.Join(',', new[]{
+                            genNum,
+                            currentMinFitness,
+                            currentAvgFitness,
+                            minDepth,
+                            averageDepth
+                        }));
 
-                    System.Console.WriteLine($"Computed {genNum}th generation. " +
-                        $"Lowest Fitness: {currentMinFitness} " +
-                        $"Average Fitness: {currentAvgFitness:F2} " +
-                        $"Min depth: {minDepth} " +
-                        $"Average depth: {averageDepth:F1} "
-                    );
-                    // System.Console.WriteLine(population.Select(ind => ind.Fitness).Stringify());
-                };
-                double smallDelta = Math.Pow(10, -20);
-                Func<IReadOnlyList<TreeChromosome>, bool> stopCond = (population)
-                    => population.Min(ind => ind.Fitness) <= smallDelta;
-                if (cliArgs.MultiThreaded)
-                    resultPopulations[i] = GAs[i].Start(callback, stopCond);
-                else
-                    resultPopulations[i] = GAs[i].StartSingleThreaded(callback, stopCond);
-            }
-            System.Console.Error.WriteLine($"GA {gaNum} done.");
+                        System.Console.Error.WriteLine($"Computed {genNum}th generation. " +
+                            $"Lowest Fitness: {currentMinFitness} " +
+                            $"Average Fitness: {currentAvgFitness:F2} " +
+                            $"Depth of min: {population.MinBy(ind => ind.Fitness).GetDepth()} " +
+                            $"Average depth: {averageDepth:F1} "
+                        );
+                        // System.Console.WriteLine(population.Select(ind => ind.Fitness).Stringify());
+                    };
+                    double smallDelta = Math.Pow(10, -20);
+                    Func<IReadOnlyList<TreeChromosome>, bool> stopCond = (population)
+                        => false; // population.Min(ind => ind.Fitness) <= smallDelta;
+                    if (cliArgs.MultiThreaded)
+                        resultPopulations[i] = GAs[i].Start(callback, stopCond);
+                    else
+                        resultPopulations[i] = GAs[i].StartSingleThreaded(callback, stopCond);
+                }
+                System.Console.Error.WriteLine($"GA {gaNum} done.");
 
-        }
-
-        System.Console.Error.WriteLine();
-
-        using (var sw = new StreamWriter(File.OpenWrite(directory.FullName + "/" + "result_formulas.txt")))
-        {
-            for (int i = 0; i < resultPopulations.Length; i++)
-            {
-                System.Console.Error.WriteLine($"Best individual for output #{i} (Fitness = {resultPopulations[i].Min(ind => ind.Fitness)}):");
-                bestIndividuals[i] = resultPopulations[i].MinBy(ind => ind.Fitness);
-                sw.WriteLine(bestIndividuals[i].GetRepresentation());
-                System.Console.Error.WriteLine(bestIndividuals[i].GetRepresentation());
-                System.Console.Error.WriteLine();
             }
 
-            System.Console.WriteLine("Calculating prediction accuracy...");
+            System.Console.Error.WriteLine();
 
-            int goodPredictionCounter = 0;
-            foreach ((var row_inputs, var row_outputs) in Enumerable.Zip(inputs.IterateRows(), outputs.IterateRows()))
+            using (var sw = new StreamWriter(File.OpenWrite(Path.Combine(baseDirectory.FullName, "result_formulas.txt"))))
             {
-                var output_row = row_outputs.ToArray();
-                foreach ((var inputNode, var inputValue) in Enumerable.Zip(inputNodes, row_inputs))
+                for (int i = 0; i < resultPopulations.Length; i++)
                 {
-                    inputNode.Value = inputValue;
+                    System.Console.Error.WriteLine($"Best individual for output #{i} (Fitness = {resultPopulations[i].Min(ind => ind.Fitness)}):");
+                    bestIndividuals[i] = resultPopulations[i].MinBy(ind => ind.Fitness);
+                    sw.WriteLine(bestIndividuals[i].GetRepresentation());
+                    System.Console.Error.WriteLine(bestIndividuals[i].GetRepresentation());
+                    System.Console.Error.WriteLine();
                 }
 
-                double[] predictions = bestIndividuals
-                    .Select(ind => ind.ComputeResult())
-                    // clip
-                    .Select(res => {
-                        if (res > 1)
-                            return 1d;
-                        else if (res < 0)
-                            return 0d;
-                        else
-                            return res;
-                    })
-                    .ToArray();
-                double bestPrediction = predictions.Max();
-                // choose max as predicted class
-                int[] predictedClass = predictions.Select(pred => pred == bestPrediction ? 1 : 0).ToArray();
-                // System.Console.WriteLine($"Wanted output: {output_row.Stringify()}");
-                // System.Console.WriteLine($"Predicted: {predictions.Stringify()}");
+                System.Console.WriteLine("Calculating prediction accuracy...");
 
-                if (Enumerable.Zip(predictedClass, output_row).All(tup => tup.First == tup.Second))
-                    goodPredictionCounter += 1;
+                int goodPredictionCounter = 0;
+                foreach ((var row_inputs, var row_outputs) in Enumerable.Zip(inputs.IterateRows(), outputs.IterateRows()))
+                {
+                    var output_row = row_outputs.ToArray();
+                    foreach ((var inputNode, var inputValue) in Enumerable.Zip(inputNodes, row_inputs))
+                    {
+                        inputNode.Value = inputValue;
+                    }
+
+                    double[] predictions = bestIndividuals
+                        .Select(ind => ind.ComputeResult())
+                        // clip
+                        .Select(res => {
+                            if (res > 1)
+                                return 1d;
+                            else if (res < 0)
+                                return 0d;
+                            else
+                                return res;
+                        })
+                        .ToArray();
+                    double bestPrediction = predictions.Max();
+                    // choose max as predicted class
+                    int[] predictedClass = predictions.Select(pred => pred == bestPrediction ? 1 : 0).ToArray();
+                    // System.Console.WriteLine($"Wanted output: {output_row.Stringify()}");
+                    // System.Console.WriteLine($"Predicted: {predictions.Stringify()}");
+
+                    if (Enumerable.Zip(predictedClass, output_row).All(tup => tup.First == tup.Second))
+                        goodPredictionCounter += 1;
+                }
+                double accuracyScore = (double)goodPredictionCounter / inputs.GetRowsAmount();
+                System.Console.Error.WriteLine($"Accuracy score: {accuracyScore * 100 :0.00} %");
+                sw.WriteLine($"Accuracy score: {accuracyScore * 100 :0.00} %");
             }
-            double accuracyScore = (double)goodPredictionCounter / inputs.GetRowsAmount();
-            System.Console.Error.WriteLine($"Accuracy score: {accuracyScore * 100 :0.00} %");
-            sw.WriteLine($"Accuracy score: {accuracyScore * 100 :0.00} %");
         }
+
     }
     public static bool CheckArgs(Options args)
     {
