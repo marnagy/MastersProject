@@ -42,18 +42,41 @@ def main():
         data=df,
         x='gen',
         y='minFitness',
-        color='r'
+        color='r',
+        label='MinFitness'
     )
     ax = sns.lineplot(
         data=df,
         x='gen',
         y='averageFitness',
         color='g',
-        ax=ax
+        ax=ax,
+        label='AvgFitness'
     )
 
     print('Done')
     plt.yscale('log')
+    plt.show()
+
+    print('Plotting...', end='')
+    ax = sns.lineplot(
+        data=df,
+        x='gen',
+        y='minDepth',
+        color='r',
+        label='MinDepth'
+    )
+    ax = sns.lineplot(
+        data=df,
+        x='gen',
+        y='averageDepth',
+        color='g',
+        ax=ax,
+        label='AvgDepth'
+    )
+
+    print('Done')
+    # plt.yscale('log')
     plt.show()
 
 
