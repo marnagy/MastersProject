@@ -65,11 +65,7 @@ class Program
             terminalNodesProbabilities,
             nonTerminalNodesProbabilities
         );
-        // var secondChromosome = dummyTreeChromosome.Clone();
 
-        // int a = 5;
-
-        // return;
         var mutationChange = new ChangeNodeMutation(
             cliArgs.ChangeNodeMutationProbability,
             percentageToChange: cliArgs.PercentageToChange,
@@ -116,11 +112,11 @@ class Program
                 crossovers,
                 fitness,
                 //new ReversedRouletteWheelSelection<TreeChromosome>(),
-                new TournamentSelection<TreeChromosome>(3),
+                new MinTournamentSelection<TreeChromosome>(3),
                 //new TakeNewCombination()
-                new ElitismCombination<TreeChromosome>(
+                new MinElitismCombination<TreeChromosome>(
                     bestAmount: 2,
-                    newIndividuals: 0,  // cliArgs.PopulationSize / 10,
+                    newIndividuals:  cliArgs.PopulationSize / 10,
                     fitnessFunc: fitness,
                     createNewChrom: () => dummyTreeChromosome.Clone(
                         dummyTreeChromosome.CreateNewTreeFull(cliArgs.DefaultTreeDepth)

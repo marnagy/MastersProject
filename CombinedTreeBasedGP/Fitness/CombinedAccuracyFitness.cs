@@ -1,27 +1,40 @@
+using System.Runtime.InteropServices;
+
 public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
 {
     private readonly double[,] Inputs;
     private readonly int[,] Outputs;
-    private readonly int OutputIndex;
     private bool UseClip = true;
     private readonly InputFunctionality[] InputNodes;
-    public CombinedAccuracyFitness(double[,] inputs, int[,] outputs, int outputIndex, InputFunctionality[] inputNodes)
+    public CombinedAccuracyFitness(double[,] inputs, int[,] outputs, InputFunctionality[] inputNodes)
     {
         this.Inputs = inputs;
         this.Outputs = outputs;
-        this.OutputIndex = outputIndex;
         this.InputNodes = inputNodes;
     }
     private double MagicNormalizationCoefficient(CombinedTreeChromosome ind)
-    => 1d/Math.Pow(2, ind.Subchromosomes.Max(subchrom => subchrom.GetDepth()));
+    => 1d/
+    Math.Sqrt(
+        ind.Subchromosomes
+            .Select(subchrom => subchrom.GetDepth())
+            .Average()
+    );
+    
+    // Math.Pow(
+    //     2,
+    //     ind.Subchromosomes
+    //         .Select(subchrom => subchrom.GetDepth())
+    //         .Average()
+    //     );
     public override double ComputeFitness(CombinedTreeChromosome ind)
     {
         // don't compute fitness again
-        if (ind.Fitness != TreeChromosome.DefaultFitness)
-            return ind.Fitness;
+        // if (ind.Fitness != CombinedTreeChromosome.DefaultFitness)
+        //     return ind.Fitness;
 
-        double totalDiff = 0d;
-        for (int rowIndex = 0; rowIndex < this.Inputs.GetRowsAmount(); rowIndex++)
+        int accurateCounter = 0;
+        int rowsAmount = this.Inputs.GetRowsAmount();
+        for (int rowIndex = 0; rowIndex < rowsAmount; rowIndex++)
         {
             // set input nodes to values from row
             // fitness is calculated in single thread sequentially - so don't fear changing InputNodes
@@ -36,49 +49,34 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
             double[] values = ind.Subchromosomes
                 .Select(subchrom => subchrom.ComputeResult())
                 .ToArray();
-            // double maxValue = values.Max();
-            // int maxValueIndex = Enumerable.Range(0, values.Length)
-            //     .First(index => values[index] == maxValue);
             
-            
-            int[] wantedResults = this.Outputs
-                .GetRow(rowIndex)
-                .ToArray();
+            IEnumerable<int> wantedResults = this.Outputs
+                .GetRow(rowIndex);
 
-            double diff = 0;
-
-            foreach ((double computedRes, int wantedResult)
-                in Enumerable.Zip(values, wantedResults))
-            {
-                double computedResult = computedRes;
-                if (this.UseClip)
-                {
-                    if (wantedResult == 0 && computedResult < 0d)
-                        computedResult = 0d;
-                    if (wantedResult == 1 && computedResult > 1d)
-                        computedResult = 1d;
-                }
-
-                diff += Math.Abs(wantedResult - computedResult);
-            }
-            
-            // // make correct class more significant
-            // if (wantedResult == 1d && diff > 0)
-            //             diff *= this.Inputs.GetColumnsAmount();
-
-            totalDiff += diff;
+            if (Enumerable
+                    .Zip(this.ConvertToOnehot(values), wantedResults)
+                    .All(tup => tup.First == tup.Second)
+                )
+                accurateCounter += 1;
         }
 
-        if (double.IsNaN(totalDiff) || !this.HasInputNode(ind))
+        if (!this.HasInputNode(ind))
             return double.PositiveInfinity;
 
-        return totalDiff * this.MagicNormalizationCoefficient(ind) / this.CountInputNodes(ind);
+        int inputNodesAmount = this.CountInputNodes(ind);
+        // without cast to double, the operation would mean "div"
+        double accuracy = (double)accurateCounter / rowsAmount;
+        // System.Console.Error.WriteLine($"Accuracy: {accuracy}");
+        return 
+            // (1 - accuracy) *
+            //this.MagicNormalizationCoefficient(ind)
+            1d / inputNodesAmount;
     }
 
     public override void ComputeFitnessPopulation(CombinedTreeChromosome[] population)
     {
         int totalRows = this.Inputs.GetRowsAmount();
-        double[] diffCounters = new double[population.Length];
+        double[] accurateCounters = new double[population.Length];
         for (int i = 0; i < totalRows; i++)
         {
             // update input nodes
@@ -95,55 +93,28 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
                 .Select(i => (index: i, ind: population[i]))
                 // don't compute fitness again
                 .Where(tup => tup.ind.Fitness == TreeChromosome.DefaultFitness)
-                .AsParallel()
-                .Select(tup => (tup.index, computedResult: tup.ind.ComputeResults()))
-                .AsSequential()
+                //.AsParallel()
+                .Select(tup => (tup.index, computedResult: tup.ind.ComputeResults().ToArray()))
+                //.AsSequential()
                 .ForEach(tup => {
-                    IEnumerable<int> wantedResults = this.Outputs.GetRow(i);
-                    IEnumerable<double> computedResults = tup.computedResult;
+                    var wantedResults = this.Outputs.GetRow(i);
+                    double[] computedResults = tup.computedResult;
+                    var computedOnehot = this.ConvertToOnehot(computedResults);
 
-                    foreach ((double computedRes, int wantedResult)
-                        in Enumerable.Zip(computedResults, wantedResults))
-                    {
-                        double computedResult = computedRes;
-                        if (this.UseClip)
-                        {
-                            if (wantedResult == 0 && computedResult < 0d)
-                                    computedResult = 0d;
-                            if (wantedResult == 1 && computedResult > 1d)
-                                computedResult = 1d;
-                        }
-
-                        double diff = Math.Abs(wantedResult - computedResult);
-
-                        // if (wantedResult == 1 && diff > 0)
-                        //     diff *= this.Inputs.GetColumnsAmount();
-                        diffCounters[tup.index] += diff;
-                    }
+                    if (Enumerable.Zip(computedOnehot, wantedResults).All(tup => tup.First == tup.Second))
+                        accurateCounters[tup.index] += 1;
                 });
         }
 
-        // Enumerable.Range(0, population.Length)
-        //     .Select(i => (i, ind: population[i]))
-        //     .Where(tup => tup.ind.Fitness != TreeChromosome.DefaultFitness)
-        //     .AsParallel()
-        //     .ForEach(tup => {
-        //         diffCounters[tup.i] = diffCounters[tup.i] / totalRows;
-
-        //         if (double.IsNaN(diffCounters[tup.i]) || !this.HasInputNode(population[tup.i]))
-        //             population[tup.i].Fitness = double.PositiveInfinity;
-        //         else
-        //             population[tup.i].Fitness = diffCounters[tup.i] * this.MagicNormalizationCoefficient(population[tup.i]) / this.CountInputNodes(population[tup.i]); //* this.MagicNormalizationCoefficient(population[j]);
-        //     });
-
         for (int j = 0; j < population.Length; j++)
         {
-            diffCounters[j] = diffCounters[j] / totalRows;
+            accurateCounters[j] = 1 - (accurateCounters[j] / totalRows);
 
-            if (double.IsNaN(diffCounters[j]) || !this.HasInputNode(population[j]))
+            int inputNodesAmount = this.CountInputNodes(population[j]);
+            if (inputNodesAmount == 0)
                 population[j].Fitness = double.PositiveInfinity;
             else
-                population[j].Fitness = diffCounters[j] * this.MagicNormalizationCoefficient(population[j]) / this.CountInputNodes(population[j]); //* this.MagicNormalizationCoefficient(population[j]);
+                population[j].Fitness = accurateCounters[j] / inputNodesAmount; // * this.MagicNormalizationCoefficient(population[j]) / inputNodesAmount;
         }
     }
     private bool HasInputNode(CombinedTreeChromosome ind)
@@ -177,5 +148,15 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
             }
             return counter;
         }
+    }
+    private IEnumerable<int> ConvertToOnehot(double[] values)
+    {
+        int maxIndex = Enumerable.Range(0, values.Length)
+            .Select(i => (index: i, value: values[i]))
+            .MaxBy(tup => tup.value)
+            .index;
+        
+        return Enumerable.Range(0, values.Length)
+            .Select(i => i == maxIndex ? 1 : 0);
     }
 }

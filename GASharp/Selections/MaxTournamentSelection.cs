@@ -1,8 +1,8 @@
 
-public class TournamentSelection<T> : Selection<T> where T: Chromosome<T>
+public class MaxTournamentSelection<T> : Selection<T> where T: Chromosome<T>
 {
     public readonly int Folds;
-    public TournamentSelection(int folds)
+    public MaxTournamentSelection(int folds)
     {
         if (folds <= 0)
             throw new ArgumentOutOfRangeException("Folds cannot be non-positive number.");

@@ -37,7 +37,7 @@ def main():
     print(df)
 
     # TODO: continue here
-    print('Plotting...', end='')
+    print('Plotting fitness...', end='')
     ax = sns.lineplot(
         data=df,
         x='gen',
@@ -58,7 +58,7 @@ def main():
     plt.yscale('log')
     plt.show()
 
-    print('Plotting...', end='')
+    print('Plotting depth...', end='')
     ax = sns.lineplot(
         data=df,
         x='gen',

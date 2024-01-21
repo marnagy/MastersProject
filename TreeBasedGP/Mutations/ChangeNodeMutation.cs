@@ -31,18 +31,18 @@ public class ChangeNodeMutation : Mutation<TreeChromosome>
         rand_value = Random.Shared.NextDouble();
 
         if (rand_value < this.MutationProbability)
-            this.Mutate(ind.RootNode, ind, genNum);
+            this.Mutate(ref ind.RootNode, ind, genNum);
 
         return ind;
     }
-    private void Mutate(TreeNodeMaster node, TreeChromosome ind, int genNum)
+    private void Mutate(ref TreeNodeMaster node, TreeChromosome ind, int genNum)
     {
         // don't mutate node
         if (!(Random.Shared.NextDouble() < this.PercentageToChange) && node.HasChildren)
         {
-            foreach (var childNode in node.Children)
+            for (int i = 0; i < node.Children.Length; i++)
             {
-                this.Mutate(childNode, ind, genNum);
+                this.Mutate(ref node.Children[i], ind, genNum);
             }
         }
             

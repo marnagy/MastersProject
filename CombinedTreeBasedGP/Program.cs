@@ -38,10 +38,10 @@ class Program
         {
             {new ValueFunctionality(0d), 0.2d}
         };
-        for (int i = 1; i <= 2; i++)
+        for (int i = 1; i <= 1; i++)
         {
             terminalNodesProbabilities.Add(new ValueFunctionality(i), 0.2d);
-            terminalNodesProbabilities.Add(new ValueFunctionality(-i), 0.2d);
+            //terminalNodesProbabilities.Add(new ValueFunctionality(-i), 0.2d);
         }
         foreach (var inputNode in inputNodes)
         {
@@ -52,7 +52,7 @@ class Program
             {new SumNode(), 1d},
             {new ProductNode(), 1d},
             // {new PowerNode(), 0.1d},
-            {new UnaryMinusNode(), 1d},
+            {new UnaryMinusNode(), 0.7d},
             {new SinNode(), 0.5d},
             // {new SigmoidNode(), 0.2d}
         };
@@ -65,11 +65,7 @@ class Program
             terminalNodesProbabilities,
             nonTerminalNodesProbabilities
         );
-        // var secondChromosome = dummyTreeChromosome.Clone();
 
-        // int a = 5;
-
-        // return;
         var mutationChange = new ChangeNodesMutation(
             cliArgs.ChangeNodeMutationProbability,
             outputs.GetColumnsAmount(),
@@ -89,64 +85,61 @@ class Program
             //mutationShuffle,
         ];
         // ramped half-and-half
-        Func<TreeChromosome> newTreeChromosome = () => dummyTreeChromosome.Clone(
-            Random.Shared.NextDouble() < 0.5
-                ? dummyTreeChromosome.CreateNewTreeFull(cliArgs.DefaultTreeDepth)
-                : dummyTreeChromosome.CreateNewTreeGrow(cliArgs.DefaultTreeDepth)
-        );
-        Func<CombinedTreeChromosome> newChromosomeFunc = () => new CombinedTreeChromosome(
+        Func<TreeChromosome> newTreeChromosome = () => 
+            dummyTreeChromosome.CreateNew();
+        // dummyTreeChromosome.Clone(
+        //     Random.Shared.NextDouble() < 0.5
+        //         ? dummyTreeChromosome.CreateNewTreeFull(cliArgs.DefaultTreeDepth)
+        //         : dummyTreeChromosome.CreateNewTreeGrow(cliArgs.DefaultTreeDepth)
+        //     // dummyTreeChromosome.CreateNewTreeFull(cliArgs.DefaultTreeDepth)
+        // );
+        Func<CombinedTreeChromosome> newChromosomeFunc = () => CombinedTreeChromosome.CreateNew(
             outputs.GetColumnsAmount(),
             newTreeChromosome
         );
         Crossover<CombinedTreeChromosome>[] crossovers = [
-            //new SwitchNodesCrossover(),
+            // new CombinedSwitchNodesCrossover(),
             new DummyCombinedCrossover(), 
         ];
 
         var outputsAmount = outputs.GetColumnsAmount();
         double previousMinFitness = double.PositiveInfinity;
-        var GAs = new GeneticAlgorithm<CombinedTreeChromosome>[outputsAmount];
-        // TODO: create GA for each of the output columns (expecting one-hot encoding)
-        for (int outputIndex = 0; outputIndex < outputsAmount; outputIndex++)
-        {
-            var fitness = new CombinedAccuracyFitness(
-                inputs,
-                outputs,
-                outputIndex,
-                inputNodes
-            );
-            var treeBasedGA = new GeneticAlgorithm<CombinedTreeChromosome>(
-                newChromosomeFunc,
-                mutations,
-                crossovers,
-                fitness,
-                //new ReversedRouletteWheelSelection<TreeChromosome>(),
-                new TournamentSelection<CombinedTreeChromosome>(3),
-                //new TakeNewCombination()
-                new ElitismCombination<CombinedTreeChromosome>(
-                    bestAmount: 2,
-                    newIndividuals: 0,  // cliArgs.PopulationSize / 10,
-                    fitnessFunc: fitness,
-                    createNewChrom: newChromosomeFunc
-                )
-            ){
-                MaxGenerations = cliArgs.MaxGenerations,
-                CrossoverProbability = cliArgs.CrossoverProbability,
-                PopulationSize = cliArgs.PopulationSize,
-                MutationProbability = cliArgs.MutationProbability,
-                MinThreads = cliArgs.MinThreads,
-                MaxThreads = cliArgs.MaxThreads
-            };
+        var fitness = 
+        //new CombinedDifferenceFitness(
+        new CombinedAccuracyFitness(
+            inputs,
+            outputs,
+            inputNodes
+        );
 
-            GAs[outputIndex] = treeBasedGA;
-        }
-
-        System.Console.Error.WriteLine($"{GAs.Length} GAs created.");
+        //!  ##### ! #####
+        var combinedTreeBasedGA = new GeneticAlgorithm<CombinedTreeChromosome>(
+            newChromosomeFunc,
+            mutations,
+            crossovers,
+            fitness,
+            //new ReversedRouletteWheelSelection<CombinedTreeChromosome>(),
+            new MinTournamentSelection<CombinedTreeChromosome>(5),
+            new TakeNewCombination<CombinedTreeChromosome>()
+            // new MinElitismCombination<CombinedTreeChromosome>(
+            //     bestAmount: 2,
+            //     newIndividuals: 0, // cliArgs.PopulationSize / 10,
+            //     fitnessFunc: fitness,
+            //     createNewChrom: newChromosomeFunc
+            // )
+            // new MinCombineBestCombination<CombinedTreeChromosome>()
+        ){
+            MaxGenerations = cliArgs.MaxGenerations,
+            CrossoverProbability = cliArgs.CrossoverProbability,
+            PopulationSize = cliArgs.PopulationSize,
+            MutationProbability = cliArgs.MutationProbability,
+            MinThreads = cliArgs.MinThreads,
+            MaxThreads = cliArgs.MaxThreads
+        };
 
         var dt = DateTime.UtcNow;
 
-
-        var masterDirectory = Directory.CreateDirectory($"{dt.Year}-{dt.Month}-{dt.Day}_{dt.Hour}-{dt.Minute}-{dt.Second}");
+        var masterDirectory = Directory.CreateDirectory($"combined_{dt.Year}-{dt.Month}-{dt.Day}_{dt.Hour}-{dt.Minute}-{dt.Second}");
         var baseDirectory = masterDirectory;
 
         //save cliArgs
@@ -162,83 +155,73 @@ class Program
             if (cliArgs.RepeatAmount > 1)
                 baseDirectory = masterDirectory.CreateSubdirectory($"run_{j}");
 
-            CombinedTreeChromosome[][] resultPopulations = new CombinedTreeChromosome[GAs.Length][];
-            CombinedTreeChromosome[] bestIndividuals = new CombinedTreeChromosome[GAs.Length];
-            for (int i = 0; i < GAs.Length; i++)
+            CombinedTreeChromosome[] resultPopulation; // = new CombinedTreeChromosome[cliArgs.PopulationSize];
+            CombinedTreeChromosome bestIndividual;
+            System.Console.Error.WriteLine($"Running GA...");
+            previousMinFitness = double.PositiveInfinity;
+            string[] columnNames = [
+                "gen",
+                "minFitness",
+                "averageFitness",
+                "minDepth",
+                "averageDepth",
+            ];
+            using (var sw = new StreamWriter(File.OpenWrite(Path.Combine(baseDirectory.FullName, $"run.csv"))))
             {
-                int gaNum = i+1;
-                System.Console.Error.WriteLine($"Running GA number {gaNum}...");
-                previousMinFitness = double.PositiveInfinity;
-                string[] columnNames = [
-                    "gen",
-                    "minFitness",
-                    "averageFitness",
-                    "minDepth",
-                    "averageDepth",
-                ];
-                using (var sw = new StreamWriter(File.OpenWrite(Path.Combine(baseDirectory.FullName, $"run_{gaNum}.csv"))))
+                sw.WriteLine(string.Join(',', columnNames));
+                Action<int, IReadOnlyList<CombinedTreeChromosome>> callback = (genNum, population) =>
                 {
-                    sw.WriteLine(string.Join(',', columnNames));
-                    Action<int, IReadOnlyList<CombinedTreeChromosome>> callback = (genNum, population) =>
-                    {
-                        var currentMinFitness = population
-                            .Select(ind => ind.Fitness)
-                            .Min();
-                        var currentAvgFitness = population
-                            // fitness can be +inf
-                            .Where(ind => double.IsNormal(ind.Fitness) || ind.Fitness == 0d)
-                            .Select(ind => ind.Fitness)
-                            .Average();
+                    var currentMinFitness = population
+                        .Select(ind => ind.Fitness)
+                        .Min();
+                    var currentAvgFitness = population
+                        // fitness can be +inf
+                        .Where(ind => double.IsNormal(ind.Fitness) || ind.Fitness == 0d)
+                        .Select(ind => ind.Fitness)
+                        .Average();
 
-                        // if (currentMinFitness > previousMinFitness)
-                        //     throw new Exception("Weird elitism...");
-                        
-                        previousMinFitness = currentMinFitness;
+                    // if (currentMinFitness > previousMinFitness)
+                    //     throw new Exception("Weird elitism...");
+                    
+                    previousMinFitness = currentMinFitness;
 
-                        var depthsFunc = population.Select(ind => ind.GetDepth());
-                        var minDepth = depthsFunc.Min();
-                        var averageDepth = depthsFunc.Average();
-                        sw.WriteLine(string.Join(',', new[]{
-                            genNum,
-                            currentMinFitness,
-                            currentAvgFitness,
-                            minDepth,
-                            averageDepth
-                        }));
+                    var depthsFunc = population.Select(ind => ind.GetDepth());
+                    var minDepth = depthsFunc.Min();
+                    var averageDepth = depthsFunc.Average();
+                    sw.WriteLine(string.Join(',', new[]{
+                        genNum,
+                        currentMinFitness,
+                        currentAvgFitness,
+                        minDepth,
+                        averageDepth
+                    }));
 
-                        System.Console.Error.WriteLine($"Computed {genNum}th generation. " +
-                            $"Lowest Fitness: {currentMinFitness} " +
-                            $"Average Fitness: {currentAvgFitness:F2} " +
-                            $"Depth of min: {population.MinBy(ind => ind.Fitness).GetDepth()} " +
-                            $"Average depth: {averageDepth:F1} "
-                        );
-                        // System.Console.WriteLine(population.Select(ind => ind.Fitness).Stringify());
-                    };
-                    double smallDelta = Math.Pow(10, -20);
-                    Func<IReadOnlyList<CombinedTreeChromosome>, bool> stopCond = (population)
-                        => false; // population.Min(ind => ind.Fitness) <= smallDelta;
-                    if (cliArgs.MultiThreaded)
-                        resultPopulations[i] = GAs[i].Start(callback, stopCond);
-                    else
-                        resultPopulations[i] = GAs[i].StartSingleThreaded(callback, stopCond);
-                }
-                System.Console.Error.WriteLine($"GA {gaNum} done.");
-
+                    System.Console.Error.WriteLine($"Computed {genNum}th generation. " +
+                        $"Lowest Fitness: {currentMinFitness} " +
+                        $"Average Fitness: {1/currentAvgFitness} " + //:F2} " +
+                        $"Depth of min: {population.MinBy(ind => ind.Fitness).GetDepth()} " +
+                        $"Average depth: {averageDepth:F1} "
+                    );
+                    // System.Console.WriteLine(population.Select(ind => ind.Fitness).Stringify());
+                };
+                double smallDelta = 1d / inputs.GetRowsAmount();
+                Func<IReadOnlyList<CombinedTreeChromosome>, bool> stopCond = (population)
+                    => false; // population.Min(ind => ind.Fitness) <= smallDelta;
+                resultPopulation = cliArgs.MultiThreaded
+                    ? combinedTreeBasedGA.Start(callback, stopCond)
+                    : combinedTreeBasedGA.StartSingleThreaded (callback, stopCond);
             }
+            System.Console.Error.WriteLine("GA done.");
 
             System.Console.Error.WriteLine();
 
             using (var sw = new StreamWriter(File.OpenWrite(Path.Combine(baseDirectory.FullName, "result_formulas.txt"))))
             {
-                for (int i = 0; i < resultPopulations.Length; i++)
-                {
-                    // TODO
-                    System.Console.Error.WriteLine($"Best individual for output #{i} (Fitness = {resultPopulations[i].Min(ind => ind.Fitness)}):");
-                    bestIndividuals[i] = resultPopulations[i].MinBy(ind => ind.Fitness);
-                    sw.WriteLine(bestIndividuals[i].GetRepresentation());
-                    System.Console.Error.WriteLine(bestIndividuals[i].GetRepresentation());
-                    System.Console.Error.WriteLine();
-                }
+                System.Console.Error.WriteLine($"Best individual (Fitness = {resultPopulation.Min(ind => ind.Fitness)}):");
+                bestIndividual = resultPopulation.MinBy(ind => ind.Fitness);
+                sw.WriteLine(bestIndividual.GetRepresentation());
+                System.Console.Error.WriteLine(bestIndividual.GetRepresentation());
+                System.Console.Error.WriteLine();
 
                 System.Console.WriteLine("Calculating prediction accuracy...");
 
@@ -251,25 +234,14 @@ class Program
                         inputNode.Value = inputValue;
                     }
 
-                    double[] predictions = bestIndividuals
-                        .Select(ind => ind.ComputeResult())
-                        // clip
-                        .Select(res => {
-                            if (res > 1)
-                                return 1d;
-                            else if (res < 0)
-                                return 0d;
-                            else
-                                return res;
-                        })
+                    double[] predictions = bestIndividual
+                        .ComputeResult()
                         .ToArray();
-                    double bestPrediction = predictions.Max();
-                    // choose max as predicted class
-                    int[] predictedClass = predictions.Select(pred => pred == bestPrediction ? 1 : 0).ToArray();
-                    // System.Console.WriteLine($"Wanted output: {output_row.Stringify()}");
-                    // System.Console.WriteLine($"Predicted: {predictions.Stringify()}");
+                    
+                    int[] predictionsOneHot = GetOneHotEncoding(predictions);
 
-                    if (Enumerable.Zip(predictedClass, output_row).All(tup => tup.First == tup.Second))
+                    if (Enumerable.Zip(predictions, output_row)
+                            .All(tup => tup.First == tup.Second))
                         goodPredictionCounter += 1;
                 }
                 double accuracyScore = (double)goodPredictionCounter / inputs.GetRowsAmount();
@@ -279,6 +251,17 @@ class Program
         }
 
     }
+
+    private static int[] GetOneHotEncoding(double[] predictions)
+    {
+        double maxValue = predictions.Max();
+        int maxValueIndex = Enumerable.Range(0, predictions.Length)
+            .First(i => predictions[i] == maxValue);
+        return Enumerable.Range(0, predictions.Length)
+            .Select(i => i == maxValueIndex ? 1 : 0)
+            .ToArray();
+    }
+
     public static bool CheckArgs(Options args)
     {
         return args.CSVFilePath != null

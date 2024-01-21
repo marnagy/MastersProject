@@ -4,7 +4,7 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
     /// Function to use when creating new random solution.
     /// </summary>
     private Func<T> createNewInd;
-    private Mutation<T>[] mutations;
+    private IList<Mutation<T>> mutations;
     private Crossover<T>[] crossovers;
     private Fitness<T> fitnessFunction;
     private Selection<T> selectionStrategy;
@@ -25,12 +25,12 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
     public int MinThreads = 1;
     public int MaxThreads = 1;
     public GeneticAlgorithm(Func<T> createNewFunc,
-        IEnumerable<Mutation<T>> mutations,
+        IList<Mutation<T>> mutations,
         Crossover<T>[] crossovers, Fitness<T> fitness, Selection<T> selection,
         PopulationCombinationStrategy<T> popCombination) //, Action<int, IReadOnlyList<T>> callback)
     {
         this.createNewInd = createNewFunc;
-        this.mutations = mutations.ToArray();
+        this.mutations = mutations;
         this.crossovers = crossovers;
         this.fitnessFunction = fitness;
         this.populationStrategy = popCombination;
@@ -112,7 +112,7 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
         
         // update Fitness
         population
-            .ForEach(ind => ind.UpdateFitness(this.fitnessFunction)  );
+            .ForEach(ind => ind.UpdateFitness(this.fitnessFunction));
 
         for (int genNum = 0; genNum < MaxGenerations; genNum++)
         {
@@ -133,15 +133,25 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
                         return new Tuple<T, T>(parents.p.Item1, parents.p.Item2);
                 })
                 .SelectMany(tup => new[] {tup.Item1, tup.Item2})
+                .Select(ind => ind.Clone())
                 .ToArray();
+            
+            parents = null;
 
             // mutation
             foreach (var mut in this.mutations)
             {
-                nextPopulation = nextPopulation
-                    .Select(x => mut.Mutate(x, genNum))
-                    .ToArray();
+                nextPopulation
+                    .ForEach(x => mut.Mutate(x, genNum));
+                // nextPopulation = nextPopulation
+                //     .Select(x => mut.Mutate(x, genNum))
+                //     .Select(ind => ind.Clone())
+                //     .ToArray();
             }
+
+            // nextPopulation = nextPopulation
+            //     .Select(ind => ind.Clone())
+            //     .ToArray();
 
             // update Fitness
             foreach (var ind in nextPopulation)

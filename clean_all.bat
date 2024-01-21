@@ -8,3 +8,5 @@ call rmdir HelperClasses\bin /S /Q
 call rmdir HelperClasses\obj /S /Q
 call rmdir TreeBasedGP\bin /S /Q
 call rmdir TreeBasedGP\obj /S /Q
+call rmdir CombinedTreeBasedGP\bin /S /Q
+call rmdir CombinedTreeBasedGP\obj /S /Q
