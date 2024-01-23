@@ -68,9 +68,9 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
         double accuracy = (double)accurateCounter / rowsAmount;
         // System.Console.Error.WriteLine($"Accuracy: {accuracy}");
         return 
-            // (1 - accuracy) *
+            (1 - accuracy);
             //this.MagicNormalizationCoefficient(ind)
-            1d / inputNodesAmount;
+            //1d / inputNodesAmount;
     }
 
     public override void ComputeFitnessPopulation(CombinedTreeChromosome[] population)
@@ -92,7 +92,7 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
             Enumerable.Range(0, population.Length)
                 .Select(i => (index: i, ind: population[i]))
                 // don't compute fitness again
-                .Where(tup => tup.ind.Fitness == TreeChromosome.DefaultFitness)
+                //.Where(tup => tup.ind.Fitness == TreeChromosome.DefaultFitness)
                 //.AsParallel()
                 .Select(tup => (tup.index, computedResult: tup.ind.ComputeResults().ToArray()))
                 //.AsSequential()
@@ -108,13 +108,18 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
 
         for (int j = 0; j < population.Length; j++)
         {
-            accurateCounters[j] = 1 - (accurateCounters[j] / totalRows);
+            accurateCounters[j] = 1d - (accurateCounters[j] / totalRows);
 
             int inputNodesAmount = this.CountInputNodes(population[j]);
             if (inputNodesAmount == 0)
                 population[j].Fitness = double.PositiveInfinity;
             else
-                population[j].Fitness = accurateCounters[j] / inputNodesAmount; // * this.MagicNormalizationCoefficient(population[j]) / inputNodesAmount;
+                population[j].Fitness = accurateCounters[j]; // / (inputNodesAmount * population[j].Sub ); // * this.MagicNormalizationCoefficient(population[j]) / inputNodesAmount;
+        }
+
+        if (population.Select(ind => ind.Fitness).Any(fitness => fitness > 1d))
+        {
+            int a = 5;
         }
     }
     private bool HasInputNode(CombinedTreeChromosome ind)

@@ -264,6 +264,7 @@ class Program
                     if (Enumerable.Zip(predictedClass, output_row).All(tup => tup.First == tup.Second))
                         goodPredictionCounter += 1;
                 }
+
                 double accuracyScore = (double)goodPredictionCounter / inputs.GetRowsAmount();
                 System.Console.Error.WriteLine($"Accuracy score: {accuracyScore * 100 :0.00} %");
                 sw.WriteLine($"Accuracy score: {accuracyScore * 100 :0.00} %");

@@ -86,11 +86,11 @@ class Program
         ];
         // ramped half-and-half
         Func<TreeChromosome> newTreeChromosome = () => 
-            dummyTreeChromosome.CreateNew();
-        // dummyTreeChromosome.Clone(
-        //     Random.Shared.NextDouble() < 0.5
-        //         ? dummyTreeChromosome.CreateNewTreeFull(cliArgs.DefaultTreeDepth)
-        //         : dummyTreeChromosome.CreateNewTreeGrow(cliArgs.DefaultTreeDepth)
+            //dummyTreeChromosome.CreateNew();
+        dummyTreeChromosome.Clone(
+            Random.Shared.NextDouble() < 0.5
+                ? dummyTreeChromosome.CreateNewTreeFull(cliArgs.DefaultTreeDepth)
+                : dummyTreeChromosome.CreateNewTreeGrow(cliArgs.DefaultTreeDepth));
         //     // dummyTreeChromosome.CreateNewTreeFull(cliArgs.DefaultTreeDepth)
         // );
         Func<CombinedTreeChromosome> newChromosomeFunc = () => CombinedTreeChromosome.CreateNew(
@@ -98,8 +98,8 @@ class Program
             newTreeChromosome
         );
         Crossover<CombinedTreeChromosome>[] crossovers = [
-            // new CombinedSwitchNodesCrossover(),
-            new DummyCombinedCrossover(), 
+            new CombinedSwitchNodesCrossover(),
+            // new DummyCombinedCrossover(), 
         ];
 
         var outputsAmount = outputs.GetColumnsAmount();
@@ -198,7 +198,7 @@ class Program
 
                     System.Console.Error.WriteLine($"Computed {genNum}th generation. " +
                         $"Lowest Fitness: {currentMinFitness} " +
-                        $"Average Fitness: {1/currentAvgFitness} " + //:F2} " +
+                        $"Average Fitness: {currentAvgFitness} " + //:F2} " +
                         $"Depth of min: {population.MinBy(ind => ind.Fitness).GetDepth()} " +
                         $"Average depth: {averageDepth:F1} "
                     );
@@ -225,26 +225,10 @@ class Program
 
                 System.Console.WriteLine("Calculating prediction accuracy...");
 
-                int goodPredictionCounter = 0;
-                foreach ((var row_inputs, var row_outputs) in Enumerable.Zip(inputs.IterateRows(), outputs.IterateRows()))
-                {
-                    var output_row = row_outputs.ToArray();
-                    foreach ((var inputNode, var inputValue) in Enumerable.Zip(inputNodes, row_inputs))
-                    {
-                        inputNode.Value = inputValue;
-                    }
+                var resultAccuracyFitness = new CombinedAccuracyFitness(inputs, outputs, inputNodes);
 
-                    double[] predictions = bestIndividual
-                        .ComputeResult()
-                        .ToArray();
-                    
-                    int[] predictionsOneHot = GetOneHotEncoding(predictions);
-
-                    if (Enumerable.Zip(predictions, output_row)
-                            .All(tup => tup.First == tup.Second))
-                        goodPredictionCounter += 1;
-                }
-                double accuracyScore = (double)goodPredictionCounter / inputs.GetRowsAmount();
+                double accuracyScore = 1d - resultAccuracyFitness.ComputeFitness(bestIndividual);
+                
                 System.Console.Error.WriteLine($"Accuracy score: {accuracyScore * 100 :0.00} %");
                 sw.WriteLine($"Accuracy score: {accuracyScore * 100 :0.00} %");
             }

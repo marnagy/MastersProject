@@ -1,6 +1,6 @@
 using System.Text;
 
-public struct TreeNodeMaster
+public class TreeNodeMaster
 {
     public TreeNodeMaster[]? Children;
     public bool HasChildren => this.Children != null;
@@ -35,7 +35,7 @@ public struct TreeNodeMaster
         if (this.HasChildren)
         {
             sb.Append('[');
-            sb.Append(string.Join(", ", this.Children));
+            sb.Append(string.Join<TreeNodeMaster>(", ", this.Children));
             sb.Append(']');
         }
         return sb.ToString();

@@ -23,6 +23,7 @@ def main():
         if os.path.isdir(full_path) and file_or_dir.startswith('run_'):
             subdirs.append(full_path)
 
+    print("Loading csv\'s...", end='')
     dfs = [
         pd.read_csv(
             os.path.join(subdir, file),
@@ -33,8 +34,9 @@ def main():
         if file.endswith('.csv')
     ]
     df = pd.concat(dfs)
+    print('Done')
 
-    print(df)
+    # print(df)
 
     # TODO: continue here
     print('Plotting fitness...', end='')
@@ -55,7 +57,7 @@ def main():
     )
 
     print('Done')
-    plt.yscale('log')
+    # plt.yscale('log')
     plt.show()
 
     print('Plotting depth...', end='')
