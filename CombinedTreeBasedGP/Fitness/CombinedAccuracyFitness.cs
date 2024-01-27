@@ -93,12 +93,12 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
                 .Select(i => (index: i, ind: population[i]))
                 // don't compute fitness again
                 //.Where(tup => tup.ind.Fitness == TreeChromosome.DefaultFitness)
-                //.AsParallel()
-                .Select(tup => (tup.index, computedResult: tup.ind.ComputeResults().ToArray()))
+                .AsParallel()
+                .Select(tup => (tup.index, computedResult: tup.ind.ComputeResults()))
                 //.AsSequential()
                 .ForEach(tup => {
                     var wantedResults = this.Outputs.GetRow(i);
-                    double[] computedResults = tup.computedResult;
+                    double[] computedResults = tup.computedResult.ToArray();
                     var computedOnehot = this.ConvertToOnehot(computedResults);
 
                     if (Enumerable.Zip(computedOnehot, wantedResults).All(tup => tup.First == tup.Second))

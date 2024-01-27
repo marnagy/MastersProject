@@ -42,6 +42,7 @@ public class CombinedTreeChromosome : Chromosome<CombinedTreeChromosome>
 
     public IEnumerable<double> ComputeResults()
     => this.Subchromosomes
+        .AsParallel()
         .Select(subchrom => subchrom.ComputeResult());
 
     public override bool IsValid()
