@@ -79,6 +79,9 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
         double[] accurateCounters = new double[population.Length];
         for (int i = 0; i < totalRows; i++)
         {
+            // if (i % 100 == 0)
+            //     System.Console.Error.Write($"Calculating fitness: {i}/{totalRows}\r");
+ 
             // update input nodes
             foreach (
                 (InputFunctionality inputNode, double inputValue)

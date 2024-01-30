@@ -26,7 +26,7 @@ class Program
 
         // prepare CSV
         (double[,] inputs, int[,] outputs) = CSVHelper.PrepareCSV(
-            cliArgs.CSVFilePath,
+            cliArgs.TrainCSVFilePath,
             cliArgs.CSVInputsAmount,
             cliArgs.CSVDelimiter
         );
@@ -38,7 +38,7 @@ class Program
         {
             {new ValueFunctionality(0d), 0.2d}
         };
-        for (int i = 1; i <= 1; i++)
+        for (int i = 1; i <= 5; i++)
         {
             terminalNodesProbabilities.Add(new ValueFunctionality(i), 0.2d);
             //terminalNodesProbabilities.Add(new ValueFunctionality(-i), 0.2d);
@@ -48,12 +48,13 @@ class Program
             terminalNodesProbabilities.Add(inputNode, 1d);
         }
         var nonTerminalNodesProbabilities = new Dictionary<NodeFunctionality, double> {
-            // {new ConditionNode(), 0.5d},
+            // {new ConditionNode(), 0.2d},
             {new SumNode(), 1d},
             {new ProductNode(), 1d},
-            // {new PowerNode(), 0.1d},
+            {new PowerNode(), 0.1d},
             {new UnaryMinusNode(), 0.7d},
             {new SinNode(), 0.5d},
+            // {new ReLUNode(), 0.5d},
             // {new SigmoidNode(), 0.2d}
         };
         // rng for creating first population
@@ -120,14 +121,14 @@ class Program
             fitness,
             //new ReversedRouletteWheelSelection<CombinedTreeChromosome>(),
             new MinTournamentSelection<CombinedTreeChromosome>(5),
-            new TakeNewCombination<CombinedTreeChromosome>()
+            // new TakeNewCombination<CombinedTreeChromosome>()
             // new MinElitismCombination<CombinedTreeChromosome>(
             //     bestAmount: 2,
-            //     newIndividuals: 0, // cliArgs.PopulationSize / 10,
+            //     newIndividuals: cliArgs.PopulationSize / 10,
             //     fitnessFunc: fitness,
             //     createNewChrom: newChromosomeFunc
             // )
-            // new MinCombineBestCombination<CombinedTreeChromosome>()
+            new MinCombineBestCombination<CombinedTreeChromosome>()
         ){
             MaxGenerations = cliArgs.MaxGenerations,
             CrossoverProbability = cliArgs.CrossoverProbability,
@@ -148,6 +149,11 @@ class Program
             JsonSerializer.Serialize(cliArgs, new JsonSerializerOptions(){
                 WriteIndented=true
             })
+        );
+
+        File.WriteAllText(
+            Path.Combine(masterDirectory.FullName, "info.txt"),
+            $"Computed using CSV {cliArgs.TrainCSVFilePath} with {outputsAmount} output classes."
         );
 
         for (int j = 0; j < cliArgs.RepeatAmount; j++)
@@ -218,12 +224,22 @@ class Program
             using (var sw = new StreamWriter(File.OpenWrite(Path.Combine(baseDirectory.FullName, "result_formulas.txt"))))
             {
                 System.Console.Error.WriteLine($"Best individual (Fitness = {resultPopulation.Min(ind => ind.Fitness)}):");
-                bestIndividual = resultPopulation.MinBy(ind => ind.Fitness);
+                bestIndividual = resultPopulation
+                    .Where(ind => double.IsNormal(ind.Fitness) || ind.Fitness == 0d)
+                    .MinBy(ind => ind.Fitness);
                 sw.WriteLine(bestIndividual.GetRepresentation());
                 System.Console.Error.WriteLine(bestIndividual.GetRepresentation());
                 System.Console.Error.WriteLine();
 
                 System.Console.WriteLine("Calculating prediction accuracy...");
+
+                // load test inputs & outputs if specified
+                if (cliArgs.TestCSVFilePath != null)
+                    (inputs, outputs) = CSVHelper.PrepareCSV(
+                        cliArgs.TrainCSVFilePath,
+                        cliArgs.CSVInputsAmount,
+                        cliArgs.CSVDelimiter
+                    );
 
                 var resultAccuracyFitness = new CombinedAccuracyFitness(inputs, outputs, inputNodes);
 
@@ -248,7 +264,7 @@ class Program
 
     public static bool CheckArgs(Options args)
     {
-        return args.CSVFilePath != null
+        return args.TrainCSVFilePath != null
             && args.CSVInputsAmount > 0;
     }
 }

@@ -44,6 +44,7 @@ public class ChangeNodeMutation : Mutation<TreeChromosome>
             {
                 this.Mutate(ref node.Children[i], ind, genNum);
             }
+            return;
         }
             
 
@@ -73,7 +74,7 @@ public class ChangeNodeMutation : Mutation<TreeChromosome>
             {
                 // create children
                 node.Children = Enumerable.Range(0, TreeNodeMaster.ChildrenAmount)
-                    .Select(_ => ind.CreateNewTreeFull(TreeChromosome.DefaultDepth))
+                    .Select(_ => ind.CreateNewTreeFull(TreeChromosome.DefaultSubtreeDepth))
                     .ToArray();
             }
         }

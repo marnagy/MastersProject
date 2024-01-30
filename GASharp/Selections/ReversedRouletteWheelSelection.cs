@@ -18,4 +18,9 @@ public class ReversedRouletteWheelSelection<T> : Selection<T> where T: Chromosom
             Random.Shared.Choose(population, weights: fitnessValues)
         );
     }
+
+    public override Tuple<T, T> ChooseParents(IReadOnlyList<T> population, IReadOnlyList<double> probabilities)
+    {
+        throw new NotImplementedException();
+    }
 }

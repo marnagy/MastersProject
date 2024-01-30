@@ -5,6 +5,7 @@ public class TreeChromosome : Chromosome<TreeChromosome>
     public TreeNodeMaster RootNode;
     public const double DefaultFitness = -1d;
     public static int DefaultDepth = 4;
+    public static int DefaultSubtreeDepth = 2;
     private readonly int? _seed;
     public readonly IReadOnlyDictionary<NodeFunctionality, double> TerminalNodesProbabilities;
     public readonly IReadOnlyDictionary<NodeFunctionality, double> NonTerminalNodesProbabilities;

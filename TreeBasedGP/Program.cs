@@ -26,7 +26,7 @@ class Program
 
         // prepare CSV
         (double[,] inputs, int[,] outputs) = CSVHelper.PrepareCSV(
-            cliArgs.CSVFilePath,
+            cliArgs.TrainCSVFilePath,
             cliArgs.CSVInputsAmount,
             cliArgs.CSVDelimiter
         );
@@ -234,6 +234,12 @@ class Program
 
                 System.Console.WriteLine("Calculating prediction accuracy...");
 
+                (inputs, outputs) = CSVHelper.PrepareCSV(
+                    cliArgs.TestCSVFilePath,
+                    cliArgs.CSVInputsAmount,
+                    cliArgs.CSVDelimiter
+                );
+
                 int goodPredictionCounter = 0;
                 foreach ((var row_inputs, var row_outputs) in Enumerable.Zip(inputs.IterateRows(), outputs.IterateRows()))
                 {
@@ -274,7 +280,7 @@ class Program
     }
     public static bool CheckArgs(Options args)
     {
-        return args.CSVFilePath != null
+        return args.TrainCSVFilePath != null
             && args.CSVInputsAmount > 0;
     }
 }

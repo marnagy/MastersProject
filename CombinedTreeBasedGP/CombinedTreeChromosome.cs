@@ -44,7 +44,16 @@ public class CombinedTreeChromosome : Chromosome<CombinedTreeChromosome>
     => this.Subchromosomes
         .AsParallel()
         .Select(subchrom => subchrom.ComputeResult());
-
+    public double[] GetProbabilities()
+    {
+        var results = this.ComputeResults()
+            .Select(value => Math.Exp(value))
+            .ToArray();
+        double summed = results.Sum();
+        return results
+            .Select(value => value / summed)
+            .ToArray();
+    }
     public override bool IsValid()
     => this.Subchromosomes
         .All(subchrom => subchrom.IsValid());

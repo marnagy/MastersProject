@@ -11,9 +11,17 @@ public class RouletteWheelSelection<T> : Selection<T> where T: Chromosome<T>
     {
         double[] fitnessValues = population.Select(ind => ind.Fitness).ToArray();
 
-        return new Tuple<T, T>(
-            Random.Shared.Choose(population, weights: fitnessValues),
-            Random.Shared.Choose(population, weights: fitnessValues)
+        return this.ChooseParents(
+            population,
+            fitnessValues
         );
+
+        
     }
+
+    public override Tuple<T, T> ChooseParents(IReadOnlyList<T> population, IReadOnlyList<double> probabilities)
+    => new Tuple<T, T>(
+            Random.Shared.ChooseProbs(population, probabilities),
+            Random.Shared.ChooseProbs(population, probabilities)
+        );
 }

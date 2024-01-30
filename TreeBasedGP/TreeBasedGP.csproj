@@ -17,6 +17,7 @@
     <Nullable>enable</Nullable>
     <ServerGarbageCollection>true</ServerGarbageCollection>
     <RetainVMGarbageCollection>true</RetainVMGarbageCollection>
+    <SelfContained>true</SelfContained>
   </PropertyGroup>
 
 </Project>

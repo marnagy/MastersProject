@@ -9,11 +9,13 @@ public class Options
     public bool MultiThreaded { get; set; }
     [Option("json", Default = null, HelpText = "Input JSON for easier loading of hyperparameters.")]
     public string? JsonFilePath { get; set; }
-    [Option("input-csv", Required = true, HelpText = "CSV of input values. Assumes numbers in en-US style.")]
-    public string? CSVFilePath { get; set; }
-    [Option("input-csv-inputs-amount", Required = true, HelpText = "Amount of input columns in CSV file.")]
+    [Option("train-csv", Required = true, HelpText = "Train CSV of input values. Assumes numbers in en-US style.")]
+    public string? TrainCSVFilePath { get; set; }
+    [Option("test-csv", HelpText = "Test CSV of input values. Assumes numbers in en-US style. If not provided, use train-csv file.")]
+    public string? TestCSVFilePath { get; set; }
+    [Option("csv-inputs-amount", Required = true, HelpText = "Amount of input columns in CSV file.")]
     public int CSVInputsAmount { get; set; }
-    [Option("input-csv-delimiter", Default = ',', HelpText = "Delimiter")]
+    [Option("csv-delimiter", Default = ',', HelpText = "Delimiter")]
     public char CSVDelimiter { get; set; }
     [Option("min-threads", Default = 2, /*Min = 1, Max = 32,*/ HelpText = "Minimum amount of threads to be used by ThreadPool class.")]
     public int MinThreads { get; set; }
