@@ -1,0 +1,1 @@
+dotnet publish -c Release --os osx --arch x64 --sc -o OSX_x64
