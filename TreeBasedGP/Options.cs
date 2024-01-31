@@ -43,6 +43,28 @@ public class Options
     public double ChangeNodeMutationProbability { get; set; }
     [Option("percentage-to-change", Default = 0.2d, HelpText = "How much of 1 individual should mutation change.")]
     public double PercentageToChange { get; set; }
+
+    // node probabilities
+    [Option("value-node-weight", Default = 0.2d, Min = 0)]
+    public double ValueNodeProbability { get; set; }
+    [Option("sum-node-weight", Default = 0.2d, Min = 0)]
+    public double SumNodeProbability { get; set; }
+    [Option("prod-node-weight", Default = 0.2d, Min = 0)]
+    public double ProductNodeProbability { get; set; }
+    [Option("sin-node-weight", Default = 0.2d, Min = 0)]
+    public double SinNodeProbability { get; set; }
+    [Option("pow-node-weight", Default = 0.2d, Min = 0)]
+    public double PowerNodeProbability { get; set; }
+    [Option("unary-minus-node-weight", Default = 0.2d, Min = 0)]
+    public double UnaryMinusNodeProbability { get; set; }
+    [Option("sig-node-weight", Default = 0.2d, Min = 0)]
+    public double SigmoidNodeProbability { get; set; }
+    [Option("relu-node-weight", Default = 0.2d, Min = 0)]
+    public double ReLUNodeProbability { get; set; }
+    [Option("cond-node-weight", Default = 0.2d, Min = 0)]
+    public double ConditionNodeProbability { get; set; }
+    [Option("input-node-weight", Default = 0.2d, Min = 0)]
+    public double InputNodeProbability { get; set; }
     public override string ToString()
     {
         return JsonSerializer.Serialize(this);

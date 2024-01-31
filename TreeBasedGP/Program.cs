@@ -36,25 +36,26 @@ class Program
             .ToArray();
         var terminalNodesProbabilities = new Dictionary<NodeFunctionality, double>
         {
-            {new ValueFunctionality(0d), 0.2d}
+            {new ValueFunctionality(0d), cliArgs.ValueNodeProbability}
         };
         for (int i = 1; i <= 2; i++)
         {
-            terminalNodesProbabilities.Add(new ValueFunctionality(i), 0.2d);
-            terminalNodesProbabilities.Add(new ValueFunctionality(-i), 0.2d);
+            terminalNodesProbabilities.Add(new ValueFunctionality(i), cliArgs.ValueNodeProbability);
+            terminalNodesProbabilities.Add(new ValueFunctionality(-i), cliArgs.ValueNodeProbability);
         }
         foreach (var inputNode in inputNodes)
         {
-            terminalNodesProbabilities.Add(inputNode, 1d);
+            terminalNodesProbabilities.Add(inputNode, cliArgs.InputNodeProbability);
         }
         var nonTerminalNodesProbabilities = new Dictionary<NodeFunctionality, double> {
-            // {new ConditionNode(), 0.5d},
-            {new SumNode(), 1d},
-            {new ProductNode(), 1d},
-            // {new PowerNode(), 0.1d},
-            {new UnaryMinusNode(), 1d},
-            {new SinNode(), 0.5d},
-            // {new SigmoidNode(), 0.2d}
+            {new ConditionNode(), cliArgs.ConditionNodeProbability},
+            {new SumNode(), cliArgs.SumNodeProbability},
+            {new ProductNode(), cliArgs.ProductNodeProbability},
+            {new PowerNode(), cliArgs.PowerNodeProbability},
+            {new UnaryMinusNode(), cliArgs.UnaryMinusNodeProbability},
+            {new SinNode(), cliArgs.SinNodeProbability},
+            {new SigmoidNode(), cliArgs.SigmoidNodeProbability},
+            {new ReLUNode(), cliArgs.ReLUNodeProbability}
         };
         // rng for creating first population
         TreeChromosome.DefaultDepth = cliArgs.DefaultTreeDepth;
