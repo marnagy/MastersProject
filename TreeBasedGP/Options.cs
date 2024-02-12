@@ -45,25 +45,25 @@ public class Options
     public double PercentageToChange { get; set; }
 
     // node probabilities
-    [Option("value-node-weight", Default = 0.2d, Min = 0)]
+    [Option("value-node-weight", Default = 0.2d)]
     public double ValueNodeProbability { get; set; }
-    [Option("sum-node-weight", Default = 0.2d, Min = 0)]
+    [Option("sum-node-weight", Default = 0.2d)]
     public double SumNodeProbability { get; set; }
-    [Option("prod-node-weight", Default = 0.2d, Min = 0)]
+    [Option("prod-node-weight", Default = 0.2d)]
     public double ProductNodeProbability { get; set; }
-    [Option("sin-node-weight", Default = 0.2d, Min = 0)]
+    [Option("sin-node-weight", Default = 0.2d)]
     public double SinNodeProbability { get; set; }
-    [Option("pow-node-weight", Default = 0.2d, Min = 0)]
+    [Option("pow-node-weight", Default = 0.2d)]
     public double PowerNodeProbability { get; set; }
-    [Option("unary-minus-node-weight", Default = 0.2d, Min = 0)]
+    [Option("unary-minus-node-weight", Default = 0.2d)]
     public double UnaryMinusNodeProbability { get; set; }
-    [Option("sig-node-weight", Default = 0.2d, Min = 0)]
+    [Option("sig-node-weight", Default = 0.2d)]
     public double SigmoidNodeProbability { get; set; }
-    [Option("relu-node-weight", Default = 0.2d, Min = 0)]
+    [Option("relu-node-weight", Default = 0.2d)]
     public double ReLUNodeProbability { get; set; }
-    [Option("cond-node-weight", Default = 0.2d, Min = 0)]
+    [Option("cond-node-weight", Default = 0.2d)]
     public double ConditionNodeProbability { get; set; }
-    [Option("input-node-weight", Default = 0.2d, Min = 0)]
+    [Option("input-node-weight", Default = 0.2d)]
     public double InputNodeProbability { get; set; }
     public override string ToString()
     {

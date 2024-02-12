@@ -55,7 +55,7 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
         start = DateTime.UtcNow;
 
         var population = Enumerable.Range(0, PopulationSize)
-            .AsParallel()
+            .AsParallel().WithDegreeOfParallelism(this.MaxThreads)
             .Select(_ => this.createNewInd())
             .ToArray();
         if (UseTimes)
@@ -80,7 +80,7 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
                         .ToArray()
                 );
                 var parents = Enumerable.Range(0, population.Length / 2)
-                    .AsParallel().AsUnordered()
+                    .AsParallel().AsUnordered().WithDegreeOfParallelism(this.MaxThreads)
                     .Select(_ => this.selectionStrategy.ChooseParents(population, probs))
                     .Select(tup => new Tuple<T,T>(tup.Item1.Clone(), tup.Item2.Clone()))
                     .ToArray();
@@ -94,7 +94,7 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
                     .Select(i => (index1: 2*i, index2: 2*i + 1, par: parents[i], prob: Random.Shared.NextDouble()))
                 // parents
                 //     .Select(p => (p, prob: Random.Shared.NextDouble()))
-                    .AsParallel()
+                    .AsParallel().AsUnordered().WithDegreeOfParallelism(this.MaxThreads)
                     .Select(tup => {
                         if (tup.prob < this.CrossoverProbability)
                             return (
@@ -135,7 +135,7 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
             foreach (var mut in this.mutations)
             {
                 Enumerable.Range(0, PopulationSize)
-                    .AsParallel()
+                    .AsParallel().WithDegreeOfParallelism(this.MaxThreads)
                     .Select(i => (index: i, ind: nextPopulation[i]))
                     .ForAll(tup => nextPopulation[tup.index] = mut.Mutate(tup.ind, genNum));
             }

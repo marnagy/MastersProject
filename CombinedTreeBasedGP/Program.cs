@@ -75,7 +75,8 @@ class Program
             terminalNodesProbabilities,
             terminalNodes: terminalNodesProbabilities.Keys.ToArray(),
             nonTerminalNodesProbabilities,
-            nonTerminalNodes: nonTerminalNodesProbabilities.Keys.ToArray()
+            nonTerminalNodes: nonTerminalNodesProbabilities.Keys.ToArray(),
+            maxThreads: cliArgs.MaxThreads
         );
         // var mutationShuffle = new ShuffleChildrenMutation(
         //     cliArgs.ChangeNodeMutationProbability,
@@ -110,7 +111,8 @@ class Program
         new CombinedAccuracyFitness(
             inputs,
             outputs,
-            inputNodes
+            inputNodes,
+            cliArgs.MaxThreads
         );
 
         //!  ##### ! #####
@@ -123,8 +125,8 @@ class Program
             new MinTournamentSelection<CombinedTreeChromosome>(5),
             // new TakeNewCombination<CombinedTreeChromosome>()
             // new MinElitismCombination<CombinedTreeChromosome>(
-            //     bestAmount: 2,
-            //     newIndividuals: cliArgs.PopulationSize / 10,
+            //     bestAmount: 1,
+            //     newIndividuals: 0, //cliArgs.PopulationSize / 10,
             //     fitnessFunc: fitness,
             //     createNewChrom: newChromosomeFunc
             // )
@@ -138,9 +140,11 @@ class Program
             MaxThreads = cliArgs.MaxThreads
         };
 
+        CombinedTreeChromosome.MaxThreads = cliArgs.MaxThreads;
+
         var dt = DateTime.UtcNow;
 
-        var masterDirectory = Directory.CreateDirectory($"combined_{dt.Year}-{dt.Month}-{dt.Day}_{dt.Hour}-{dt.Minute}-{dt.Second}");
+        var masterDirectory = Directory.CreateDirectory($"combined-scored_{dt.Year}-{dt.Month:00}-{dt.Day:00}_{dt.Hour:00}-{dt.Minute:00}-{dt.Second:00}");
         var baseDirectory = masterDirectory;
 
         //save cliArgs
@@ -169,6 +173,8 @@ class Program
                 "gen",
                 "minFitness",
                 "averageFitness",
+                "minScore",
+                "averageScore",
                 "minDepth",
                 "averageDepth",
             ];
@@ -185,6 +191,15 @@ class Program
                         .Where(ind => double.IsNormal(ind.Fitness) || ind.Fitness == 0d)
                         .Select(ind => ind.Fitness)
                         .Average();
+                    
+                    var currentMinScore = population
+                        .Select(ind => ind.Score)
+                        .Min();
+                    var currentAvgScore = population
+                        // fitness can be +inf
+                        .Where(ind => double.IsNormal(ind.Score) || ind.Score == 0d)
+                        .Select(ind => ind.Score)
+                        .Average();
 
                     // if (currentMinFitness > previousMinFitness)
                     //     throw new Exception("Weird elitism...");
@@ -198,15 +213,19 @@ class Program
                         genNum,
                         currentMinFitness,
                         currentAvgFitness,
+                        currentMinScore,
+                        currentAvgScore,
                         minDepth,
                         averageDepth
                     }));
 
                     System.Console.Error.WriteLine($"Computed {genNum}th generation. " +
-                        $"Lowest Fitness: {currentMinFitness} " +
-                        $"Average Fitness: {currentAvgFitness} " + //:F2} " +
-                        $"Depth of min: {population.MinBy(ind => ind.Fitness).GetDepth()} " +
-                        $"Average depth: {averageDepth:F1} "
+                        $"MinFitness: {currentMinFitness} " +
+                        $"AvgFitness: {currentAvgFitness} " + //:F2} " +
+                        $"MinScore: {currentMinScore:F3} " +
+                        $"AvgScore: {currentAvgScore:F3} " +
+                        $"Depth of min: {population.MinBy(ind => ind.Fitness).GetDepth():F1} " +
+                        $"AvgDepth: {averageDepth:F1} "
                     );
                     // System.Console.WriteLine(population.Select(ind => ind.Fitness).Stringify());
                 };
@@ -241,12 +260,12 @@ class Program
                         cliArgs.CSVDelimiter
                     );
 
-                var resultAccuracyFitness = new CombinedAccuracyFitness(inputs, outputs, inputNodes);
+                var resultAccuracyFitness = new CombinedAccuracyFitness(inputs, outputs, inputNodes, cliArgs.MaxThreads);
 
                 double accuracyScore = 1d - resultAccuracyFitness.ComputeFitness(bestIndividual);
                 
-                System.Console.Error.WriteLine($"Accuracy score: {accuracyScore * 100 :0.00} %");
-                sw.WriteLine($"Accuracy score: {accuracyScore * 100 :0.00} %");
+                System.Console.Error.WriteLine($"Accuracy score: {accuracyScore * 100 } %");
+                sw.WriteLine($"Accuracy score: {accuracyScore * 100} %");
             }
         }
 

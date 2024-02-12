@@ -105,7 +105,8 @@ class Program
                 inputs,
                 outputs,
                 outputIndex,
-                inputNodes
+                inputNodes,
+                cliArgs.MaxThreads
             );
             var treeBasedGA = new GeneticAlgorithm<TreeChromosome>(
                 newChromosomeFunc,
@@ -167,6 +168,8 @@ class Program
                     "gen",
                     "minFitness",
                     "averageFitness",
+                    "minScore",
+                    "averageScore",
                     "minDepth",
                     "averageDepth",
                 ];

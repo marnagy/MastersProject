@@ -5,12 +5,14 @@ public class AccuracyFitness : Fitness<TreeChromosome>
     private readonly int OutputIndex;
     private bool UseClip = true;
     private readonly InputFunctionality[] InputNodes;
-    public AccuracyFitness(double[,] inputs, int[,] outputs, int outputIndex, InputFunctionality[] inputNodes)
+    private readonly int MaxThreads;
+    public AccuracyFitness(double[,] inputs, int[,] outputs, int outputIndex, InputFunctionality[] inputNodes, int maxThreads)
     {
         this.Inputs = inputs;
         this.Outputs = outputs;
         this.OutputIndex = outputIndex;
         this.InputNodes = inputNodes;
+        this.MaxThreads = maxThreads;
     }
     private double MagicNormalizationCoefficient(TreeChromosome ind)
     => 1d/Math.Pow(2, ind.GetDepth());
@@ -78,9 +80,9 @@ public class AccuracyFitness : Fitness<TreeChromosome>
 
             Enumerable.Range(0, population.Length)
                 .Select(i => (index: i, ind: population[i]))
-                // don't compute fitness again
+                // compute fitness only on newly created chromosomes
                 .Where(tup => tup.ind.Fitness == TreeChromosome.DefaultFitness)
-                .AsParallel()
+                .AsParallel().WithDegreeOfParallelism(this.MaxThreads)
                 .Select(tup => (tup.index, computedResult: tup.ind.ComputeResult()))
                 .ForEach(tup => {
                     int wantedResult = this.Outputs[i, this.OutputIndex];

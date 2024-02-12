@@ -4,6 +4,8 @@ public class CombinedTreeChromosome : Chromosome<CombinedTreeChromosome>
 {
     public TreeChromosome[] Subchromosomes;
     public const double DefaultFitness = -2d;
+    public double Score { get; internal set; }
+    public static int MaxThreads = 4;
 
     private CombinedTreeChromosome(int outputClasses, TreeChromosome[] newSubchromosomes)
     {
@@ -17,16 +19,20 @@ public class CombinedTreeChromosome : Chromosome<CombinedTreeChromosome>
             .Select(_ => newSubchromosome())
             .ToArray()
     );
-    private CombinedTreeChromosome(TreeChromosome[] subchromosomes)
+    private CombinedTreeChromosome(TreeChromosome[] subchromosomes, double fitness, double score)
     {
         this.Subchromosomes = subchromosomes;
-        this.Fitness = CombinedTreeChromosome.DefaultFitness;
+        //this.Fitness = CombinedTreeChromosome.DefaultFitness;
+        this.Fitness = fitness;
+        this.Score = score;
     }
     public CombinedTreeChromosome Clone(TreeChromosome[] subchromosomes)
     => new CombinedTreeChromosome(
         subchromosomes
             .Select(subchrom => subchrom.Clone())
-            .ToArray()
+            .ToArray(),
+        this.Fitness,
+        this.Score
     );
     public override CombinedTreeChromosome Clone()
     => this.Clone(this.Subchromosomes);
@@ -35,14 +41,18 @@ public class CombinedTreeChromosome : Chromosome<CombinedTreeChromosome>
     => new CombinedTreeChromosome(
         this.Subchromosomes
             .Select(subchrom => subchrom.CreateNew())
-            .ToArray()
+            .ToArray(),
+        fitness: 0d,
+        score: 0d
     );
-    public int GetDepth()
-    => this.Subchromosomes.Max(subchrom => subchrom.GetDepth());
+    public double GetDepth()
+    => this.Subchromosomes
+        .Select(subchrom => subchrom.GetDepth())
+        .Max();
 
     public IEnumerable<double> ComputeResults()
     => this.Subchromosomes
-        .AsParallel()
+        .AsParallel().WithDegreeOfParallelism(CombinedTreeChromosome.MaxThreads)
         .Select(subchrom => subchrom.ComputeResult());
     public double[] GetProbabilities()
     {

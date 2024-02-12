@@ -33,6 +33,8 @@ public class MaxElitismCombination<T> : PopulationCombinationStrategy<T> where T
             result[newIndividualsStartIndex + i].UpdateFitness(this.Fitness);
         }
 
-        return result;
+        return result
+            .Select(ind => ind.Clone())
+            .ToArray();
     }
 }

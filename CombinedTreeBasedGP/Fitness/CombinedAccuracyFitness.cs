@@ -6,19 +6,20 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
     private readonly int[,] Outputs;
     private bool UseClip = true;
     private readonly InputFunctionality[] InputNodes;
-    public CombinedAccuracyFitness(double[,] inputs, int[,] outputs, InputFunctionality[] inputNodes)
+    private readonly int MaxThreads;
+    public CombinedAccuracyFitness(double[,] inputs, int[,] outputs, InputFunctionality[] inputNodes, int maxThreads)
     {
         this.Inputs = inputs;
         this.Outputs = outputs;
         this.InputNodes = inputNodes;
+        this.MaxThreads = maxThreads;
     }
     private double MagicNormalizationCoefficient(CombinedTreeChromosome ind)
-    => 1d/
-    Math.Sqrt(
+    => 1d + (
         ind.Subchromosomes
             .Select(subchrom => subchrom.GetDepth())
             .Average()
-    );
+    )/1_000d;
     
     // Math.Pow(
     //     2,
@@ -32,7 +33,7 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
         // if (ind.Fitness != CombinedTreeChromosome.DefaultFitness)
         //     return ind.Fitness;
 
-        int accurateCounter = 0;
+        double accurateCounter = 0;
         int rowsAmount = this.Inputs.GetRowsAmount();
         for (int rowIndex = 0; rowIndex < rowsAmount; rowIndex++)
         {
@@ -57,18 +58,18 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
                     .Zip(this.ConvertToOnehot(values), wantedResults)
                     .All(tup => tup.First == tup.Second)
                 )
-                accurateCounter += 1;
+                accurateCounter += 1d;
         }
 
         if (!this.HasInputNode(ind))
             return double.PositiveInfinity;
 
-        int inputNodesAmount = this.CountInputNodes(ind);
+        // int inputNodesAmount = this.CountInputNodes(ind);
         // without cast to double, the operation would mean "div"
-        double accuracy = (double)accurateCounter / rowsAmount;
+        double accuracy = accurateCounter / rowsAmount;
         // System.Console.Error.WriteLine($"Accuracy: {accuracy}");
         return 
-            (1 - accuracy);
+            1 - accuracy;
             //this.MagicNormalizationCoefficient(ind)
             //1d / inputNodesAmount;
     }
@@ -91,16 +92,15 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
                 inputNode.Value = inputValue;
             }
 
-
+            int[] wantedResults = this.Outputs.GetRow(i).ToArray();
             Enumerable.Range(0, population.Length)
                 .Select(i => (index: i, ind: population[i]))
                 // don't compute fitness again
                 //.Where(tup => tup.ind.Fitness == TreeChromosome.DefaultFitness)
-                .AsParallel()
+                .AsParallel().WithDegreeOfParallelism(this.MaxThreads)
                 .Select(tup => (tup.index, computedResult: tup.ind.ComputeResults()))
                 //.AsSequential()
                 .ForEach(tup => {
-                    var wantedResults = this.Outputs.GetRow(i);
                     double[] computedResults = tup.computedResult.ToArray();
                     var computedOnehot = this.ConvertToOnehot(computedResults);
 
@@ -117,13 +117,17 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
             if (inputNodesAmount == 0)
                 population[j].Fitness = double.PositiveInfinity;
             else
-                population[j].Fitness = accurateCounters[j]; // / (inputNodesAmount * population[j].Sub ); // * this.MagicNormalizationCoefficient(population[j]) / inputNodesAmount;
+            {
+                population[j].Score = accurateCounters[j];
+                population[j].Fitness = accurateCounters[j] + 2*population[j].GetDepth() / this.Inputs.GetRowsAmount(); // * this.MagicNormalizationCoefficient(population[j]);
+
+            }
         }
 
-        if (population.Select(ind => ind.Fitness).Any(fitness => fitness > 1d))
-        {
-            int a = 5;
-        }
+        // if (population.Select(ind => ind.Fitness).Any(fitness => fitness > 1d))
+        // {
+        //     int a = 5;
+        // }
     }
     private bool HasInputNode(CombinedTreeChromosome ind)
     => ind.Subchromosomes

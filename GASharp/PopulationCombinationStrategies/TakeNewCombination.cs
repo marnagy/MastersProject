@@ -2,6 +2,6 @@ public class TakeNewCombination<T> : PopulationCombinationStrategy<T> where T: C
 {
     public override T[] Combine(T[] oldPopulation, T[] newPopulation)
         => newPopulation
-            .Select(ind => ind)
+            .Select(ind => ind.Clone())
             .ToArray();
 }
