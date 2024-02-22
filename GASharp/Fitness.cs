@@ -1,4 +1,15 @@
 abstract public class Fitness<T> where T: Chromosome<T>
 {
-    abstract public double ComputeFitness(T ind);
+    public abstract double ComputeFitness(T ind);
+    /// <summary>
+    /// Thread-safe implementation of computing fitness for whole population.
+    /// </summary>
+    /// <param name="population"></param>
+    public virtual void ComputeFitnessPopulation(T[] population)
+    {
+        foreach (var ind in population)
+        {
+            this.ComputeFitness(ind);
+        }
+    }
 }

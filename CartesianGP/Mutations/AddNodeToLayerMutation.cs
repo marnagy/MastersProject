@@ -3,7 +3,7 @@ public class AddNodeToLayerMutation : Mutation<CartesianChromosome>
     private readonly IReadOnlyDictionary<int, IReadOnlyList<CartesianNode>> NodeCatalogue;
     private readonly IReadOnlyList<CartesianNode> Nodes;
     public AddNodeToLayerMutation(double probability,
-        IReadOnlyDictionary<int, IReadOnlyList<CartesianNode>> nodeCatalogue, int? seed): base(probability, seed)
+        IReadOnlyDictionary<int, IReadOnlyList<CartesianNode>> nodeCatalogue): base(probability)
     {
         this.NodeCatalogue = nodeCatalogue;
         this.Nodes = nodeCatalogue.Keys
@@ -13,10 +13,7 @@ public class AddNodeToLayerMutation : Mutation<CartesianChromosome>
     public override CartesianChromosome Mutate(CartesianChromosome ind, int genNum)
     {
         double rand_value;
-        lock (this)
-        {
-            rand_value = this._rng.NextDouble();
-        }
+        rand_value = Random.Shared.NextDouble();
 
         // don't mutate
         if (rand_value > this.MutationProbability)
@@ -25,28 +22,22 @@ public class AddNodeToLayerMutation : Mutation<CartesianChromosome>
         var layers = ind.DeepCopyLayers();
         
         int indexOfLayerAddNodeTo;
-        lock (this)
-        {
-            // don't change output layer
-            indexOfLayerAddNodeTo = _rng.Next(layers.Count - 1);
-        }
+        // don't change output layer
+        indexOfLayerAddNodeTo = Random.Shared.Next(layers.Count - 1);
 
-        lock (this)
-        {
-            var parents = Enumerable.Range(0, CartesianNode.ParentsAmount)
-                .Select(_ => { 
-                    // include input layer
-                    var parentLayerIndex = this._rng.Next(indexOfLayerAddNodeTo + 1);
-                    return new ParentIndices(){
-                        LayerIndex=parentLayerIndex,
-                        Index=this._rng.Next(ind[parentLayerIndex].Count)
-                    };
-                })
-                .ToArray();
-            layers[indexOfLayerAddNodeTo].Add(
-                this._rng.Choose(this.Nodes).Clone(parents)
-            );
-        }
+        var parents = Enumerable.Range(0, CartesianNode.ParentsAmount)
+            .Select(_ => { 
+                // include input layer
+                var parentLayerIndex = Random.Shared.Next(indexOfLayerAddNodeTo + 1);
+                return new ParentIndices(){
+                    LayerIndex=parentLayerIndex,
+                    Index=Random.Shared.Next(ind[parentLayerIndex].Count)
+                };
+            })
+            .ToArray();
+        layers[indexOfLayerAddNodeTo].Add(
+            Random.Shared.Choose(this.Nodes).Clone(parents)
+        );
 
         var newChromosome = new CartesianChromosome(
             ind.InputsAmount,

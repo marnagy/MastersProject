@@ -1,39 +1,78 @@
 public static class RandomExtensions
 {
-    public static T Choose<T>(this Random rng, IReadOnlyList<T> arr, IList<double>? probabilities = null)
+    /// <summary>
+    /// Chooses one element from given list of elements.
+    /// If no weights are provided, uses uniform probability.
+    /// Weights will get normalized.
+    /// </summary>
+    /// <param name="arr">List of elements to choose from.</param>
+    /// <param name="weights">
+    /// Non-negative weight for each of the elements in previous argument.
+    /// Weights will be normalized.
+    /// </param>
+    /// <returns>Chosen element</returns>
+    /// <exception cref="ArgumentException"></exception>
+    public static T Choose<T>(this Random rng, IReadOnlyList<T> arr, IReadOnlyList<double>? weights = null)
     {
-        if (probabilities is null)
+        double[] probs = CalculateProbabilities(arr, weights);
+
+        return ChooseProbs(rng, arr, probs);
+    }
+    public static IEnumerable<T> ChooseMultiple<T>(this Random rng, IReadOnlyList<T> arr, int k, IReadOnlyList<double>? weights = null)
+    {
+        double[] probs = CalculateProbabilities(arr, weights);
+
+        return Enumerable.Range(0, k)
+            .Select(_ => ChooseProbs(rng, arr, probs));
+    }
+    public static double[] CalculateProbabilities<T>(IReadOnlyList<T> arr)
+    => CalculateProbabilities(
+        arr,
+        Enumerable.Range(0, arr.Count)
+            .Select(_ => 1d/arr.Count)
+            .ToArray()
+    );
+    public static double[] CalculateProbabilities<T>(IReadOnlyList<T> arr, IReadOnlyList<double> weights)
+    {
+        if (weights is null)
         {
             // use uniform probabilities
-            probabilities = Enumerable.Range(0, arr.Count)
+            weights = Enumerable.Range(0, arr.Count)
                 .Select(_ => 1d / arr.Count)
                 .ToArray();
         }
 
-        if (arr.Count != probabilities.Count)
-            throw new ArgumentException("Array of individuals and probabilities have to have the same length.");
+        if (arr.Count != weights.Count)
+            throw new ArgumentException("Array of individuals and weights have to have the same length.");
 
-        if (probabilities.Any(p => p < 0))
-            throw new ArgumentException("All probabilities have to be non-negative numbers.");
-
-        double randValue;
-        lock (rng)
+        if (weights.Any(p => p < 0))
         {
-            randValue = rng.NextDouble();
+            throw new ArgumentException("Array of weights cannot contain negative values.");
+            // double minWeight = weights.Min();
+            // weights = weights
+            //     .Select(w => w - minWeight + 1)
+            //     .ToArray();
         }
 
         // normalize
-        var probsSum = probabilities.Sum();
-        var probs = probabilities
+        var probsSum = weights.Sum();
+        var probs = weights
             .Select(p => p / probsSum)
             .ToArray();
+        
+        return probs;
+    }
+    public static T ChooseProbs<T>(this Random rng, IReadOnlyList<T> arr, IReadOnlyList<double> probs)
+    {
+        double randValue;
+        randValue = rng.NextDouble();
 
-        for (int i = 0; i < probabilities.Count - 1; i++)
+        for (int i = 0; i < probs.Count - 1; i++)
         {
-            if (randValue < probabilities[i])
+            if (randValue < probs[i])
                 return arr[i];
             else
-                randValue = randValue - probabilities[i];
+                randValue = randValue - probs[i];
         }
 
         // return the last one

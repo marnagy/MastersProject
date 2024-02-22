@@ -1,1 +1,1 @@
-call dotnet build
+call dotnet build -c Debug

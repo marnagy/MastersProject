@@ -8,4 +8,14 @@
 *.err
 *.out
 
+2024*
+combined_2024*
+combined-scored_2024*
+
+wine_dataset
+
 python/venv
+
+# release directories
+Windows_x64
+OSX_arm
