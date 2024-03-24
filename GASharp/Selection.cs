@@ -4,5 +4,8 @@ public abstract class Selection<T>
     /// <summary>
     /// Prevent having to recalculate probabilities by already providing them.
     /// </summary>
-    public abstract Tuple<T, T> ChooseParents(IReadOnlyList<T> population, IReadOnlyList<double> probabilities);
+    public abstract Tuple<T, T> ChooseParents(
+        IReadOnlyList<T> population,
+        IReadOnlyList<double> probabilities
+    );
 }

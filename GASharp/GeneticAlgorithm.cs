@@ -27,8 +27,10 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
     public int MaxThreads = 1;
     public GeneticAlgorithm(Func<T> createNewFunc,
         IList<Mutation<T>> mutations,
-        Crossover<T>[] crossovers, Fitness<T> fitness, Selection<T> selection,
-        PopulationCombinationStrategy<T> popCombination) //, Action<int, IReadOnlyList<T>> callback)
+        Crossover<T>[] crossovers,
+        Fitness<T> fitness,
+        Selection<T> selection,
+        PopulationCombinationStrategy<T> popCombination)
     {
         this.createNewInd = createNewFunc;
         this.mutations = mutations;

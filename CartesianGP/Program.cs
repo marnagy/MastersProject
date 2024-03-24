@@ -5,10 +5,19 @@ class Program
     public static void Main(string[] args)
     {
         Options cliArgs = Parser.Default.ParseArguments<Options>(args).Value;
+        //System.Console.WriteLine(cliArgs);
+        if (cliArgs == null) // --help case
+            return;
+        
+        if (!CheckArgs(cliArgs))
+        {
+            System.Console.Error.WriteLine("Invalid arguments.");
+            System.Console.Error.WriteLine(cliArgs);
+        }
 
-        System.Console.WriteLine(cliArgs);
+        double terminalNodesProbability = cliArgs.TerminalNodesProbability;
 
-        return;
+        // return;
 
         var test_input = new[] {1,2,3,4,5};
         var inputs = new double[5, 2];
@@ -111,6 +120,11 @@ class Program
         );
 
         // System.Threading.Thread.Sleep(5_000);
+    }
+
+    private static bool CheckArgs(Options cliArgs)
+    {
+        return true;
     }
 }
 // testing CLI arguments

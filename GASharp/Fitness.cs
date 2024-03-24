@@ -4,7 +4,6 @@ abstract public class Fitness<T> where T: Chromosome<T>
     /// <summary>
     /// Thread-safe implementation of computing fitness for whole population.
     /// </summary>
-    /// <param name="population"></param>
     public virtual void ComputeFitnessPopulation(T[] population)
     {
         foreach (var ind in population)
