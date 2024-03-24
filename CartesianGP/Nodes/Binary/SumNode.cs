@@ -1,5 +1,3 @@
-using System.Text;
-
 public class SumNode : BinaryNode
 {
     public SumNode(ParentIndices[] parents) : base(parents) { }

@@ -43,15 +43,20 @@ class Program
             terminalNodesProbabilities.Add(new ValueFunctionality(i), cliArgs.ValueNodeProbability);
             //terminalNodesProbabilities.Add(new ValueFunctionality(-i), cliArgs.ValueNodeProbability);
         }
+        // also add input nodes so they can be used wherever in trees
         foreach (var inputNode in inputNodes)
         {
             terminalNodesProbabilities.Add(inputNode, cliArgs.InputNodeProbability);
         }
-        var nonTerminalNodesProbabilities = new Dictionary<NodeFunctionality, double> {
+        var nonTerminalNodesProbabilities = new Dictionary<NodeFunctionality, double>
+        {
+            // tertiary
             {new ConditionNode(), cliArgs.ConditionNodeProbability},
+            // binary
             {new SumNode(), cliArgs.SumNodeProbability},
             {new ProductNode(), cliArgs.ProductNodeProbability},
             {new PowerNode(), cliArgs.PowerNodeProbability},
+            // unary
             {new UnaryMinusNode(), cliArgs.UnaryMinusNodeProbability},
             {new SinNode(), cliArgs.SinNodeProbability},
             {new ReLUNode(), cliArgs.ReLUNodeProbability},

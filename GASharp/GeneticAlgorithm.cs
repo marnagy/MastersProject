@@ -18,7 +18,6 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
     /// Can be used for collecting metadata for analysis after run.
     /// </summary>
     public double CrossoverProbability;
-    public double MutationProbability;
     public int MaxGenerations = 500;
     public int PopulationSize = 50;
     private bool UseTimes = false;

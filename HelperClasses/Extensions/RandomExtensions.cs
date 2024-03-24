@@ -2,7 +2,7 @@ public static class RandomExtensions
 {
     /// <summary>
     /// Chooses one element from given list of elements.
-    /// If no weights are provided, uses uniform probability.
+    /// If no weights are provided, method uses uniform probability.
     /// Weights will get normalized.
     /// </summary>
     /// <param name="arr">List of elements to choose from.</param>

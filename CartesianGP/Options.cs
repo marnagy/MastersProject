@@ -34,17 +34,17 @@ public class Options
     [Option("crossover-probability", Default = 0.5d, HelpText = "Probability of each mutation taking action.")]
     public double CrossoverProbability { get; set; }
 
-    // specific for TreeBasedGP
-    [Option("terminal-nodes-probability", Default = 0.2d, HelpText = "Probability of choosing from terminal nodes instead of non-terminal nodes.")]
-    public double TerminalNodesProbability { get; set; }
-    [Option("depth", Default = 3, HelpText = "Maximum depth of starting trees.")]
-    public int DefaultTreeDepth { get; set; }
+    // specific for CartesianGP
+    [Option("layer-sizes", Default = new[]{10, 5}, HelpText = "Maximum depth of starting trees.")]
+    public int[]? LayerSizes { get; set; }
+
+    // node probabilities
     [Option("change-node-mutation-probability", Default = 0.3d, HelpText = "Probability of using ChangeNodeMutation class.")]
     public double ChangeNodeMutationProbability { get; set; }
     [Option("percentage-to-change", Default = 0.2d, HelpText = "How much of 1 individual should mutation change.")]
     public double PercentageToChange { get; set; }
-
-    // node probabilities
+    [Option("terminal-nodes-probability", Default = 0.2d, HelpText = "Probability of choosing from terminal nodes instead of non-terminal nodes.")]
+    public double TerminalNodesProbability { get; set; }
     [Option("value-node-weight", Default = 0.2d)]
     public double ValueNodeProbability { get; set; }
     [Option("sum-node-weight", Default = 0.2d)]

@@ -17,6 +17,91 @@ class Program
 
         double terminalNodesProbability = cliArgs.TerminalNodesProbability;
 
+        // prepare CSV
+        (double[,] inputs, int[,] outputs) = CSVHelper.PrepareCSV(
+            cliArgs.TrainCSVFilePath,
+            cliArgs.CSVInputsAmount,
+            cliArgs.CSVDelimiter
+        );
+        int inputSize = inputs.GetRow(0).Count();
+        int outputSize = outputs.GetRow(0).Count();
+
+        var emptyParents = CartesianNode.GetEmptyParents();
+        var terminalNodesProbabilities = new Dictionary<CartesianNode, double>
+        {
+            {new ValueNode(0d, emptyParents), cliArgs.ValueNodeProbability}
+        };
+        for (int i = 1; i <= 2; i++)
+        {
+            terminalNodesProbabilities.Add(
+                new ValueNode(i, emptyParents), cliArgs.ValueNodeProbability
+            );
+        }
+        // no need to add input nodes
+
+        var nonTerminalNodesProbabilities = new Dictionary<CartesianNode, double>
+        {
+            // tertiary
+            {new ConditionNode(emptyParents), cliArgs.ConditionNodeProbability},
+            // binary
+            {new SumNode(emptyParents), cliArgs.SumNodeProbability},
+            {new ProductNode(emptyParents), cliArgs.ProductNodeProbability},
+            {new PowerNode(emptyParents), cliArgs.PowerNodeProbability},
+            // unary
+            {new UnaryMinusNode(emptyParents), cliArgs.UnaryMinusNodeProbability},
+            {new SinNode(emptyParents), cliArgs.SinNodeProbability},
+            {new ReLUNode(emptyParents), cliArgs.ReLUNodeProbability},
+            {new SigmoidNode(emptyParents), cliArgs.SigmoidNodeProbability}
+
+        };
+
+        var trainAccuracy = new AccuracyFitness(
+            inputs,
+            outputs,
+            cliArgs.MaxThreads
+        );
+
+        int[] layerSizes = new int[1 + cliArgs.LayerSizes.Length + 1];
+        layerSizes[0] = inputSize;
+        layerSizes[^1] = outputSize;
+        cliArgs.LayerSizes.CopyTo(layerSizes, 1);
+
+        Func<CartesianChromosome> createNewChromosome = ()
+            => CartesianChromosome.CreateNewRandom(
+                layerSizes,
+                cliArgs.TerminalNodesProbability,
+                terminalNodesProbabilities,
+                nonTerminalNodesProbabilities
+            );
+        var cartesianGA = new GeneticAlgorithm<CartesianChromosome>(
+            createNewChromosome,
+            new[]{ new ChangeNodeMutation(
+                    cliArgs.PercentageToChange,
+                    cliArgs.MutationProbability,
+                    cliArgs.TerminalNodesProbability,
+                    nonTerminalNodesProbabilities,
+                    terminalNodesProbabilities
+                ),
+            },
+            [new FixedIndexCrossover()],
+            trainAccuracy,
+            new MinTournamentSelection<CartesianChromosome>(folds: 5),
+            new MinElitismCombination<CartesianChromosome>(
+                bestAmount: 1,
+                newIndividuals: 0,
+                trainAccuracy,
+                createNewChromosome
+            )
+        ){
+            CrossoverProbability = cliArgs.CrossoverProbability,
+            MaxGenerations = cliArgs.MaxGenerations,
+            PopulationSize = cliArgs.PopulationSize,
+            MinThreads = cliArgs.MinThreads,
+            MaxThreads = cliArgs.MaxThreads
+        };
+
+        // TODO: implement multiple runs
+
         // return;
 
         var test_input = new[] {1,2,3,4,5};

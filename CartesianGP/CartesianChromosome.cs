@@ -7,7 +7,7 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
     /// </summary>
     private readonly ValueNode[] Inputs;
     /// <summary>
-    /// Internal layer <b>excluding</b> Inputs.
+    /// Internal layers <b>excluding</b> Input nodes.
     /// </summary>
     private List<List<CartesianNode>> Layers;
     /// <summary>
@@ -28,11 +28,23 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
     }
 
     public static CartesianChromosome CreateNewRandom(int[] layerSizes,
-        IReadOnlyDictionary<int, IReadOnlyList<CartesianNode>> nodeCatalogue)
+        double terminalNodesProbability,
+        IReadOnlyDictionary<CartesianNode, double> terminalNodesProbabilities,
+        IReadOnlyDictionary<CartesianNode, double> nonTerminalNodesProbabilities
+        // , IReadOnlyDictionary<int, IReadOnlyList<CartesianNode>> nodeCatalogue
+        )
     {
         // !: Fix creation of chromosome
         // invalid LayerIndex in nodes
         var now = DateTime.UtcNow;
+        IReadOnlyList<CartesianNode> terminalNodes = terminalNodesProbabilities.Keys.ToArray();
+        IReadOnlyList<double> terminalNodesWeights = terminalNodes
+            .Select(node => terminalNodesProbabilities[node])
+            .ToArray();
+        IReadOnlyList<CartesianNode> nonTerminalNodes = nonTerminalNodesProbabilities.Keys.ToArray();
+        IReadOnlyList<double> nonTerminalNodesWeights = nonTerminalNodes
+            .Select(node => nonTerminalNodesProbabilities[node])
+            .ToArray();
 
         int inputsAmount = layerSizes[0];
         List<List<CartesianNode>> layers = new List<List<CartesianNode>>();
@@ -64,16 +76,33 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
                         Index = nodeIndex
                     });
                 }
+
+                CartesianNode newNode;
+                IReadOnlyList<CartesianNode> nodes;
+                IReadOnlyList<double> nodesWeights;
+                if (Random.Shared.NextDouble() < terminalNodesProbability)
+                {
+                    nodes = terminalNodes;
+                    nodesWeights = terminalNodesWeights;
+                }
+                else
+                {
+                    nodes = nonTerminalNodes;
+                    nodesWeights = nonTerminalNodesWeights;
+                }
+                newNode = Random.Shared.Choose(nodes, nodesWeights)
+                    .Clone(parents.ToArray());
+
                 // choose node and create clone with new parents
                 // choose random arity
-                var arities = nodeCatalogue.Keys.ToArray();
-                var arityIndex = Random.Shared.Choose(arities);
-                CartesianNode templateNode = Random.Shared.Choose(nodeCatalogue[
-                    arityIndex
-                ]);
-                CartesianNode newNode = templateNode.Clone(
-                    parents.ToArray()
-                );
+                // var arities = nodeCatalogue.Keys.ToArray();
+                // var arityIndex = Random.Shared.Choose(arities);
+                // CartesianNode templateNode = Random.Shared.Choose(nodeCatalogue[
+                //     arityIndex
+                // ]);
+                // CartesianNode newNode = templateNode.Clone(
+                //     parents.ToArray()
+                // );
                 System.Console.Error.WriteLine($"Creating node with parents:");
                 foreach (ParentIndices par in newNode.Parents)
                 {
@@ -88,7 +117,7 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
         return new CartesianChromosome(inputsAmount, layers);
     }
 
-    public IEnumerable<double> ComputeResult(double[] input)
+    public IList<double> ComputeResult(double[] input)
     {
         if (this.Inputs.Length != input.Length)
             throw new ArgumentException($"Invalid number of inputs. Expected {this.Inputs.Length}, got {input.Length}");
@@ -100,7 +129,8 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
         }
 
         return this.Layers[^1]
-            .Select(node => node.Compute(this));
+            .Select(node => node.Compute(this))
+            .ToArray();
     }
 
     public override CartesianChromosome Clone()
