@@ -128,7 +128,6 @@ class Program
                 MaxGenerations = cliArgs.MaxGenerations,
                 CrossoverProbability = cliArgs.CrossoverProbability,
                 PopulationSize = cliArgs.PopulationSize,
-                MutationProbability = cliArgs.MutationProbability,
                 MinThreads = cliArgs.MinThreads,
                 MaxThreads = cliArgs.MaxThreads
             };

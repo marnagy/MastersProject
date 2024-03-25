@@ -1,0 +1,1 @@
+call dotnet run --project ./CartesianGP -- --train-csv prepared_train_Iris.csv --csv-inputs-amount 4 --population-size 50 --max-generations 1000 --percentage-to-change 0.1 --crossover-probability 0.2 --mutation-probability 0.4 --terminal-nodes-probability 0.1 --min-threads 2 --max-threads 4 --layer-sizes 20 10

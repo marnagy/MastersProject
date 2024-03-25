@@ -1,16 +1,9 @@
 public class ChangeParentsMutation : Mutation<CartesianChromosome>
 {
     public double PercentageToChange { get; }
-    private readonly IReadOnlyDictionary<int, IList<CartesianNode>> NodeCatalogue;
-    private readonly IList<CartesianNode> Nodes;
-    public ChangeParentsMutation(double chromosomePercentageToChange, double probability,
-            Dictionary<int, IList<CartesianNode>> nodeCatalogue) : base(probability)
+    public ChangeParentsMutation(double chromosomePercentageToChange, double probability) : base(probability)
     {
         this.PercentageToChange = chromosomePercentageToChange;
-        this.NodeCatalogue = nodeCatalogue;
-        this.Nodes = nodeCatalogue.Keys
-            .SelectMany(arity => nodeCatalogue[arity])
-            .ToArray();
     }
     public override CartesianChromosome Mutate(CartesianChromosome ind, int genNum)
     {
@@ -38,6 +31,7 @@ public class ChangeParentsMutation : Mutation<CartesianChromosome>
             {
                 if (shouldNodeMutate[i][j])
                 {
+                    // !: FIX THIS
                     // choose new parent nodes
                     // choose layer and index within uniformly
                     ParentIndices[] newParents;

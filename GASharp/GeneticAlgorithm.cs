@@ -154,10 +154,10 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
             if (UseTimes)
                 System.Console.Error.WriteLine($"Population combination took {DateTime.UtcNow - start} s");
 
-            for (int i = 0; i < nextPopulation.Length; i++)
-            {
-                nextPopulation[i] = null;
-            }
+            // for (int i = 0; i < nextPopulation.Length; i++)
+            // {
+            //     nextPopulation[i] = null;
+            // }
 
             start = DateTime.UtcNow;
             callback(genNum, population);
@@ -186,20 +186,19 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
         for (int genNum = 0; genNum < MaxGenerations; genNum++)
         {
             // select parents
-            var parents = Enumerable.Range(0, population.Length / 2)
+            IList<Tuple<T,T>> parents = Enumerable.Range(0, population.Length / 2)
                 .Select(_ => this.selectionStrategy.ChooseParents(population))
                 .Select(par => new Tuple<T, T>(par.Item1.Clone(), par.Item2.Clone()))
                 .ToArray();
 
             // crossover
-            // TODO: choose only 1 using GA.
-            var nextPopulation = parents
+            T[] nextPopulation = parents
                 .Select(p => (p, prob: Random.Shared.NextDouble()))
                 .Select(parents => {
                     if (parents.prob < this.CrossoverProbability)
                         return this.crossovers[0].Cross(parents.p.Item1, parents.p.Item2);
                     else
-                        return new Tuple<T, T>(parents.p.Item1, parents.p.Item2);
+                        return new Tuple<T, T>(parents.p.Item1.Clone(), parents.p.Item2.Clone());
                 })
                 .SelectMany(tup => new[] {tup.Item1, tup.Item2})
                 .ToArray();

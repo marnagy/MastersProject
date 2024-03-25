@@ -1,3 +1,5 @@
+using System.Text;
+
 public class ValueNode : CartesianNode
 {
     public double Value { get; internal set; }
@@ -31,5 +33,10 @@ public class ValueNode : CartesianNode
     public override string ToString()
     {
         return $"ValueNode:{this.Value}";
+    }
+
+    public override void GetRepresentation(StringBuilder sb, CartesianChromosome _)
+    {
+        sb.Append(this.Value);
     }
 }

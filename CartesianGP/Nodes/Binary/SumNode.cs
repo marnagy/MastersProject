@@ -1,3 +1,5 @@
+using System.Text;
+
 public class SumNode : BinaryNode
 {
     public SumNode(ParentIndices[] parents) : base(parents) { }
@@ -22,5 +24,16 @@ public class SumNode : BinaryNode
         }
 
         return false;
+    }
+
+    public override void GetRepresentation(StringBuilder sb, CartesianChromosome ind)
+    {
+        var firstParent = this.Parents[0];
+        var secondParent = this.Parents[1];
+        sb.Append('(');
+        ind[firstParent.LayerIndex][firstParent.Index].GetRepresentation(sb, ind);
+        sb.Append('+');
+        ind[secondParent.LayerIndex][secondParent.Index].GetRepresentation(sb, ind);
+        sb.Append(')');
     }
 }

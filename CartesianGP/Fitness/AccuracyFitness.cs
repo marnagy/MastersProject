@@ -60,7 +60,10 @@ public class AccuracyFitness : Fitness<CartesianChromosome>
             );
             var wantedResult = this.Outputs.GetRow(row).ToArray();
 
-            if (wantedResult == computedResult)
+            if (Enumerable
+                    .Zip(wantedResult, computedResult)
+                    .All(tup => tup.First == tup.Second)
+                )
                 correctAmount += 1;
         }
 

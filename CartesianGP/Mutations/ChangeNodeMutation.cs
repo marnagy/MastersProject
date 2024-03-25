@@ -49,10 +49,10 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
                 if (shouldNodeMutate[i][j])
                 {
                     // choose new random node, preserve parents
-                    System.Console.Error.WriteLine($"PreviousParents: {layers[i][j].Parents.Stringify()}");
-                    layers[i][j] = this.PerformMutation(ind, layerIndex: i, nodeIndex: j);
+                    // System.Console.Error.WriteLine($"PreviousParents: {layers[i][j].Parents.Stringify()}");
+                    layers[i][j] = this.PerformMutation(previousNode: layers[i][j], layerIndex: i, nodeIndex: j);
                     // layers[i][j] = Random.Shared.Choose(this.Nodes).Clone(layers[i][j].Parents);
-                    System.Console.Error.WriteLine($"Parents after mutation: {layers[i][j].Parents.Stringify()}");
+                    // System.Console.Error.WriteLine($"Parents after mutation: {layers[i][j].Parents.Stringify()}");
                 }
             }
         }
@@ -62,16 +62,15 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
             layers
         );
 
-        System.Console.Error.WriteLine($"ChangeNodeCreated valid chromosome? {CartesianChromosome.IsValid(newChromosome)}");
+        // System.Console.Error.WriteLine($"ChangeNodeCreated valid chromosome? {CartesianChromosome.IsValid(newChromosome)}");
 
-        if ( !CartesianChromosome.IsValid(newChromosome) )
-            throw new Exception($"Created invalid chromosome in {this.GetType()}!");
+        // if ( !CartesianChromosome.IsValid(newChromosome) )
+        //     throw new Exception($"Created invalid chromosome in {this.GetType()}!");
 
         return newChromosome;
     }
-    private CartesianNode PerformMutation(CartesianChromosome ind, int layerIndex, int nodeIndex)
+    private CartesianNode PerformMutation(CartesianNode previousNode, int layerIndex, int nodeIndex)
     {
-        var previousNode = ind[layerIndex][nodeIndex];
         IReadOnlyList<CartesianNode> nodes;
         IReadOnlyList<double> nodesWeights;
 

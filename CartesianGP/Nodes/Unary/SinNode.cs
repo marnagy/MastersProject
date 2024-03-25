@@ -1,3 +1,5 @@
+using System.Text;
+
 public class SinNode : UnaryNode
 {
     public SinNode(ParentIndices[] parents): base(parents)
@@ -26,5 +28,13 @@ public class SinNode : UnaryNode
         }
 
         return false;
+    }
+
+    public override void GetRepresentation(StringBuilder sb, CartesianChromosome ind)
+    {
+        var firstParent = this.Parents[0];
+        sb.Append("sin(");
+        ind[firstParent.LayerIndex][firstParent.Index].GetRepresentation(sb, ind);
+        sb.Append(')');
     }
 }

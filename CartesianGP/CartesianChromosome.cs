@@ -5,7 +5,7 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
     /// <summary>
     /// Layer of ValueNode nodes representing inputs. ParentIndices set to <b>-1</b>. 
     /// </summary>
-    private readonly ValueNode[] Inputs;
+    private readonly InputNode[] Inputs;
     /// <summary>
     /// Internal layers <b>excluding</b> Input nodes.
     /// </summary>
@@ -18,7 +18,7 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
     public CartesianChromosome(int inputsAmount, List<List<CartesianNode>> layers)
     {
         this.Inputs = Enumerable.Range(0, inputsAmount)
-            .Select(_ => new ValueNode(0d, CartesianNode.GetEmptyParents()))
+            .Select(i => new InputNode(0d, inputIndex: i, CartesianNode.GetEmptyParents()))
             .ToArray();
         this.Layers = layers;
     }
@@ -69,7 +69,7 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
                         // random from other layers
                         nodeIndex = Random.Shared.Next(layers[layerIndex - 1].Count);
                     }
-                    System.Console.Error.WriteLine($"Choosing parent LayerIndex {layerIndex} with Index {nodeIndex}");
+                    // System.Console.Error.WriteLine($"Choosing parent LayerIndex {layerIndex} with Index {nodeIndex}");
                     parents.Add(new ParentIndices
                     {
                         LayerIndex = layerIndex,
@@ -103,11 +103,11 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
                 // CartesianNode newNode = templateNode.Clone(
                 //     parents.ToArray()
                 // );
-                System.Console.Error.WriteLine($"Creating node with parents:");
-                foreach (ParentIndices par in newNode.Parents)
-                {
-                    System.Console.Error.WriteLine($"Choosing parent LayerIndex {par.LayerIndex} with Index {par.Index}");
-                }
+                // System.Console.Error.WriteLine($"Creating node with parents:");
+                // foreach (ParentIndices par in newNode.Parents)
+                // {
+                //     System.Console.Error.WriteLine($"Choosing parent LayerIndex {par.LayerIndex} with Index {par.Index}");
+                // }
                 layers[currentLayer - 1].Add(
                     newNode
                 );
@@ -197,9 +197,18 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
 
         return isValid;
     }
-
+    /// <summary>
+    /// Get sizes of layers <b>excluding</b> input layer.
+    /// </summary>
+    /// <returns></returns> <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public IEnumerable<int> GetLayerSizes()
         => this.Layers.Select(layer => layer.Count);
+    
+    public int GetDepth()
+    => 1 + this.Layers.Count;
 
     public int InputsAmount => this.Inputs.Length;
 
@@ -221,6 +230,17 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
             sb.Append("[");
             sb.Append(string.Join(", ", layer));
             sb.AppendLine("]");
+        }
+        return sb.ToString();
+    }
+
+    internal string GetRepresentation()
+    {
+        var sb = new StringBuilder();
+        foreach (var outputNode in this.Layers[^1])
+        {
+            outputNode.GetRepresentation(sb, this);
+            sb.AppendLine();
         }
         return sb.ToString();
     }

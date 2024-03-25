@@ -1,3 +1,5 @@
+using System.Text;
+
 public class ReLUNode : UnaryNode
 {
     public ReLUNode(ParentIndices[] parents): base(parents)
@@ -29,5 +31,13 @@ public class ReLUNode : UnaryNode
         }
 
         return false;
+    }
+
+    public override void GetRepresentation(StringBuilder sb, CartesianChromosome ind)
+    {
+        var firstParent = this.Parents[0];
+        sb.Append("ReLU(");
+        ind[firstParent.LayerIndex][firstParent.Index].GetRepresentation(sb, ind);
+        sb.Append(')');
     }
 }

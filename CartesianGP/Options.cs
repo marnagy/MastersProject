@@ -36,7 +36,7 @@ public class Options
 
     // specific for CartesianGP
     [Option("layer-sizes", Default = new[]{10, 5}, HelpText = "Maximum depth of starting trees.")]
-    public int[]? LayerSizes { get; set; }
+    public IList<int>? LayerSizes { get; set; }
 
     // node probabilities
     [Option("change-node-mutation-probability", Default = 0.3d, HelpText = "Probability of using ChangeNodeMutation class.")]

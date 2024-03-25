@@ -1,3 +1,5 @@
+using System.Net;
+
 /// <summary>
 /// Splits Chromosomes using the same index of layers and fixes index
 /// </summary>
@@ -19,11 +21,11 @@ public class FixedIndexCrossover : Crossover<CartesianChromosome>
         var layers1 = ind1.DeepCopyLayers();
         var layers2 = ind2.DeepCopyLayers();
 
-        var newLayers1 = layers1.GetRange(0, splittingIndex-1);
+        var newLayers1 = layers1.GetRange(0, splittingIndex);
         newLayers1.AddRange(
             layers2.GetRange(splittingIndex, layers2.Count - splittingIndex)
         );
-        var newLayers2 = layers2.GetRange(0, splittingIndex-1);
+        var newLayers2 = layers2.GetRange(0, splittingIndex);
         newLayers2.AddRange(
             layers1.GetRange(splittingIndex, layers1.Count - splittingIndex)
         );
@@ -42,6 +44,10 @@ public class FixedIndexCrossover : Crossover<CartesianChromosome>
                         {
                             var parentLayerIndex = parent.LayerIndex;
                             var fixedParentIndexWithinLayer = parent.Index;
+
+                            // index to inputs (no need to fix)
+                            if (parentLayerIndex == 0)
+                                return parent.Clone();
 
                             // If the node is from bigger layer, fix to the last node.
                             if (fixedParentIndexWithinLayer >= layers[parentLayerIndex - 1].Count)

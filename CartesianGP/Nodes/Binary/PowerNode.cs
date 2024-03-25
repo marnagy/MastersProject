@@ -1,3 +1,5 @@
+using System.Text;
+
 public class PowerNode : BinaryNode
 {
     public PowerNode(ParentIndices[] parents) : base(parents) { }
@@ -26,5 +28,16 @@ public class PowerNode : BinaryNode
         }
 
         return false;
+    }
+
+    public override void GetRepresentation(StringBuilder sb, CartesianChromosome ind)
+    {
+        var baseParent = this.Parents[0];
+        var exponentParent = this.Parents[1];
+        sb.Append('(');
+        ind[baseParent.LayerIndex][baseParent.Index].GetRepresentation(sb, ind);
+        sb.Append("**");
+        ind[exponentParent.LayerIndex][exponentParent.Index].GetRepresentation(sb, ind);
+        sb.Append(')');
     }
 }

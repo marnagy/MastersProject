@@ -1,3 +1,5 @@
+using System.Text;
+
 public class ConditionNode : CartesianNode
 {
     public ConditionNode(ParentIndices[] parents): base(parents) { }
@@ -37,5 +39,16 @@ public class ConditionNode : CartesianNode
         }
         else
             return false;
+    }
+
+    public override void GetRepresentation(StringBuilder sb, CartesianChromosome ind)
+    {
+        sb.Append("[if ");
+        this.GetConditionNode(ind).GetRepresentation(sb, ind);
+        sb.Append(" > 0) then (");
+        this.GetTrueNode(ind).GetRepresentation(sb, ind);
+        sb.Append(") else (");
+        this.GetFalseNode(ind).GetRepresentation(sb, ind);
+        sb.Append(")]");
     }
 }

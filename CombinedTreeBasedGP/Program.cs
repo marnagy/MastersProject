@@ -140,7 +140,6 @@ class Program
             MaxGenerations = cliArgs.MaxGenerations,
             CrossoverProbability = cliArgs.CrossoverProbability,
             PopulationSize = cliArgs.PopulationSize,
-            MutationProbability = cliArgs.MutationProbability,
             MinThreads = cliArgs.MinThreads,
             MaxThreads = cliArgs.MaxThreads
         };
@@ -173,7 +172,7 @@ class Program
             CombinedTreeChromosome[] resultPopulation; // = new CombinedTreeChromosome[cliArgs.PopulationSize];
             CombinedTreeChromosome bestIndividual;
             System.Console.Error.WriteLine($"Running GA...");
-            previousMinFitness = double.PositiveInfinity;
+            // previousMinFitness = double.PositiveInfinity;
             string[] columnNames = [
                 "gen",
                 "minFitness",
@@ -209,7 +208,7 @@ class Program
                     // if (currentMinFitness > previousMinFitness)
                     //     throw new Exception("Weird elitism...");
                     
-                    previousMinFitness = currentMinFitness;
+                    // previousMinFitness = currentMinFitness;
 
                     var depthsFunc = population.Select(ind => ind.GetDepth());
                     var minDepth = depthsFunc.Min();
@@ -286,9 +285,9 @@ class Program
             .ToArray();
     }
 
-    public static bool CheckArgs(Options args)
+    public static bool CheckArgs(Options cliArgs)
     {
-        return args.TrainCSVFilePath != null
-            && args.CSVInputsAmount > 0;
+        return cliArgs.TrainCSVFilePath != null
+            && cliArgs.CSVInputsAmount > 0;
     }
 }

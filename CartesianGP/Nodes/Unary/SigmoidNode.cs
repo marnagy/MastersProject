@@ -1,3 +1,5 @@
+using System.Text;
+
 public class SigmoidNode : UnaryNode
 {
     public SigmoidNode(ParentIndices[] parents): base(parents)
@@ -28,5 +30,13 @@ public class SigmoidNode : UnaryNode
         }
 
         return false;
+    }
+
+    public override void GetRepresentation(StringBuilder sb, CartesianChromosome ind)
+    {
+        var firstParent = this.Parents[0];
+        sb.Append("sigmoid(");
+        ind[firstParent.LayerIndex][firstParent.Index].GetRepresentation(sb, ind);
+        sb.Append(')');
     }
 }

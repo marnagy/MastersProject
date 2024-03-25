@@ -57,7 +57,7 @@ def main():
     )
 
     print('Done')
-    # plt.yscale('log')
+    plt.yscale('log')
     plt.show()
 
     print('Plotting depth...', end='')

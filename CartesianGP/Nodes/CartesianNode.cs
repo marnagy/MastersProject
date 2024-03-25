@@ -59,4 +59,5 @@ public abstract class CartesianNode : IEquatable<CartesianNode>
         }
         return sb.ToString();
     }
+    public abstract void GetRepresentation(StringBuilder sb, CartesianChromosome ind);
 }

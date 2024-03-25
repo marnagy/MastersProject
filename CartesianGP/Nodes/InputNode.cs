@@ -1,3 +1,5 @@
+using System.Text;
+
 public class InputNode : ValueNode
 {
     public readonly int InputIndex;
@@ -33,5 +35,9 @@ public class InputNode : ValueNode
     public override string ToString()
     {
         return $"InputNode:x_{this.InputIndex}";
+    }
+    public override void GetRepresentation(StringBuilder sb, CartesianChromosome _)
+    {
+        sb.Append($"x_{this.InputIndex}");
     }
 }
