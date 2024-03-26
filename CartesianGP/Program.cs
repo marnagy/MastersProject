@@ -56,10 +56,10 @@ class Program
             {new ProductNode(emptyParents), cliArgs.ProductNodeProbability},
             // {new PowerNode(emptyParents), cliArgs.PowerNodeProbability},
             // unary
-            // {new UnaryMinusNode(emptyParents), cliArgs.UnaryMinusNodeProbability},
-            // {new SinNode(emptyParents), cliArgs.SinNodeProbability},
-            // {new ReLUNode(emptyParents), cliArgs.ReLUNodeProbability},
-            // {new SigmoidNode(emptyParents), cliArgs.SigmoidNodeProbability}
+            {new UnaryMinusNode(emptyParents), cliArgs.UnaryMinusNodeProbability},
+            {new SinNode(emptyParents), cliArgs.SinNodeProbability},
+            {new ReLUNode(emptyParents), cliArgs.ReLUNodeProbability},
+            {new SigmoidNode(emptyParents), cliArgs.SigmoidNodeProbability}
 
         };
 
@@ -107,27 +107,27 @@ class Program
             [ 
                 new ChangeNodeMutation(
                     cliArgs.PercentageToChange,
-                    cliArgs.MutationProbability,
+                    cliArgs.ChangeNodeMutationProbability,
                     cliArgs.TerminalNodesProbability,
                     nonTerminalNodesProbabilities,
                     terminalNodesProbabilities
                 ),
-                // new ChangeParentsMutation(
-                //     cliArgs.PercentageToChange,
-                //     cliArgs.MutationProbability
-                // )
+                new ChangeParentsMutation(
+                    cliArgs.PercentageToChange,
+                    cliArgs.ChangeParentsMutationProbability
+                )
             ],
             [new FixedIndexCrossover()],
             trainAccuracy,
             new MinTournamentSelection<CartesianChromosome>(folds: 5),
-            // new MinElitismCombination<CartesianChromosome>(
-            //     bestAmount: 1,
-            //     newIndividuals: 0,
-            //     trainAccuracy,
-            //     createNewChromosome
-            // )
-            // new TakeNewCombination()
-            new MinCombineBestCombination<CartesianChromosome>()
+            new MinElitismCombination<CartesianChromosome>(
+                bestAmount: 1,
+                newIndividuals: 0,
+                trainAccuracy,
+                createNewChromosome
+            )
+            // new TakeNewCombination<CartesianChromosome>()
+            // new MinCombineBestCombination<CartesianChromosome>()
         ){
             CrossoverProbability = cliArgs.CrossoverProbability,
             MaxGenerations = cliArgs.MaxGenerations,
@@ -204,7 +204,7 @@ class Program
                         averageDepth
                     }));
 
-                    if (genNum % 100 == 0)
+                    if (genNum % 10 == 0)
                         System.Console.Error.WriteLine($"Computed {genNum}th generation. " +
                             $"MinFitness: {currentMinFitness} " +
                             $"AvgFitness: {currentAvgFitness} " + //:F2} " +

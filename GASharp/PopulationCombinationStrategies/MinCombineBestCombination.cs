@@ -9,7 +9,7 @@ public class MinCombineBestCombination<T> : PopulationCombinationStrategy<T> whe
         Array.Sort(combinedArr, (a,b) => a.Fitness < b.Fitness ? -1 : 1);
 
         return combinedArr[..oldPopulation.Length]
-            .Select(ind => ind.Clone())
+            .Select(ind => ind) //.Clone(preserveFitness: true))
             .ToArray();
     }
 }

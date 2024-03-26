@@ -198,7 +198,7 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
                     if (parents.prob < this.CrossoverProbability)
                         return this.crossovers[0].Cross(parents.p.Item1, parents.p.Item2);
                     else
-                        return new Tuple<T, T>(parents.p.Item1.Clone(), parents.p.Item2.Clone());
+                        return new Tuple<T, T>(parents.p.Item1, parents.p.Item2);
                 })
                 .SelectMany(tup => new[] {tup.Item1, tup.Item2})
                 .ToArray();

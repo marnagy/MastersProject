@@ -18,8 +18,7 @@ public class ChangeParentsMutation : Mutation<CartesianChromosome>
         IList<IList<bool>> shouldNodeMutate;
         shouldNodeMutate = ind.GetLayerSizes()
             .Select(layerSize => Enumerable.Range(0, layerSize)
-                .Select(_ => Random.Shared.NextDouble())
-                .Select(prob => prob < this.PercentageToChange)
+                .Select(_ => Random.Shared.NextDouble() < this.PercentageToChange)
                 .ToArray()
             )
             .ToArray();
@@ -36,7 +35,7 @@ public class ChangeParentsMutation : Mutation<CartesianChromosome>
                     // choose layer and index within uniformly
                     ParentIndices[] newParents;
                     newParents = Enumerable.Range(0, CartesianNode.ParentsAmount)
-                        .Select(_ => Random.Shared.Next(j + 1))
+                        .Select(_ => Random.Shared.Next(i + 1))
                         .Select(layerIndex => new ParentIndices
                             {
                                 LayerIndex=layerIndex,
@@ -45,9 +44,9 @@ public class ChangeParentsMutation : Mutation<CartesianChromosome>
                         )
                         .ToArray();
 
-                    System.Console.Error.WriteLine($"PreviousParents: {layers[i][j].Parents.Stringify()}");
+                    // System.Console.Error.WriteLine($"PreviousParents: {layers[i][j].Parents.Stringify()}");
                     layers[i][j] =  layers[i][j].Clone(newParents);
-                    System.Console.Error.WriteLine($"Parents after mutation: {layers[i][j].Parents.Stringify()}");
+                    // System.Console.Error.WriteLine($"Parents after mutation: {layers[i][j].Parents.Stringify()}");
                 }
             }
         }
@@ -57,7 +56,7 @@ public class ChangeParentsMutation : Mutation<CartesianChromosome>
             layers
         );
 
-        System.Console.Error.WriteLine($"ChangeNodeCreated valid chromosome? {CartesianChromosome.IsValid(newChromosome)}");
+        // System.Console.Error.WriteLine($"ChangeNodeCreated valid chromosome? {CartesianChromosome.IsValid(newChromosome)}");
 
         // if ( !CartesianChromosome.IsValid(newChromosome) )
         //     throw new Exception($"Created invalid chromosome in {this.GetType()}!");

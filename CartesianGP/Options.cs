@@ -38,9 +38,13 @@ public class Options
     [Option("layer-sizes", Default = new[]{10, 5}, HelpText = "Maximum depth of starting trees.")]
     public IList<int>? LayerSizes { get; set; }
 
-    // node probabilities
-    [Option("change-node-mutation-probability", Default = 0.3d, HelpText = "Probability of using ChangeNodeMutation class.")]
+    // mutation probabilitites
+    [Option("change-node-mutation-probability", Default = 0d, HelpText = "Probability of using ChangeNodeMutation class.")]
     public double ChangeNodeMutationProbability { get; set; }
+    [Option("change-parents-mutation-probability", Default = 0d, HelpText = "Probability of using ChangeParentsMutation class.")]
+    public double ChangeParentsMutationProbability { get; set; }
+
+    // node probabilities
     [Option("percentage-to-change", Default = 0.2d, HelpText = "How much of 1 individual should mutation change.")]
     public double PercentageToChange { get; set; }
     [Option("terminal-nodes-probability", Default = 0.2d, HelpText = "Probability of choosing from terminal nodes instead of non-terminal nodes.")]
