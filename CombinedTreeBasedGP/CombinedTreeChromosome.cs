@@ -34,7 +34,7 @@ public class CombinedTreeChromosome : Chromosome<CombinedTreeChromosome>
         this.Fitness,
         this.Score
     );
-    public override CombinedTreeChromosome Clone()
+    public override CombinedTreeChromosome Clone(bool preserveFitness = false)
     => this.Clone(this.Subchromosomes);
 
     public override CombinedTreeChromosome CreateNew()

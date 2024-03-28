@@ -20,7 +20,7 @@ public class TreeChromosome : Chromosome<TreeChromosome>
         this.NonTerminalNodesProbabilities = nonTerminalNodesProbabilities;
         this.Fitness = TreeChromosome.DefaultFitness;
     }
-    public override TreeChromosome Clone()
+    public override TreeChromosome Clone(bool _preserveFitness = false)
     => this.Clone(this.RootNode);
     public TreeChromosome Clone(TreeNodeMaster rootNode)
     => new TreeChromosome(

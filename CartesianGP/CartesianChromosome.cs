@@ -161,12 +161,15 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
     }
     public override bool IsValid() => CartesianChromosome.IsValid(this);
 
-    public static bool IsValid(CartesianChromosome chromosome)
+    public static bool IsValid(CartesianChromosome chromosome, bool verbose = false)
     {
         bool isValid = true;
 
-        System.Console.WriteLine("Checking chromosome:");
-        System.Console.WriteLine(chromosome);
+        if (verbose)
+        {
+            System.Console.WriteLine("Checking chromosome:");
+            System.Console.WriteLine(chromosome);
+        }
         
         // inputs layer
         ParentIndices invalidParents = ParentIndices.GetInvalid();
@@ -175,20 +178,26 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
             isValid = isValid && valNode.Parents.All(par => par == invalidParents);
         }
 
-        System.Console.Error.WriteLine($"Inputs' parents valid? {isValid}");
+        if (verbose)
+            System.Console.Error.WriteLine($"Inputs' parents valid? {isValid}");
 
         // other layers
         for (int layerIndex = 0; layerIndex < chromosome.Layers.Count; layerIndex++)
         {
             var layer = chromosome.Layers[layerIndex];
-            System.Console.Error.WriteLine($"Validating internal layer {layerIndex}");
+            if (verbose)
+                System.Console.Error.WriteLine($"Validating internal layer {layerIndex}");
             foreach (CartesianNode node in layer)
             {
-                System.Console.Error.WriteLine($"Checking node of type {node.GetType()}");
-                System.Console.Error.WriteLine($"Node parents:{node.Parents.Stringify()}");
-                System.Console.Error.WriteLine($"Testing nodeINLayerTest...");
+                if (verbose)
+                {
+                    System.Console.Error.WriteLine($"Checking node of type {node.GetType()}");
+                    System.Console.Error.WriteLine($"Node parents:{node.Parents.Stringify()}");
+                    System.Console.Error.WriteLine($"Testing nodeINLayerTest...");
+                }
                 var nodeInLayerTest = node.Parents.All(par => par.Index < chromosome[par.LayerIndex].Count);
-                System.Console.Error.WriteLine($"Testing layerTest...");
+                if (verbose)
+                    System.Console.Error.WriteLine($"Testing layerTest...");
                 var layerTest = node.Parents.All(par => par.LayerIndex < layerIndex + 1);
                 isValid = isValid
                     && nodeInLayerTest && layerTest; // include Inputs layer
@@ -219,6 +228,25 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
     {
         throw new Exception($"Not implemented for CartesianChromosome. Please use CartesianChromosome.CreateNewRandom(...)");
     }
+    public static ParentIndices[] ChooseParents(int inputsAmount, List<List<CartesianNode>> internalLayers, int internalLayerIndex)
+    => Enumerable.Range(0, CartesianNode.ParentsAmount)
+        .Select(_ => { 
+            // include input layer
+            var parentLayerIndex = Random.Shared.Next(internalLayerIndex + 1);
+            if (parentLayerIndex == 0)
+            {
+                // choose from inputs
+                return new ParentIndices(){
+                    LayerIndex=parentLayerIndex,
+                    Index=Random.Shared.Next(inputsAmount)
+                };
+            }
+            return new ParentIndices(){
+                LayerIndex=parentLayerIndex,
+                Index=Random.Shared.Next(internalLayers[parentLayerIndex-1].Count)
+            };
+        })
+        .ToArray();
     public override string ToString()
     {
         var sb = new StringBuilder();

@@ -24,28 +24,33 @@ public class ChangeParentsMutation : Mutation<CartesianChromosome>
             .ToArray();
 
         var layers = ind.DeepCopyLayers();
-        for (int i = 0; i < layers.Count; i++)
+        for (int layerIndex = 0; layerIndex < layers.Count; layerIndex++)
         {
-            for (int j = 0; j < layers[i].Count; j++)
+            for (int j = 0; j < layers[layerIndex].Count; j++)
             {
-                if (shouldNodeMutate[i][j])
+                if (shouldNodeMutate[layerIndex][j])
                 {
                     // !: FIX THIS
                     // choose new parent nodes
                     // choose layer and index within uniformly
                     ParentIndices[] newParents;
-                    newParents = Enumerable.Range(0, CartesianNode.ParentsAmount)
-                        .Select(_ => Random.Shared.Next(i + 1))
-                        .Select(layerIndex => new ParentIndices
-                            {
-                                LayerIndex=layerIndex,
-                                Index=Random.Shared.Next(ind[layerIndex].Count)
-                            }
-                        )
-                        .ToArray();
+                    // newParents = Enumerable.Range(0, CartesianNode.ParentsAmount)
+                    //     .Select(_ => Random.Shared.Next(i + 1))
+                    //     .Select(layerIndex => new ParentIndices
+                    //         {
+                    //             LayerIndex=layerIndex,
+                    //             Index=Random.Shared.Next(ind[layerIndex].Count)
+                    //         }
+                    //     )
+                    //     .ToArray();
+                    newParents = CartesianChromosome.ChooseParents(
+                        inputsAmount: ind.InputsAmount,
+                        layers,
+                        internalLayerIndex: layerIndex
+                    );
 
                     // System.Console.Error.WriteLine($"PreviousParents: {layers[i][j].Parents.Stringify()}");
-                    layers[i][j] =  layers[i][j].Clone(newParents);
+                    layers[layerIndex][j] =  layers[layerIndex][j].Clone(newParents);
                     // System.Console.Error.WriteLine($"Parents after mutation: {layers[i][j].Parents.Stringify()}");
                 }
             }
@@ -58,8 +63,8 @@ public class ChangeParentsMutation : Mutation<CartesianChromosome>
 
         // System.Console.Error.WriteLine($"ChangeNodeCreated valid chromosome? {CartesianChromosome.IsValid(newChromosome)}");
 
-        // if ( !CartesianChromosome.IsValid(newChromosome) )
-        //     throw new Exception($"Created invalid chromosome in {this.GetType()}!");
+        if ( !CartesianChromosome.IsValid(newChromosome) )
+            throw new Exception($"Created invalid chromosome in {this.GetType()}!");
 
         return newChromosome;
     }

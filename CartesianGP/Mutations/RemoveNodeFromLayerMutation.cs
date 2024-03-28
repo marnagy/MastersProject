@@ -41,12 +41,17 @@ public class RemoveNodeFromLayerMutation : Mutation<CartesianChromosome>
                             };
                         else // choose new random parent
                         {
-                            // include InputLayer
-                            int newLayerIndex = Random.Shared.Next(layerToRemoveNodeFrom + 1);
-                            return new ParentIndices(){
-                                LayerIndex=newLayerIndex,
-                                Index=Random.Shared.Next(ind[newLayerIndex].Count)
-                            };
+                            return CartesianChromosome.ChooseParents(
+                                ind.InputsAmount,
+                                internalLayers: layers,
+                                internalLayerIndex: layerToRemoveNodeFrom
+                            )[0];
+
+                            // int newLayerIndex = Random.Shared.Next(layerToRemoveNodeFrom + 1);
+                            // return new ParentIndices(){
+                            //     LayerIndex=newLayerIndex,
+                            //     Index=Random.Shared.Next(ind[newLayerIndex].Count)
+                            // };
                         }
                     })
                     .ToArray();

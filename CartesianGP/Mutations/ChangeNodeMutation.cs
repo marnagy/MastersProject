@@ -42,15 +42,19 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
             .ToArray();
 
         var layers = ind.DeepCopyLayers();
-        for (int i = 0; i < layers.Count; i++)
+        for (int layerIndex = 0; layerIndex < layers.Count; layerIndex++)
         {
-            for (int j = 0; j < layers[i].Count; j++)
+            for (int j = 0; j < layers[layerIndex].Count; j++)
             {
-                if (shouldNodeMutate[i][j])
+                if (shouldNodeMutate[layerIndex][j])
                 {
                     // choose new random node, preserve parents
                     // System.Console.Error.WriteLine($"PreviousParents: {layers[i][j].Parents.Stringify()}");
-                    layers[i][j] = this.PerformMutation(previousNode: layers[i][j], layerIndex: i, nodeIndex: j);
+                    layers[layerIndex][j] = this.PerformMutation(
+                        previousNode: layers[layerIndex][j],
+                        layerIndex: layerIndex,
+                        nodeIndex: j
+                    );
                     // layers[i][j] = Random.Shared.Choose(this.Nodes).Clone(layers[i][j].Parents);
                     // System.Console.Error.WriteLine($"Parents after mutation: {layers[i][j].Parents.Stringify()}");
                 }

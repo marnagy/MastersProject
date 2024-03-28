@@ -20,9 +20,10 @@ public class RemoveLayerMutation : Mutation<CartesianChromosome>
         layers.RemoveAt(indexOfLayerToDelete);
 
         // fix indices if needed
-        for (int i = indexOfLayerToDelete; i < layers.Count; i++)
+        // TODO: check if correct
+        for (int layerIndex = indexOfLayerToDelete; layerIndex < layers.Count; layerIndex++)
         {
-            foreach (var node in layers[i])
+            foreach (var node in layers[layerIndex])
             {
                 var parents = node.Parents;
 
@@ -39,7 +40,7 @@ public class RemoveLayerMutation : Mutation<CartesianChromosome>
                         // choose new parent from NOT ALTERED layers
                         else if (parent.LayerIndex == indexOfLayerToDelete)
                         {
-                            var newLayerIndex = Random.Shared.Next(indexOfLayerToDelete + 1); // include input layer
+                            var newLayerIndex = Random.Shared.Next(layerIndex + 1); // include input layer
                             return new ParentIndices(){
                                 LayerIndex=newLayerIndex,
                                 Index=Random.Shared.Next(ind[newLayerIndex].Count)

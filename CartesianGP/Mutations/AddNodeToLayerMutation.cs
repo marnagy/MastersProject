@@ -1,14 +1,20 @@
 public class AddNodeToLayerMutation : Mutation<CartesianChromosome>
 {
-    private readonly IReadOnlyDictionary<int, IReadOnlyList<CartesianNode>> NodeCatalogue;
-    private readonly IReadOnlyList<CartesianNode> Nodes;
+    private readonly double TerminalNodesProbability;
+    private readonly IReadOnlyDictionary<CartesianNode, double> TerminalNodesProbabilities;
+    private IReadOnlyList<CartesianNode> TerminalNodes;
+    private readonly IReadOnlyDictionary<CartesianNode, double> NonTerminalNodesProbabilities;
+    private IReadOnlyList<CartesianNode> NonTerminalNodes;
     public AddNodeToLayerMutation(double probability,
-        IReadOnlyDictionary<int, IReadOnlyList<CartesianNode>> nodeCatalogue): base(probability)
+        double terminalNodesProbability,
+        IReadOnlyDictionary<CartesianNode, double> terminalNodesProbabilities,
+        IReadOnlyDictionary<CartesianNode, double> nonTerminalNodesProbabilities): base(probability)
     {
-        this.NodeCatalogue = nodeCatalogue;
-        this.Nodes = nodeCatalogue.Keys
-            .SelectMany(arity => nodeCatalogue[arity])
-            .ToArray();
+        this.TerminalNodesProbability = terminalNodesProbability;
+        this.TerminalNodesProbabilities = terminalNodesProbabilities;
+        this.TerminalNodes = terminalNodesProbabilities.Keys.ToArray();
+        this.NonTerminalNodesProbabilities = nonTerminalNodesProbabilities;
+        this.NonTerminalNodes = nonTerminalNodesProbabilities.Keys.ToArray();
     }
     public override CartesianChromosome Mutate(CartesianChromosome ind, int genNum)
     {
@@ -25,18 +31,40 @@ public class AddNodeToLayerMutation : Mutation<CartesianChromosome>
         // don't change output layer
         indexOfLayerAddNodeTo = Random.Shared.Next(layers.Count - 1);
 
-        var parents = Enumerable.Range(0, CartesianNode.ParentsAmount)
-            .Select(_ => { 
-                // include input layer
-                var parentLayerIndex = Random.Shared.Next(indexOfLayerAddNodeTo + 1);
-                return new ParentIndices(){
-                    LayerIndex=parentLayerIndex,
-                    Index=Random.Shared.Next(ind[parentLayerIndex].Count)
-                };
-            })
-            .ToArray();
+        // var parents = Enumerable.Range(0, CartesianNode.ParentsAmount)
+        //     .Select(_ => { 
+        //         // include input layer
+        //         var parentLayerIndex = Random.Shared.Next(indexOfLayerAddNodeTo + 1);
+        //         return new ParentIndices(){
+        //             LayerIndex=parentLayerIndex,
+        //             Index=Random.Shared.Next(ind[parentLayerIndex].Count)
+        //         };
+        //     })
+        //     .ToArray();
+        var parents = CartesianChromosome.ChooseParents(
+            inputsAmount: ind.InputsAmount,
+            internalLayers: layers,
+            internalLayerIndex: indexOfLayerAddNodeTo
+        );
+        IReadOnlyList<CartesianNode> nodes;
+        IReadOnlyList<double> nodeWeights;
+
+        if (Random.Shared.NextDouble() < this.TerminalNodesProbability)
+        {
+            nodes = this.TerminalNodes;
+            nodeWeights = this.TerminalNodes
+                .Select(node => this.TerminalNodesProbabilities[node])
+                .ToArray();
+        }
+        else
+        {
+            nodes = this.NonTerminalNodes;
+            nodeWeights = this.NonTerminalNodes
+                .Select(node => this.NonTerminalNodesProbabilities[node])
+                .ToArray();
+        }
         layers[indexOfLayerAddNodeTo].Add(
-            Random.Shared.Choose(this.Nodes).Clone(parents)
+            Random.Shared.Choose(nodes, nodeWeights).Clone(parents)
         );
 
         var newChromosome = new CartesianChromosome(
