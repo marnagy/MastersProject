@@ -10,10 +10,12 @@ class Program
         // from https://stackoverflow.com/questions/2234492/is-it-possible-to-set-the-cultureinfo-for-an-net-application-or-just-a-thread#comment32681459_2247570
         System.Threading.Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
 
-        Options cliArgs = Parser.Default.ParseArguments<Options>(args).Value;
+        Options cliArgsMut = Parser.Default.ParseArguments<Options>(args).Value;
         //System.Console.WriteLine(cliArgs);
-        if (cliArgs == null) // --help case
+        if (cliArgsMut == null) // --help case
             return;
+        
+        var cliArgs = OptionsImmutable.From(cliArgsMut);
         
         if (!CheckArgs(cliArgs))
         {
@@ -356,10 +358,34 @@ class Program
         // System.Threading.Thread.Sleep(5_000);
     }
 
-    private static bool CheckArgs(Options cliArgs)
+    private static bool CheckArgs(OptionsImmutable cliArgs)
     {
-        return cliArgs.TrainCSVFilePath != null
-            && cliArgs.CSVInputsAmount > 0;
+        return cliArgs.CSVInputsAmount > 0
+            && cliArgs.MinThreads >= 1
+            && cliArgs.MaxThreads >= 1
+            && cliArgs.MaxThreads >= cliArgs.MinThreads
+            // technically only positive is needed, but come on...
+            && cliArgs.PopulationSize >= 10 
+            && cliArgs.PopulationSize % 2 == 0 // needed for crossover
+            && cliArgs.MaxGenerations >= 100
+            && cliArgs.RepeatAmount >= 1
+            && cliArgs.LayerSizes != null
+            // all probabilities have to be non-negative
+            && cliArgs.CrossoverProbability >= 0d
+            && cliArgs.ChangeNodeMutationProbability >= 0d
+            && cliArgs.ChangeParentsMutationProbability >= 0d
+            && cliArgs.PercentageToChange >= 0d
+            && cliArgs.TerminalNodesProbability >= 0d
+            && cliArgs.ValueNodeProbability >= 0d
+            && cliArgs.SumNodeProbability >= 0d
+            && cliArgs.ProductNodeProbability >= 0d
+            && cliArgs.SinNodeProbability >= 0d
+            && cliArgs.PowerNodeProbability >= 0d
+            && cliArgs.UnaryMinusNodeProbability >= 0d
+            && cliArgs.SigmoidNodeProbability >= 0d
+            && cliArgs.ReLUNodeProbability >= 0d
+            && cliArgs.ConditionNodeProbability >= 0d
+            && cliArgs.InputNodeProbability >= 0d;
     }
 }
 // testing CLI arguments
