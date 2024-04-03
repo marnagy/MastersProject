@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using CommandLine;
 
@@ -155,9 +156,11 @@ class Program
 
         File.WriteAllText(
             Path.Combine(masterDirectory.FullName, "config.json"),
-            JsonSerializer.Serialize(cliArgs, inputType: cliArgs.GetType(), new JsonSerializerOptions(){
-                WriteIndented = true
-            })
+            JsonSerializer.Serialize(cliArgs, new JsonSerializerOptions(){
+                WriteIndented = true,
+                IgnoreReadOnlyFields = false
+            }),
+            Encoding.UTF8
         );
 
         for (int j = 0; j < cliArgs.RepeatAmount; j++)
