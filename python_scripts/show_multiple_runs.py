@@ -10,6 +10,7 @@ def get_args() -> Namespace:
     parser = ArgumentParser()
 
     parser.add_argument('-d', '--directory', required=True)
+    parser.add_argument('-s', '--save', action='store_true', dest='save', help='If used, graph will be saved and not shown.')
 
     return parser.parse_args()
 
@@ -36,7 +37,7 @@ def main():
     df = pd.concat(dfs)
     print('Done')
 
-    # print(df)
+    os.chdir(args.directory)
 
     # TODO: continue here
     print('Plotting fitness...', end='')
@@ -56,9 +57,13 @@ def main():
         label='AvgFitness'
     )
 
-    print('Done')
     plt.yscale('log')
-    plt.show()
+    if not args.save:
+        plt.show()
+        print('Done')
+    else:
+        plt.savefig('fitness_graph.png')
+        print('Fitness figure has been saved.')
 
     print('Plotting depth...', end='')
     ax = sns.lineplot(
@@ -77,9 +82,13 @@ def main():
         label='AvgDepth'
     )
 
-    print('Done')
     # plt.yscale('log')
-    plt.show()
+    if not args.save:
+        plt.show()
+        print('Done')
+    else:
+        plt.savefig('depth_graph.png')
+        print('Depth figure has been saved.')
 
 
 if __name__ == '__main__':

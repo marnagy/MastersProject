@@ -8,6 +8,7 @@ def get_args() -> Namespace:
     parser = ArgumentParser()
 
     parser.add_argument('-d', '--directory', required=True)
+    parser.add_argument('-s', '--save', action='store_true', dest='save', help='If used, graph will be saved and not shown.')
 
     return parser.parse_args()
 
@@ -26,7 +27,11 @@ def main():
         # axes[index].plot(df.index, df['averageFitness'])
 
     # plt.yscale('log')
-    plt.show()
+    if not args.save:
+        plt.show()
+    else:
+        plt.savefig('progress_graph.png')
+        print('Figure has been saved.')
 
 if __name__ == '__main__':
     main()
