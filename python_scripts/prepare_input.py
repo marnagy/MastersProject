@@ -15,6 +15,7 @@ def get_args() -> Namespace:
     parser.add_argument(
         type=str, help='Filepath to csv file.', dest='filepath')
     parser.add_argument('-d', '--delimiter', default=',')
+    parser.add_argument('-s', '--seed', type=int, help='Seed for train-test split function.')
     parser.add_argument(
         '--index-col', help='If CSV has index column, please include its name here.')
     parser.add_argument('--one-hot', action='store_true', default=False,
@@ -42,7 +43,12 @@ def main() -> None:
     df[last_column_name] = df[last_column_name].apply(str)
 
     if args.train_ratio is not None:
-        df_train, df_test = train_test_split(df, train_size=args.train_ratio, stratify=df[df.columns[-1]])
+        df_train, df_test = train_test_split(
+            df,
+            train_size=args.train_ratio,
+            stratify=df[df.columns[-1]],
+            random_state=args.seed    
+        )
         print(df_train)
         print(df_test)
         dfs = [df_train, df_test]
