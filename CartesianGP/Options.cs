@@ -50,25 +50,25 @@ public class Options
     public double? PercentageToChange { get; set; }
     [Option("terminal-nodes-probability", HelpText = "Probability of choosing from terminal nodes instead of non-terminal nodes.")]
     public double? TerminalNodesProbability { get; set; }
-    [Option("value-node-weight")]
+    [Option("value-node-weight", HelpText = "Weight of choosing a value node. Used for getting probability of choosing a node.")]
     public double? ValueNodeProbability { get; set; }
-    [Option("sum-node-weight")]
+    [Option("sum-node-weight", HelpText = "Weight of choosing a sum node. Used for getting probability of choosing a node.")]
     public double? SumNodeProbability { get; set; }
-    [Option("prod-node-weight")]
+    [Option("prod-node-weight", HelpText = "Weight of choosing a product node. Used for getting probability of choosing a node.")]
     public double? ProductNodeProbability { get; set; }
-    [Option("sin-node-weight")]
+    [Option("sin-node-weight", HelpText = "Weight of choosing a sin node. Used for getting probability of choosing a node.")]
     public double? SinNodeProbability { get; set; }
-    [Option("pow-node-weight")]
+    [Option("pow-node-weight", HelpText = "Weight of choosing a power node. Used for getting probability of choosing a node.")]
     public double? PowerNodeProbability { get; set; }
-    [Option("unary-minus-node-weight")]
+    [Option("unary-minus-node-weight", HelpText = "Weight of choosing a unary minus node. Used for getting probability of choosing a node.")]
     public double? UnaryMinusNodeProbability { get; set; }
-    [Option("sig-node-weight")]
+    [Option("sig-node-weight", HelpText = "Weight of choosing a sigmoid node. Used for getting probability of choosing a node.")]
     public double? SigmoidNodeProbability { get; set; }
-    [Option("relu-node-weight")]
+    [Option("relu-node-weight", HelpText = "Weight of choosing a ReLU node. Used for getting probability of choosing a node.")]
     public double? ReLUNodeProbability { get; set; }
-    [Option("cond-node-weight")]
+    [Option("cond-node-weight", HelpText = "Weight of choosing a condition node. Used for getting probability of choosing a node.")]
     public double? ConditionNodeProbability { get; set; }
-    [Option("input-node-weight")]
+    [Option("input-node-weight", HelpText = "Weight of choosing a input node. Used for getting probability of choosing a node.")]
     public double? InputNodeProbability { get; set; }
     public void SetDefaults()
     {
