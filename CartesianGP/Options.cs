@@ -44,6 +44,10 @@ public class Options
     public double? ChangeNodeMutationProbability { get; set; }
     [Option("change-parents-mutation-probability", HelpText = "Probability of using ChangeParentsMutation class.")]
     public double? ChangeParentsMutationProbability { get; set; }
+    [Option("add-node-to-layer-mutation-probability", HelpText = "Probability of using AddNodeToLayerMutation class.")]
+    public double? AddNodeToLayerMutationProbability { get; set; }
+    [Option("remove-node-from-layer-mutation-probability", HelpText = "Probability of using RemoveNodeFromLayerMutation class.")]
+    public double? RemoveNodeFromLayerMutationProbability { get; set; }
 
     // node probabilities
     [Option("percentage-to-change", HelpText = "How much of 1 individual should mutation change.")]

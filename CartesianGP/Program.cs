@@ -117,6 +117,15 @@ class Program
                 new ChangeParentsMutation(
                     cliArgs.PercentageToChange,
                     cliArgs.ChangeParentsMutationProbability
+                ),
+                new AddNodeToLayerMutation(
+                    cliArgs.AddNodeToLayerMutationProbability,
+                    cliArgs.TerminalNodesProbability,
+                    terminalNodesProbabilities,
+                    nonTerminalNodesProbabilities
+                ),
+                new RemoveNodeFromLayerMutation(
+                    cliArgs.RemoveNodeFromLayerMutationProbability
                 )
             ],
             [new FixedIndexCrossover()],
