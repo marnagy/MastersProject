@@ -67,6 +67,8 @@ public class AccuracyFitness : Fitness<CartesianChromosome>
                 correctAmount += 1;
         }
 
+        ind.Score = 1 - ((double)correctAmount / rowsAmount);
+        double fitnessResult = ind.Score + 2*ind.GetDepth() / this.Inputs.GetRowsAmount();
         return 1 - ((double)correctAmount / rowsAmount);
     }
     public override void ComputeFitnessPopulation(CartesianChromosome[] population)

@@ -6,6 +6,7 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
     /// Layer of ValueNode nodes representing inputs. ParentIndices set to <b>-1</b>. 
     /// </summary>
     private readonly InputNode[] Inputs;
+    public double Score { get; internal set; }
     /// <summary>
     /// Internal layers <b>excluding</b> Input nodes.
     /// </summary>

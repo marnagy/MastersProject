@@ -6,8 +6,8 @@ using System.Text.Json.Serialization;
 public class Options
 {
     // general
-    [Option("multi-threaded", Default = false, HelpText = "Run GP in multiple threads.")]
-    public bool? MultiThreaded { get; set; }
+    [Option("multi-threaded", Default = true, HelpText = "Run GP in multiple threads.")]
+    public bool MultiThreaded { get; set; } = false;
     [Option("json", Default = null, HelpText = "Input JSON for easier loading of hyperparameters.")]
     public string? JsonFilePath { get; set; } = null;
     [Option("train-csv", Required = true, HelpText = "Train CSV of input values. Assumes numbers in en-US style.")]

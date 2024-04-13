@@ -21,12 +21,6 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
             .Average()
     )/1_000d;
     
-    // Math.Pow(
-    //     2,
-    //     ind.Subchromosomes
-    //         .Select(subchrom => subchrom.GetDepth())
-    //         .Average()
-    //     );
     public override double ComputeFitness(CombinedTreeChromosome ind)
     {
         // don't compute fitness again

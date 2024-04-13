@@ -179,8 +179,8 @@ class Program
                 "gen",
                 "minFitness",
                 "averageFitness",
-                // "minScore",
-                // "averageScore",
+                "minScore",
+                "averageScore",
                 "minDepth",
                 "averageDepth",
             ];
@@ -198,6 +198,15 @@ class Program
                         .Select(ind => ind.Fitness)
                         .Average();
                     
+                    double currentMinScore = population
+                        .Select(ind => ind.Score)
+                        .Min();
+                    double currentAvgScore = population
+                        // fitness can be +inf
+                        .Where(ind => double.IsNormal(ind.Score) || ind.Score == 0d)
+                        .Select(ind => ind.Score)
+                        .Average();
+                    
                     int[] depths = population
                         .Select(ind => ind.GetDepth())
                         .ToArray();
@@ -207,8 +216,8 @@ class Program
                         genNum,
                         currentMinFitness,
                         currentAvgFitness,
-                        // currentMinScore,
-                        // currentAvgScore,
+                        currentMinScore,
+                        currentAvgScore,
                         minDepth,
                         averageDepth
                     }));
@@ -217,8 +226,8 @@ class Program
                         System.Console.Error.WriteLine($"Computed {genNum}th generation. " +
                             $"MinFitness: {currentMinFitness} " +
                             $"AvgFitness: {currentAvgFitness} " + //:F2} " +
-                            // $"MinScore: {currentMinScore:F3} " +
-                            // $"AvgScore: {currentAvgScore:F3} " +
+                            $"MinScore: {currentMinScore:F3} " +
+                            $"AvgScore: {currentAvgScore:F3} " +
                             $"Depth of min: {population.First(ind => ind.Fitness == currentMinFitness).GetDepth():F1} " +
                             $"AvgDepth: {averageDepth:F1} "
                         );
