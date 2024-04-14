@@ -37,7 +37,7 @@ public class Options
 
     // specific for CartesianGP
     [Option("layer-sizes", HelpText = "Sizes of internal layer excluding inputs (left) and outputs (right) layer.")]
-    public IList<int>? LayerSizes { get; set; }
+    public IReadOnlyList<int>? LayerSizes { get; set; }
 
     // mutation probabilitites
     [Option("change-node-mutation-probability", HelpText = "Probability of using ChangeNodeMutation class.")]
@@ -46,8 +46,12 @@ public class Options
     public double? ChangeParentsMutationProbability { get; set; }
     [Option("add-node-to-layer-mutation-probability", HelpText = "Probability of using AddNodeToLayerMutation class.")]
     public double? AddNodeToLayerMutationProbability { get; set; }
+    [Option("add-layer-mutation-probability", HelpText = "Probability of using AddLayerMutation class.")]
+    public double? AddLayerMutationProbability { get; set; }
     [Option("remove-node-from-layer-mutation-probability", HelpText = "Probability of using RemoveNodeFromLayerMutation class.")]
     public double? RemoveNodeFromLayerMutationProbability { get; set; }
+    [Option("remove-layer-mutation-probability", HelpText = "Probability of using RemoveLayerMutation class.")]
+    public double? RemoveLayerMutationProbability { get; set; }
 
     // node probabilities
     [Option("percentage-to-change", HelpText = "How much of 1 individual should mutation change.")]
