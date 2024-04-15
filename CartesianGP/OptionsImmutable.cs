@@ -28,6 +28,7 @@ public class OptionsImmutable
     public const string CrossoverProbabilityDefaultString = "0.4";
     // constant array not currently possible
     public static readonly IReadOnlyList<int> LayerSizesDefault = [50, 50];
+    public static readonly IReadOnlyList<string> PopulationCombinationOptions = ["elitism", "take-new", "combine"];
     public const string PopulationCombinationDefault = "take-new";
     public const double MutationProbabilityDefault = 0d;
     public const string MutationProbabilityDefaultString = "0";
@@ -136,8 +137,7 @@ public class OptionsImmutable
         this.RepeatAmount = repeatAmount;
         this.CrossoverProbability = crossoverProbability;
         this.LayerSizes = layerSizes;
-        string[] populationCombinations = ["elitism", "take-new", "combine"];
-        if (!populationCombinations.Contains(populationCombination))
+        if (!OptionsImmutable.PopulationCombinationOptions.Contains(populationCombination))
         {
             System.Console.Error.WriteLine($"Unknown population combination: {populationCombination}");
             System.Environment.Exit(1);
@@ -179,7 +179,13 @@ public class OptionsImmutable
         this.CrossoverProbability = opts.CrossoverProbability ?? fileOpts?.CrossoverProbability ?? OptionsImmutable.CrossoverProbabilityDefault;
 
         this.LayerSizes = opts.LayerSizes ?? fileOpts?.LayerSizes ?? OptionsImmutable.LayerSizesDefault;
+        // assign first, check after for simpler handling
         this.PopulationCombination = opts.PopulationCombination ?? fileOpts?.PopulationCombination ?? OptionsImmutable.PopulationCombinationDefault;
+        if (!OptionsImmutable.PopulationCombinationOptions.Contains(this.PopulationCombination))
+        {
+            System.Console.Error.WriteLine($"Unknown population combination: {this.PopulationCombination}");
+            System.Environment.Exit(1);
+        }
 
         this.ChangeNodeMutationProbability = opts.ChangeNodeMutationProbability ?? fileOpts?.ChangeNodeMutationProbability ?? OptionsImmutable.MutationProbabilityDefault;
         this.ChangeParentsMutationProbability = opts.ChangeParentsMutationProbability ?? fileOpts?.ChangeParentsMutationProbability ?? OptionsImmutable.MutationProbabilityDefault;

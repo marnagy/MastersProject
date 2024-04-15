@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using CommandLine;
@@ -104,6 +105,19 @@ class Program
                 terminalNodesProbabilities,
                 nonTerminalNodesProbabilities
             );
+        PopulationCombinationStrategy<CartesianChromosome> popComb = cliArgs.PopulationCombination switch
+        {
+            "elitism" => new MinElitismCombination<CartesianChromosome>(
+                bestAmount: 1,
+                newIndividuals: 0,
+                trainAccuracy,
+                createNewChromosome
+            ),
+            "take-new" => new TakeNewCombination<CartesianChromosome>(),
+            "combine" => new MinCombineBestCombination<CartesianChromosome>(),
+            _ => throw new Exception("User should not be able to get here. Default handling in OptionsImmutable class"),
+        };
+
         var cartesianGA = new GeneticAlgorithm<CartesianChromosome>(
             createNewChromosome,
             [ 
@@ -131,14 +145,7 @@ class Program
             [new FixedIndexCrossover()],
             trainAccuracy,
             new MinTournamentSelection<CartesianChromosome>(folds: 5),
-            new MinElitismCombination<CartesianChromosome>(
-                bestAmount: 1,
-                newIndividuals: 0,
-                trainAccuracy,
-                createNewChromosome
-            )
-            // new TakeNewCombination<CartesianChromosome>()
-            // new MinCombineBestCombination<CartesianChromosome>()
+            popComb
         ){
             CrossoverProbability = cliArgs.CrossoverProbability,
             MaxGenerations = cliArgs.MaxGenerations,
