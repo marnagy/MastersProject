@@ -9,16 +9,28 @@ using System.Text.Json.Serialization;
 public class OptionsImmutable
 {
     // default values
+    public const bool MultiThreadedDefault = false;
+    public const string MultiThreadedDefaultString = "false";
     public const string? TestCSVFilePathDefault = null;
+    public const char CSVDelimiterDefault = ',';
+    public const string CSVDelimiterDefaultString = ",";
     public const int MinThreadsDefault = 2;
+    public const string MinThreadsDefaultString = "2";
     public const int MaxThreadsDefault = 4;
+    public const string MaxThreadsDefaultString = "4";
     public const int PopulationSizeDefault = 50;
+    public const string PopulationSizeDefaultString = "50";
     public const int MaxGenerationsDefault = 500;
+    public const string MaxGenerationsDefaultString = "500";
     public const int RepeatAmountDefault = 5;
+    public const string RepeatAmountDefaultString = "5";
     public const double CrossoverProbabilityDefault = 0.4d;
+    public const string CrossoverProbabilityDefaultString = "0.4";
     // constant array not currently possible
     public static readonly IReadOnlyList<int> LayerSizesDefault = [50, 50];
+    public const string PopulationCombinationDefault = "take-new";
     public const double MutationProbabilityDefault = 0d;
+    public const string MutationProbabilityDefaultString = "0";
     // public const double ChangeNodeMutationProbabilityDefault = 0d;
     // public const double ChangeParentsMutationProbabilityDefault = 0d;
     // public const double AddNodeToLayerMutationProbabilityDefault = 0d;
@@ -26,8 +38,11 @@ public class OptionsImmutable
     // public const double RemoveNodeFromLayerMutationProbabilityDefault = 0d;
     // public const double RemoveLayerMutationProbabilityDefault = 0d;
     public const double PercentageToChangeDefault = 0.2d;
+    public const string PercentageToChangeDefaultString = "0.2";
     public const double NodeProbabilityDefault = 0.2d;
+    public const string NodeProbabilityDefaultString = "0.2";
     public const double TerminalNodesProbabilityDefault = 0.2d;
+    public const string TerminalNodesProbabilityDefaultString = "0.2";
     // public const double ValueNodeProbabilityDefault = 0.2d;
     // public const double SumNodeProbabilityDefault = 0.2d;
     // public const double ProductNodeProbabilityDefault = 0.2d;
@@ -55,6 +70,8 @@ public class OptionsImmutable
 
     // specific for CartesianGP
     public IReadOnlyList<int> LayerSizes { get; }
+    public string PopulationCombination { get; }
+
     // mutation probabilities
     public double ChangeNodeMutationProbability { get; }
     public double ChangeParentsMutationProbability { get; }
@@ -90,6 +107,7 @@ public class OptionsImmutable
         int repeatAmount,
         double crossoverProbability,
         IReadOnlyList<int> layerSizes,
+        string populationCombination,
         double changeNodeMutationProbability,
         double changeParentsMutationProbability,
         double addNodeToLayerMutationProbability,
@@ -118,6 +136,13 @@ public class OptionsImmutable
         this.RepeatAmount = repeatAmount;
         this.CrossoverProbability = crossoverProbability;
         this.LayerSizes = layerSizes;
+        string[] populationCombinations = ["elitism", "take-new", "combine"];
+        if (!populationCombinations.Contains(populationCombination))
+        {
+            System.Console.Error.WriteLine($"Unknown population combination: {populationCombination}");
+            System.Environment.Exit(1);
+        }
+        this.PopulationCombination = populationCombination;
 
         this.ChangeNodeMutationProbability = changeNodeMutationProbability;
         this.ChangeParentsMutationProbability = changeParentsMutationProbability;
@@ -146,33 +171,34 @@ public class OptionsImmutable
         this.TestCSVFilePath = opts.TestCSVFilePath ?? OptionsImmutable.TestCSVFilePathDefault;
         this.CSVInputsAmount = opts.CSVInputsAmount;
         this.CSVDelimiter = opts.CSVDelimiter;
-        this.MinThreads = fileOpts?.MinThreads ?? opts.MinThreads ?? OptionsImmutable.MinThreadsDefault;
-        this.MaxThreads = fileOpts?.MaxThreads ?? opts.MaxThreads ?? OptionsImmutable.MaxThreadsDefault;
+        this.MinThreads = opts.MinThreads ?? fileOpts?.MinThreads ?? OptionsImmutable.MinThreadsDefault;
+        this.MaxThreads = opts.MaxThreads ?? fileOpts?.MaxThreads ?? OptionsImmutable.MaxThreadsDefault;
         this.PopulationSize = opts.PopulationSize ?? OptionsImmutable.PopulationSizeDefault;
         this.MaxGenerations = opts.MaxGenerations ?? OptionsImmutable.MaxGenerationsDefault;
-        this.RepeatAmount = fileOpts?.RepeatAmount ?? opts.RepeatAmount ?? OptionsImmutable.RepeatAmountDefault;
-        this.CrossoverProbability = fileOpts?.CrossoverProbability ?? opts.CrossoverProbability ?? OptionsImmutable.CrossoverProbabilityDefault;
+        this.RepeatAmount = opts.RepeatAmount ?? fileOpts?.RepeatAmount ?? OptionsImmutable.RepeatAmountDefault;
+        this.CrossoverProbability = opts.CrossoverProbability ?? fileOpts?.CrossoverProbability ?? OptionsImmutable.CrossoverProbabilityDefault;
 
-        this.LayerSizes = fileOpts?.LayerSizes ?? opts.LayerSizes ?? OptionsImmutable.LayerSizesDefault;
+        this.LayerSizes = opts.LayerSizes ?? fileOpts?.LayerSizes ?? OptionsImmutable.LayerSizesDefault;
+        this.PopulationCombination = opts.PopulationCombination ?? fileOpts?.PopulationCombination ?? OptionsImmutable.PopulationCombinationDefault;
 
-        this.ChangeNodeMutationProbability = fileOpts?.ChangeNodeMutationProbability ?? opts.ChangeNodeMutationProbability ?? OptionsImmutable.MutationProbabilityDefault;
-        this.ChangeParentsMutationProbability = fileOpts?.ChangeParentsMutationProbability ?? opts.ChangeParentsMutationProbability ?? OptionsImmutable.MutationProbabilityDefault;
-        this.AddNodeToLayerMutationProbability = fileOpts?.AddNodeToLayerMutationProbability ?? opts.AddNodeToLayerMutationProbability ?? OptionsImmutable.MutationProbabilityDefault;
-        this.AddLayerMutationProbability = fileOpts?.AddLayerMutationProbability ?? opts.AddLayerMutationProbability ?? OptionsImmutable.MutationProbabilityDefault;
-        this.RemoveNodeFromLayerMutationProbability = fileOpts?.RemoveNodeFromLayerMutationProbability ?? opts.RemoveNodeFromLayerMutationProbability ?? OptionsImmutable.MutationProbabilityDefault;
-        this.RemoveLayerMutationProbability = fileOpts?.RemoveLayerMutationProbability ?? opts.RemoveLayerMutationProbability ?? OptionsImmutable.MutationProbabilityDefault;
+        this.ChangeNodeMutationProbability = opts.ChangeNodeMutationProbability ?? fileOpts?.ChangeNodeMutationProbability ?? OptionsImmutable.MutationProbabilityDefault;
+        this.ChangeParentsMutationProbability = opts.ChangeParentsMutationProbability ?? fileOpts?.ChangeParentsMutationProbability ?? OptionsImmutable.MutationProbabilityDefault;
+        this.AddNodeToLayerMutationProbability = opts.AddNodeToLayerMutationProbability ?? fileOpts?.AddNodeToLayerMutationProbability ?? OptionsImmutable.MutationProbabilityDefault;
+        this.AddLayerMutationProbability = opts.AddLayerMutationProbability ?? fileOpts?.AddLayerMutationProbability ?? OptionsImmutable.MutationProbabilityDefault;
+        this.RemoveNodeFromLayerMutationProbability = opts.RemoveNodeFromLayerMutationProbability ?? fileOpts?.RemoveNodeFromLayerMutationProbability ?? OptionsImmutable.MutationProbabilityDefault;
+        this.RemoveLayerMutationProbability = opts.RemoveLayerMutationProbability ?? fileOpts?.RemoveLayerMutationProbability ?? OptionsImmutable.MutationProbabilityDefault;
 
-        this.PercentageToChange = fileOpts?.PercentageToChange ?? opts.PercentageToChange ?? OptionsImmutable.PercentageToChangeDefault;
-        this.TerminalNodesProbability = fileOpts?.TerminalNodesProbability ?? opts.TerminalNodesProbability ?? OptionsImmutable.TerminalNodesProbabilityDefault;
-        this.ValueNodeProbability = fileOpts?.ValueNodeProbability ?? opts.ValueNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
-        this.SumNodeProbability = fileOpts?.SumNodeProbability ?? opts.SumNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
-        this.ProductNodeProbability = fileOpts?.ProductNodeProbability ?? opts.ProductNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
-        this.SinNodeProbability = fileOpts?.SinNodeProbability ?? opts.SinNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
-        this.PowerNodeProbability = fileOpts?.PowerNodeProbability ?? opts.PowerNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
-        this.UnaryMinusNodeProbability = fileOpts?.UnaryMinusNodeProbability ?? opts.UnaryMinusNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
-        this.SigmoidNodeProbability = fileOpts?.SigmoidNodeProbability ?? opts.SigmoidNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
-        this.ReLUNodeProbability = fileOpts?.ReLUNodeProbability ?? opts.ReLUNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
-        this.ConditionNodeProbability = fileOpts?.ConditionNodeProbability ?? opts.ConditionNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
+        this.PercentageToChange = opts.PercentageToChange ?? fileOpts?.PercentageToChange ?? OptionsImmutable.PercentageToChangeDefault;
+        this.TerminalNodesProbability = opts.TerminalNodesProbability ?? fileOpts?.TerminalNodesProbability ?? OptionsImmutable.TerminalNodesProbabilityDefault;
+        this.ValueNodeProbability = opts.ValueNodeProbability ?? fileOpts?.ValueNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
+        this.SumNodeProbability = opts.SumNodeProbability ?? fileOpts?.SumNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
+        this.ProductNodeProbability = opts.ProductNodeProbability ?? fileOpts?.ProductNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
+        this.SinNodeProbability = opts.SinNodeProbability ?? fileOpts?.SinNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
+        this.PowerNodeProbability = opts.PowerNodeProbability ?? fileOpts?.PowerNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
+        this.UnaryMinusNodeProbability = opts.UnaryMinusNodeProbability ?? fileOpts?.UnaryMinusNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
+        this.SigmoidNodeProbability = opts.SigmoidNodeProbability ?? fileOpts?.SigmoidNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
+        this.ReLUNodeProbability = opts.ReLUNodeProbability ?? fileOpts?.ReLUNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
+        this.ConditionNodeProbability = opts.ConditionNodeProbability ?? fileOpts?.ConditionNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
         // exclude input node prob. since CartesianGP does not use it
     }
 

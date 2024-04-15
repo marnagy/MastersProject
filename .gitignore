@@ -21,4 +21,5 @@ python/venv
 # release directories
 Windows_x64
 OSX_arm
+OSX_x64
 Linux_x64
