@@ -12,9 +12,11 @@ class Program
         // from https://stackoverflow.com/questions/2234492/is-it-possible-to-set-the-cultureinfo-for-an-net-application-or-just-a-thread#comment32681459_2247570
         System.Threading.Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
 
-        Options cliArgs = Parser.Default.ParseArguments<Options>(args).Value;
-        if (cliArgs == null)  // --help case
+        Options cliArgsMut = Parser.Default.ParseArguments<Options>(args).Value;
+        if (cliArgsMut == null)  // --help case
             return;
+        
+        var cliArgs = OptionsImmutable.From(cliArgsMut);
 
         if (!CheckArgs(cliArgs))
         {
@@ -281,7 +283,7 @@ class Program
         }
 
     }
-    public static bool CheckArgs(Options args)
+    public static bool CheckArgs(OptionsImmutable args)
     {
         return args.TrainCSVFilePath != null
             && args.CSVInputsAmount > 0;
