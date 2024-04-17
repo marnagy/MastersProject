@@ -8,6 +8,9 @@ class Program
 {
     public static void Main(string[] args)
     {
+        System.Console.Error.WriteLine("This project should NOT be run! Run CombinedTreeBasedGP instead.");
+        System.Environment.Exit(1);
+
         // set to en-us culture -> interpret real number with decimal point instead of decimal comma
         // from https://stackoverflow.com/questions/2234492/is-it-possible-to-set-the-cultureinfo-for-an-net-application-or-just-a-thread#comment32681459_2247570
         System.Threading.Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
@@ -32,6 +35,8 @@ class Program
             cliArgs.CSVInputsAmount,
             cliArgs.CSVDelimiter
         );
+        int inputsAmount = inputs.GetColumnsAmount();
+        int outputsAmount = outputs.GetColumnsAmount();
         
         var inputNodes = Enumerable.Range(0, cliArgs.CSVInputsAmount)
             .Select(index => new InputFunctionality(index))
@@ -59,7 +64,6 @@ class Program
             {new SigmoidNode(), cliArgs.SigmoidNodeProbability},
             {new ReLUNode(), cliArgs.ReLUNodeProbability}
         };
-        // rng for creating first population
         TreeChromosome.DefaultDepth = cliArgs.DefaultTreeDepth;
 
         var dummyTreeChromosome = new TreeChromosome(
@@ -97,7 +101,6 @@ class Program
             // new DummyCrossover(), 
         ];
 
-        var outputsAmount = outputs.GetColumnsAmount();
         double previousMinFitness = double.PositiveInfinity;
         var GAs = new GeneticAlgorithm<TreeChromosome>[outputsAmount];
         // TODO: create GA for each of the output columns (expecting one-hot encoding)

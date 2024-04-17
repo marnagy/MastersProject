@@ -12,9 +12,11 @@ class Program
         // from https://stackoverflow.com/questions/2234492/is-it-possible-to-set-the-cultureinfo-for-an-net-application-or-just-a-thread#comment32681459_2247570
         System.Threading.Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
 
-        Options cliArgs = Parser.Default.ParseArguments<Options>(args).Value;
-        if (cliArgs == null)  // --help case
+        Options cliArgsMut = Parser.Default.ParseArguments<Options>(args).Value;
+        if (cliArgsMut == null)  // --help case
             return;
+        
+        var cliArgs = OptionsImmutable.From(cliArgsMut);
 
         if (!CheckArgs(cliArgs))
         {
@@ -83,59 +85,59 @@ class Program
             nonTerminalNodes: nonTerminalNodesProbabilities.Keys.ToArray(),
             maxThreads: cliArgs.MaxThreads
         );
-        // var mutationShuffle = new ShuffleChildrenMutation(
-        //     cliArgs.ChangeNodeMutationProbability,
-        //     percentageToChange: cliArgs.PercentageToChange
-        // );
+        var mutationShuffle = new ShuffleChildrenCombinedMutation(
+            cliArgs.ShuffleChildrenMutationProbability,
+            percentageToChange: cliArgs.PercentageToChange
+        );
         Mutation<CombinedTreeChromosome>[] mutations = [
             mutationChange,
-            //mutationShuffle,
+            mutationShuffle
         ];
         // ramped half-and-half
         Func<TreeChromosome> newTreeChromosome = () => 
-            //dummyTreeChromosome.CreateNew();
         dummyTreeChromosome.Clone(
             Random.Shared.NextDouble() < 0.5
                 ? dummyTreeChromosome.CreateNewTreeFull(cliArgs.DefaultTreeDepth)
-                : dummyTreeChromosome.CreateNewTreeGrow(cliArgs.DefaultTreeDepth));
-        //     // dummyTreeChromosome.CreateNewTreeFull(cliArgs.DefaultTreeDepth)
-        // );
-        Func<CombinedTreeChromosome> newChromosomeFunc = () => CombinedTreeChromosome.CreateNew(
+                : dummyTreeChromosome.CreateNewTreeGrow(cliArgs.DefaultTreeDepth)
+        );
+
+        Func<CombinedTreeChromosome> createNewChromosome = () => CombinedTreeChromosome.CreateNew(
             outputs.GetColumnsAmount(),
             newTreeChromosome
         );
         Crossover<CombinedTreeChromosome>[] crossovers = [
-            new CombinedSwitchNodesCrossover(),
-            // new DummyCombinedCrossover(), 
+            new CombinedSwitchNodesCrossover()
         ];
 
         var outputsAmount = outputs.GetColumnsAmount();
         double previousMinFitness = double.PositiveInfinity;
-        var fitness = 
-        //new CombinedDifferenceFitness(
-        new CombinedAccuracyFitness(
+        var trainAccuracy = new CombinedAccuracyFitness(
             inputs,
             outputs,
             inputNodes,
             cliArgs.MaxThreads
         );
+        PopulationCombinationStrategy<CombinedTreeChromosome> popComb = cliArgs.PopulationCombination switch
+        {
+            "elitism" => new MinElitismCombination<CombinedTreeChromosome>(
+                bestAmount: 1,
+                newIndividuals: 0,
+                trainAccuracy,
+                createNewChromosome
+            ),
+            "take-new" => new TakeNewCombination<CombinedTreeChromosome>(),
+            "combine" => new MinCombineBestCombination<CombinedTreeChromosome>(),
+            _ => throw new Exception("User should not be able to get here. Default handling in OptionsImmutable class"),
+        };
 
         //!  ##### ! #####
         var combinedTreeBasedGA = new GeneticAlgorithm<CombinedTreeChromosome>(
-            newChromosomeFunc,
+            createNewChromosome,
             mutations,
             crossovers,
-            fitness,
-            //new ReversedRouletteWheelSelection<CombinedTreeChromosome>(),
+            trainAccuracy,
             new MinTournamentSelection<CombinedTreeChromosome>(5),
-            // new TakeNewCombination<CombinedTreeChromosome>()
-            // new MinElitismCombination<CombinedTreeChromosome>(
-            //     bestAmount: 1,
-            //     newIndividuals: 0, //cliArgs.PopulationSize / 10,
-            //     fitnessFunc: fitness,
-            //     createNewChrom: newChromosomeFunc
-            // )
-            new MinCombineBestCombination<CombinedTreeChromosome>()
+            popComb
         ){
             MaxGenerations = cliArgs.MaxGenerations,
             CrossoverProbability = cliArgs.CrossoverProbability,
@@ -285,7 +287,7 @@ class Program
             .ToArray();
     }
 
-    public static bool CheckArgs(Options cliArgs)
+    public static bool CheckArgs(OptionsImmutable cliArgs)
     {
         return cliArgs.TrainCSVFilePath != null
             && cliArgs.CSVInputsAmount > 0;

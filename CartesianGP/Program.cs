@@ -25,8 +25,6 @@ class Program
             System.Console.Error.WriteLine(cliArgs);
         }
 
-        System.Console.Error.WriteLine(cliArgs);
-
         double terminalNodesProbability = cliArgs.TerminalNodesProbability;
 
         // prepare CSV
@@ -35,8 +33,8 @@ class Program
             cliArgs.CSVInputsAmount,
             cliArgs.CSVDelimiter
         );
-        int inputsAmount = inputs.GetRow(0).Count();
-        int outputsAmount = outputs.GetRow(0).Count();
+        int inputsAmount = inputs.GetColumnsAmount();
+        int outputsAmount = outputs.GetColumnsAmount();
 
         var emptyParents = CartesianNode.GetEmptyParents();
         var terminalNodesProbabilities = new Dictionary<CartesianNode, double>
@@ -64,7 +62,6 @@ class Program
             {new SinNode(emptyParents), cliArgs.SinNodeProbability},
             {new ReLUNode(emptyParents), cliArgs.ReLUNodeProbability},
             {new SigmoidNode(emptyParents), cliArgs.SigmoidNodeProbability}
-
         };
 
         var trainAccuracy = new AccuracyFitness(
@@ -98,6 +95,29 @@ class Program
         layerSizes[^1] = outputsAmount;
         hiddenlayerSizes.CopyTo(layerSizes, 1);
 
+        Mutation<CartesianChromosome>[] mutations = [
+                new ChangeNodeMutation(
+                    cliArgs.PercentageToChange,
+                    cliArgs.ChangeNodeMutationProbability,
+                    cliArgs.TerminalNodesProbability,
+                    nonTerminalNodesProbabilities,
+                    terminalNodesProbabilities
+                ),
+                new ChangeParentsMutation(
+                    cliArgs.PercentageToChange,
+                    cliArgs.ChangeParentsMutationProbability
+                ),
+                new AddNodeToLayerMutation(
+                    cliArgs.AddNodeToLayerMutationProbability,
+                    cliArgs.TerminalNodesProbability,
+                    terminalNodesProbabilities,
+                    nonTerminalNodesProbabilities
+                ),
+                new RemoveNodeFromLayerMutation(
+                    cliArgs.RemoveNodeFromLayerMutationProbability
+                )
+        ];
+
         Func<CartesianChromosome> createNewChromosome = ()
             => CartesianChromosome.CreateNewRandom(
                 layerSizes,
@@ -120,28 +140,7 @@ class Program
 
         var cartesianGA = new GeneticAlgorithm<CartesianChromosome>(
             createNewChromosome,
-            [ 
-                new ChangeNodeMutation(
-                    cliArgs.PercentageToChange,
-                    cliArgs.ChangeNodeMutationProbability,
-                    cliArgs.TerminalNodesProbability,
-                    nonTerminalNodesProbabilities,
-                    terminalNodesProbabilities
-                ),
-                new ChangeParentsMutation(
-                    cliArgs.PercentageToChange,
-                    cliArgs.ChangeParentsMutationProbability
-                ),
-                new AddNodeToLayerMutation(
-                    cliArgs.AddNodeToLayerMutationProbability,
-                    cliArgs.TerminalNodesProbability,
-                    terminalNodesProbabilities,
-                    nonTerminalNodesProbabilities
-                ),
-                new RemoveNodeFromLayerMutation(
-                    cliArgs.RemoveNodeFromLayerMutationProbability
-                )
-            ],
+            mutations,
             [new FixedIndexCrossover()],
             trainAccuracy,
             new MinTournamentSelection<CartesianChromosome>(folds: 5),
