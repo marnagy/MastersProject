@@ -16,7 +16,7 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
     /// </summary>
     /// <param name="hiddenLayerSizes">First is input layer, last is number of outputs.</param>
     /// <param name="nodeCatalogue">Set of possible Nodes</param>
-    public CartesianChromosome(int inputsAmount, List<List<CartesianNode>> layers, double? previousFitness = null)
+    public CartesianChromosome(int inputsAmount, List<List<CartesianNode>> layers, double? previousFitness = null, double? previousScore = null)
     {
         this.Inputs = Enumerable.Range(0, inputsAmount)
             .Select(i => new InputNode(0d, inputIndex: i, CartesianNode.GetEmptyParents()))
@@ -24,6 +24,8 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
         this.Layers = layers;
         if (previousFitness.HasValue)
             this.Fitness = previousFitness.Value;
+        if (previousScore.HasValue)
+            this.Score = previousScore.Value;
     }
     public IReadOnlyList<CartesianNode> this[int i]
     {
@@ -145,7 +147,8 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
                     .ToList()
                 )
                 .ToList(),
-            previousFitness: this.Fitness
+            previousFitness: this.Fitness,
+            previousScore: this.Score
         );
     /// <summary>
     /// Deep copy layers of Cartesian chromosome. Does NOT include input layer.

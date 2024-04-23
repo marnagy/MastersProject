@@ -64,6 +64,33 @@ def main():
     else:
         plt.savefig('fitness_graph.png')
         print('Fitness figure has been saved.')
+    plt.clf()
+    
+    print('Plotting score...', end='')
+    ax = sns.lineplot(
+        data=df,
+        x='gen',
+        y='minScore',
+        color='r',
+        label='MinScore'
+    )
+    ax = sns.lineplot(
+        data=df,
+        x='gen',
+        y='averageScore',
+        color='g',
+        ax=ax,
+        label='AvgScore'
+    )
+
+    plt.yscale('log')
+    if not args.save:
+        plt.show()
+        print('Done')
+    else:
+        plt.savefig('score_graph.png')
+        print('Score figure has been saved.')
+    plt.clf()
 
     print('Plotting depth...', end='')
     ax = sns.lineplot(

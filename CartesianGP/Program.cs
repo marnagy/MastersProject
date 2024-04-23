@@ -205,8 +205,8 @@ class Program
                         .Average();
                     
                     double currentMinScore = population
-                        .Select(ind => ind.Score)
-                        .Min();
+                        .First(ind => ind.Fitness == currentMinFitness)
+                        .Score;
                     double currentAvgScore = population
                         // fitness can be +inf
                         .Where(ind => double.IsNormal(ind.Score) || ind.Score == 0d)
@@ -229,14 +229,16 @@ class Program
                     }));
 
                     if (genNum % 10 == 0)
+                    {
                         System.Console.Error.WriteLine($"Computed {genNum}th generation. " +
                             $"MinFitness: {currentMinFitness} " +
                             $"AvgFitness: {currentAvgFitness} " + //:F2} " +
-                            $"MinScore: {currentMinScore:F3} " +
+                            $"ScoreOfMin: {currentMinScore:F3} " +
                             $"AvgScore: {currentAvgScore:F3} " +
                             $"Depth of min: {population.First(ind => ind.Fitness == currentMinFitness).GetDepth():F1} " +
                             $"AvgDepth: {averageDepth:F1} "
                         );
+                    }
                 };
                 Func<IReadOnlyList<CartesianChromosome>, bool> stopCond = (population)
                     => false;

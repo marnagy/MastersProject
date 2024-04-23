@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using CommandLine;
@@ -103,9 +104,13 @@ class Program
 
         double previousMinFitness = double.PositiveInfinity;
         var GAs = new GeneticAlgorithm<TreeChromosome>[outputsAmount];
-        // TODO: create GA for each of the output columns (expecting one-hot encoding)
+
+        // create GA for each of the output columns (expecting one-hot encoding)
         for (int outputIndex = 0; outputIndex < outputsAmount; outputIndex++)
         {
+            var createNewChrom = () => dummyTreeChromosome.Clone(
+                    dummyTreeChromosome.CreateNewTreeFull(cliArgs.DefaultTreeDepth)
+                );
             var fitness = new AccuracyFitness(
                 inputs,
                 outputs,
@@ -113,22 +118,25 @@ class Program
                 inputNodes,
                 cliArgs.MaxThreads
             );
+            PopulationCombinationStrategy<TreeChromosome> popComb = cliArgs.PopulationCombination switch
+            {
+                "take-new" => new TakeNewCombination<TreeChromosome>(),
+                "elitism" => new MinElitismCombination<TreeChromosome>(
+                    bestAmount: 1,
+                    0,
+                    fitness,
+                    createNewChrom
+                ),
+                "combine" => new MinCombineBestCombination<TreeChromosome>(),
+                _ => throw new Exception("Unknown population combination. Should not be reachable!")
+            };
             var treeBasedGA = new GeneticAlgorithm<TreeChromosome>(
                 newChromosomeFunc,
                 mutations,
                 crossovers,
                 fitness,
-                //new ReversedRouletteWheelSelection<TreeChromosome>(),
                 new MinTournamentSelection<TreeChromosome>(3),
-                //new TakeNewCombination()
-                new MinElitismCombination<TreeChromosome>(
-                    bestAmount: 2,
-                    newIndividuals:  cliArgs.PopulationSize / 10,
-                    fitnessFunc: fitness,
-                    createNewChrom: () => dummyTreeChromosome.Clone(
-                        dummyTreeChromosome.CreateNewTreeFull(cliArgs.DefaultTreeDepth)
-                    )
-                )
+                popComb
             ){
                 MaxGenerations = cliArgs.MaxGenerations,
                 CrossoverProbability = cliArgs.CrossoverProbability,

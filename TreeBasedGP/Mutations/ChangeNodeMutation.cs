@@ -10,6 +10,8 @@ public class ChangeNodeMutation : Mutation<TreeChromosome>
     public readonly IReadOnlyList<NodeFunctionality> NonTerminalNodes;
     public readonly double TerminalNodesProbability;
     private const int DefaultNewDepth = 2;
+    private double[]? terminalNodesWeights;
+    private double[]? nonTerminalNodesWeights;
     public ChangeNodeMutation(double probability, 
             double percentageToChange,
             double terminalNodesProbability,
@@ -31,18 +33,21 @@ public class ChangeNodeMutation : Mutation<TreeChromosome>
         rand_value = Random.Shared.NextDouble();
 
         if (rand_value < this.MutationProbability)
-            this.Mutate(ref ind.RootNode, ind, genNum);
+            this.Mutate(ind.RootNode, ind, genNum);
 
         return ind;
     }
-    private void Mutate(ref TreeNodeMaster node, TreeChromosome ind, int genNum)
+    private void Mutate(TreeNodeMaster node, TreeChromosome ind, int genNum)
     {
         // don't mutate node
-        if (!(Random.Shared.NextDouble() < this.PercentageToChange) && node.HasChildren)
+        if (Random.Shared.NextDouble() > this.PercentageToChange) // don't mutate
         {
+            if (!node.HasChildren)
+                return;
+                
             for (int i = 0; i < node.Children.Length; i++)
             {
-                this.Mutate(ref node.Children[i], ind, genNum);
+                this.Mutate(node.Children[i], ind, genNum);
             }
             return;
         }
@@ -50,12 +55,14 @@ public class ChangeNodeMutation : Mutation<TreeChromosome>
 
         if (Random.Shared.NextDouble() < this.TerminalNodesProbability)
         {
+            this.terminalNodesWeights ??= this.TerminalNodes
+                .Select(node => this.TerminalNodesProbabilities[node])
+                .ToArray();
+
             var chosenFunctionality = Random.Shared
                 .Choose(
                     this.TerminalNodes,
-                    weights: this.TerminalNodes
-                        .Select(node => this.TerminalNodesProbabilities[node])
-                        .ToArray()
+                    weights: this.terminalNodesWeights
                 );
             var prevFunctionality = node.Functionality;
 
@@ -65,9 +72,16 @@ public class ChangeNodeMutation : Mutation<TreeChromosome>
         }
         else
         {
+            this.nonTerminalNodesWeights ??= this.NonTerminalNodes
+                    .Select(node => this.NonTerminalNodesProbabilities[node])
+                    .ToArray();
+
             // choose new non-terminal node
             var chosenFunctionality = Random.Shared
-                .Choose(this.NonTerminalNodes);
+                .Choose(
+                    this.NonTerminalNodes,
+                    weights: this.nonTerminalNodesWeights
+                );
             var prevFunctionality = node.Functionality;
 
             if (!prevFunctionality.NeedsChildren)

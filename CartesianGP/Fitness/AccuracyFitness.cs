@@ -68,19 +68,21 @@ public class AccuracyFitness : Fitness<CartesianChromosome>
         }
 
         ind.Score = 1 - ((double)correctAmount / rowsAmount);
+        // System.Console.Error.WriteLine($"Computed score {ind.Score}");
         double fitnessResult = ind.Score + 2*ind.GetDepth() / this.Inputs.GetRowsAmount();
-        return 1 - ((double)correctAmount / rowsAmount);
+        return fitnessResult;
     }
     public override void ComputeFitnessPopulation(CartesianChromosome[] population)
     {
-        double[] accuracies = population.AsParallel()
+        double[] fitnessValues = population.AsParallel()
             .WithDegreeOfParallelism(this.MaxThreads)
             .Select(ind => this.ComputeFitness(ind))
             .ToArray();
         
         for (int i = 0; i < population.Length; i++)
         {
-            population[i].Fitness = accuracies[i];
+            // Score was already set in this.ComputeFitness()
+            population[i].Fitness = fitnessValues[i];
         }
     }
     private int[] GetAsOneHot(IList<double> values)

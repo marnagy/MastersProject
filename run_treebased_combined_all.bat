@@ -1,0 +1,4 @@
+call run_treebased_combined_iris.bat
+call run_treebased_combined_wine.bat
+call run_treebased_combined_breast_cancer.bat
+call run_treebased_combined_mnist.bat

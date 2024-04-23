@@ -4,6 +4,7 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
 {
     private readonly double[,] Inputs;
     private readonly int[,] Outputs;
+    private const double coeff = 0.5;
     private bool UseClip = true;
     private readonly InputFunctionality[] InputNodes;
     private readonly int MaxThreads;
@@ -61,11 +62,10 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
         // int inputNodesAmount = this.CountInputNodes(ind);
         // without cast to double, the operation would mean "div"
         double accuracy = accurateCounter / rowsAmount;
+        ind.Score = 1d - accuracy;
+        double fitness = ind.Score + CombinedAccuracyFitness.coeff*ind.GetDepth() / this.Inputs.GetRowsAmount();
         // System.Console.Error.WriteLine($"Accuracy: {accuracy}");
-        return 
-            1 - accuracy;
-            //this.MagicNormalizationCoefficient(ind)
-            //1d / inputNodesAmount;
+        return fitness;
     }
 
     public override void ComputeFitnessPopulation(CombinedTreeChromosome[] population)
@@ -113,7 +113,7 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
             else
             {
                 population[j].Score = accurateCounters[j];
-                population[j].Fitness = accurateCounters[j] + 2*population[j].GetDepth() / this.Inputs.GetRowsAmount(); // * this.MagicNormalizationCoefficient(population[j]);
+                population[j].Fitness = accurateCounters[j] + CombinedAccuracyFitness.coeff*population[j].GetDepth() / this.Inputs.GetRowsAmount(); // * this.MagicNormalizationCoefficient(population[j]);
 
             }
         }

@@ -42,8 +42,8 @@ public class CombinedTreeChromosome : Chromosome<CombinedTreeChromosome>
         this.Subchromosomes
             .Select(subchrom => subchrom.CreateNew())
             .ToArray(),
-        fitness: 0d,
-        score: 0d
+        fitness: -1d,
+        score: -1d
     );
     public double GetDepth()
     => this.Subchromosomes

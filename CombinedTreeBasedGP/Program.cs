@@ -24,8 +24,6 @@ class Program
             System.Console.Error.WriteLine(cliArgs);
         }
 
-        System.Console.Error.WriteLine(cliArgs);
-
         double terminalNodesProbability = cliArgs.TerminalNodesProbability;
 
         // prepare CSV
@@ -93,7 +91,7 @@ class Program
         );
         Mutation<CombinedTreeChromosome>[] mutations = [
             mutationChange,
-            mutationShuffle
+            // mutationShuffle
         ];
         // ramped half-and-half
         Func<TreeChromosome> newTreeChromosome = () => 
@@ -201,8 +199,8 @@ class Program
                         .Average();
                     
                     var currentMinScore = population
-                        .Select(ind => ind.Score)
-                        .Min();
+                        .First(ind => ind.Fitness == currentMinFitness)
+                        .Score;
                     var currentAvgScore = population
                         // fitness can be +inf
                         .Where(ind => double.IsNormal(ind.Score) || ind.Score == 0d)
@@ -227,14 +225,15 @@ class Program
                         averageDepth
                     }));
 
-                    System.Console.Error.WriteLine($"Computed {genNum}th generation. " +
-                        $"MinFitness: {currentMinFitness} " +
-                        $"AvgFitness: {currentAvgFitness} " + //:F2} " +
-                        $"MinScore: {currentMinScore:F3} " +
-                        $"AvgScore: {currentAvgScore:F3} " +
-                        $"Depth of min: {population.MinBy(ind => ind.Fitness).GetDepth():F1} " +
-                        $"AvgDepth: {averageDepth:F1} "
-                    );
+                    if (genNum % 10 == 0)
+                        System.Console.Error.WriteLine($"Computed {genNum}th generation. " +
+                            $"MinFitness: {currentMinFitness} " +
+                            $"AvgFitness: {currentAvgFitness} " + //:F2} " +
+                            $"ScoreOfMin: {currentMinScore:F3} " +
+                            $"AvgScore: {currentAvgScore:F3} " +
+                            $"Depth of min: {population.MinBy(ind => ind.Fitness).GetDepth():F1} " +
+                            $"AvgDepth: {averageDepth:F1}"
+                        );
                     // System.Console.WriteLine(population.Select(ind => ind.Fitness).Stringify());
                 };
                 double smallDelta = 1d / inputs.GetRowsAmount();
@@ -261,16 +260,23 @@ class Program
                 System.Console.WriteLine("Calculating prediction accuracy...");
 
                 // load test inputs & outputs if specified
+                CombinedAccuracyFitness testAccuracyFitness;
                 if (cliArgs.TestCSVFilePath != null)
+                {
                     (inputs, outputs) = CSVHelper.PrepareCSV(
                         cliArgs.TrainCSVFilePath,
                         cliArgs.CSVInputsAmount,
                         cliArgs.CSVDelimiter
                     );
 
-                var resultAccuracyFitness = new CombinedAccuracyFitness(inputs, outputs, inputNodes, cliArgs.MaxThreads);
+                    testAccuracyFitness = new CombinedAccuracyFitness(inputs, outputs, inputNodes, cliArgs.MaxThreads);
+                }
+                else
+                {
+                    testAccuracyFitness = trainAccuracy;
+                }
 
-                double accuracyScore = 1d - resultAccuracyFitness.ComputeFitness(bestIndividual);
+                double accuracyScore = 1d - testAccuracyFitness.ComputeFitness(bestIndividual);
                 
                 System.Console.Error.WriteLine($"Accuracy score: {accuracyScore * 100 } %");
                 sw.WriteLine($"Accuracy score: {accuracyScore * 100} %");
