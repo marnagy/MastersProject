@@ -25,6 +25,8 @@ public class OptionsImmutable
     public const string CrossoverProbabilityDefaultString = "0.4";
     public static readonly IReadOnlyList<string> PopulationCombinationOptions = ["elitism", "take-new", "combine"];
     public const string PopulationCombinationDefault = "take-new";
+    public const int DefaultTreeDepthDefault = 5;
+    public const string DefaultTreeDepthDefaultString = "5";
     public const double MutationProbabilityDefault = 0d;
     public const string MutationProbabilityDefaultString = "0";
     // public const double ChangeNodeMutationProbabilityDefault = 0d;
@@ -99,8 +101,11 @@ public class OptionsImmutable
         int repeatAmount,
         double crossoverProbability,
         string populationCombination,
+        int defaultTreeDepth,
 
         // mutations
+        double changeNodeMutationProbability,
+        double shuffleChildrenMutationProbability,
 
         double percentageToChange,
         double terminalNodesProbability,
@@ -129,8 +134,10 @@ public class OptionsImmutable
             System.Environment.Exit(1);
         }
         this.PopulationCombination = populationCombination;
+        this.DefaultTreeDepth = defaultTreeDepth;
 
-        // TODO: mutations
+        this.ChangeNodeMutationProbability = changeNodeMutationProbability;
+        this.ShuffleChildrenMutationProbability = shuffleChildrenMutationProbability;
 
         this.PercentageToChange = percentageToChange;
         this.TerminalNodesProbability = terminalNodesProbability;
@@ -166,8 +173,10 @@ public class OptionsImmutable
             System.Console.Error.WriteLine($"Unknown population combination: {this.PopulationCombination}");
             System.Environment.Exit(1);
         }
+        this.DefaultTreeDepth = opts.DefaultTreeDepth ?? fileOpts?.DefaultTreeDepth ?? OptionsImmutable.DefaultTreeDepthDefault;
 
-        // TODO: mutations
+        this.ChangeNodeMutationProbability = opts.ChangeNodeMutationProbability ?? fileOpts?.ChangeNodeMutationProbability ?? OptionsImmutable.MutationProbabilityDefault;
+        this.ShuffleChildrenMutationProbability = opts.ShuffleChildrenMutationProbability ?? fileOpts?.ShuffleChildrenMutationProbability ?? OptionsImmutable.MutationProbabilityDefault;
 
         this.PercentageToChange = opts.PercentageToChange ?? fileOpts?.PercentageToChange ?? OptionsImmutable.PercentageToChangeDefault;
         this.TerminalNodesProbability = opts.TerminalNodesProbability ?? fileOpts?.TerminalNodesProbability ?? OptionsImmutable.TerminalNodesProbabilityDefault;

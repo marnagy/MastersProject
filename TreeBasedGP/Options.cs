@@ -31,22 +31,22 @@ public class Options
     public int? RepeatAmount { get; set; }
     [Option("crossover-probability", Default = 0.5d, HelpText = "Probability of each mutation taking action.")]
     public double? CrossoverProbability { get; set; }
+    [Option("population-combination", HelpText = $"Choose the Population combination. [elitism, take-new, combine] Default: {OptionsImmutable.PopulationCombinationDefault}")]
+    public string? PopulationCombination { get; set; }
 
     // specific for TreeBasedGP
-    [Option("terminal-nodes-probability", HelpText = "Probability of choosing from terminal nodes instead of non-terminal nodes.")]
-    public double? TerminalNodesProbability { get; set; }
     [Option("depth", Default = 3, HelpText = "Maximum depth of starting trees.")]
-    public int DefaultTreeDepth { get; set; }
+    public int? DefaultTreeDepth { get; set; }
     [Option("change-node-mutation-probability", HelpText = "Probability of using ChangeNodeMutation class.")]
     public double? ChangeNodeMutationProbability { get; set; }
     [Option("shuffle-children-mutation-probability", HelpText = "Probability of using ShuffleChildrenMutation class.")]
     public double? ShuffleChildrenMutationProbability { get; set; }
-    [Option("population-combination", HelpText = $"Choose the Population combination. [elitism, take-new, combine] Default: {OptionsImmutable.PopulationCombinationDefault}")]
-    public string? PopulationCombination { get; set; }
 
     // node probabilities
     [Option("percentage-to-change", HelpText = "How much of 1 individual should mutation change.")]
     public double? PercentageToChange { get; set; }
+    [Option("terminal-nodes-probability", HelpText = "Probability of choosing from terminal nodes instead of non-terminal nodes.")]
+    public double? TerminalNodesProbability { get; set; }
     [Option("value-node-weight")]
     public double? ValueNodeProbability { get; set; }
     [Option("sum-node-weight")]

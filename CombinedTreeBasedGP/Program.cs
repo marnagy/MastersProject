@@ -24,6 +24,8 @@ class Program
             System.Console.Error.WriteLine(cliArgs);
         }
 
+        System.Console.Error.WriteLine(cliArgs);
+
         double terminalNodesProbability = cliArgs.TerminalNodesProbability;
 
         // prepare CSV

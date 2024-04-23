@@ -9,7 +9,7 @@
 *.out
 
 2024*
-combined_2024*
+combined-2024*
 combined-scored_2024*
 
 cartesian-*
