@@ -13,7 +13,7 @@ def get_args() -> Namespace:
     parser = ArgumentParser()
 
     parser.add_argument(
-        type=str, help='Filepath to csv file.', dest='filepath')
+        type=str, help='Filepath to input CSV file.', dest='filepath')
     parser.add_argument('-d', '--delimiter', default=',')
     parser.add_argument('-s', '--seed', type=int, help='Seed for train-test split function.')
     parser.add_argument(
@@ -26,14 +26,13 @@ def get_args() -> Namespace:
     parser.add_argument('--train-ratio', type=float, help='If entered, the dataset will be split'
                         'with giver ratio of train-test data into separate files.')
 
-    parser.description = 'Script assumes last column is the output column.'
+    parser.description = 'Script assumes the last column is the output column.'
 
     return parser.parse_args()
 
 
 def main() -> None:
     args = get_args()
-    print(args)
 
     file_path, file_name = os.path.split(args.filepath)
 
@@ -49,13 +48,16 @@ def main() -> None:
             stratify=df[df.columns[-1]],
             random_state=args.seed    
         )
-        print(df_train)
-        print(df_test)
+        # print(df_train)
+        # print(df_test)
         dfs = [df_train, df_test]
+        file_names = [f"prepared_train_{file_name}", f"prepared_test_{file_name}"]
     else:
         dfs = [df]
+        file_names = [f"prepared_{file_name}"]
 
-    for df in dfs:
+    info_already_printed = False
+    for df, final_file_name in zip(dfs, file_names):
         column_index = 0
         last_column_converted_to_columns_amount = 1
         while column_index < len(df.columns):
@@ -83,34 +85,39 @@ def main() -> None:
                 column_index += 1
                 last_column_converted_to_columns_amount = 1
 
-        print(df.head(5))
         input_columns_amount = len(df.columns) - last_column_converted_to_columns_amount + int(args.include_index)
-        print(f'Input columns: {input_columns_amount}, output_columns: {last_column_converted_to_columns_amount}')
+
+        if not info_already_printed:
+            print("Example of output data:")
+            print(df.head(5))
+            print(f'Input columns: {input_columns_amount}, output_columns: {last_column_converted_to_columns_amount}')
+            info_already_printed = True
 
         if args.train_ratio is not None:
-            df_train, df_test = dfs
-            df_train.to_csv(os.path.join(
+            df.to_csv(os.path.join(
                     file_path,
-                    f"prepared_train_{file_name}"
+                    final_file_name
                 ),
                 sep=args.delimiter,
                 index=args.include_index
             )
-            df_train.to_csv(os.path.join(
-                    file_path,
-                    f"prepared_test_{file_name}"
-                ),
-                sep=args.delimiter,
-                index=args.include_index
-            )
+            # df_train.to_csv(os.path.join(
+            #         file_path,
+            #         f"prepared_test_{file_name}"
+            #     ),
+            #     sep=args.delimiter,
+            #     index=args.include_index
+            # )
+            print(f'Generated file: {final_file_name}')
         else:
             df.to_csv(os.path.join(
                     file_path,
-                    f"prepared_{file_name}"
+                    
                 ),
                 sep=args.delimiter,
                 index=args.include_index
             )
+            print(f'Generated file: {f"prepared_{file_name}"}')
 
 
 if __name__ == '__main__':

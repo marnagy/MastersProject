@@ -30,7 +30,7 @@ def main():
     if not args.save:
         plt.show()
     else:
-        plt.savefig('progress_graph.png')
+        plt.savefig('fitness_progress_graph.png')
         print('Figure has been saved.')
 
 if __name__ == '__main__':
