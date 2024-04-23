@@ -41,7 +41,7 @@ public class Options
 
     // specific for CartesianGP
     // cannot print default using $-string due to being an array
-    [Option("layer-sizes", HelpText = "Sizes of internal layer excluding inputs (left) and outputs (right) layer. Default: [50, 50]")]
+    [Option("layer-sizes", HelpText = "Sizes of internal layer excluding inputs (left) and outputs (right) layer. Default: \"50, 50\"")]
     public IReadOnlyList<int>? LayerSizes { get; set; }
     [Option("population-combination", HelpText = $"Choose the Population combination. [elitism, take-new, combine] Default: {OptionsImmutable.PopulationCombinationDefault}")]
     public string? PopulationCombination { get; set; }

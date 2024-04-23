@@ -290,6 +290,7 @@ class Program
             && cliArgs.LayerSizes != null
             // all probabilities have to be non-negative
             && cliArgs.CrossoverProbability >= 0d
+            && cliArgs.CrossoverProbability <= 1d
             && cliArgs.ChangeNodeMutationProbability >= 0d
             && cliArgs.ChangeParentsMutationProbability >= 0d
             && cliArgs.PercentageToChange >= 0d

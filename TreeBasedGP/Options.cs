@@ -21,8 +21,8 @@ public class Options
     public int? MinThreads { get; set; }
     [Option("max-threads", /*Min = 1, Max = 32,*/ HelpText = "Maximum amount of threads to be used by ThreadPool class.")]
     public int? MaxThreads { get; set; }
-    [Option("seed", HelpText = "Seed for the random number generator used in the GP algorithm.")]
-    public int? Seed { get; set; } = null;
+    // [Option("seed", HelpText = "Seed for the random number generator used in the GP algorithm.")]
+    // public int? Seed { get; set; } = null;
     [Option("population-size", HelpText = "Size of population in each generation.")]
     public int? PopulationSize { get; set; }
     [Option("max-generations", HelpText = "Maximum amount of generations to evolve.")]
@@ -65,8 +65,8 @@ public class Options
     public double? ReLUNodeProbability { get; set; }
     [Option("cond-node-weight")]
     public double? ConditionNodeProbability { get; set; }
-    [Option("input-node-weight")]
-    public double? InputNodeProbability { get; set; }
+    // [Option("input-node-weight")]
+    // public double? InputNodeProbability { get; set; }
     public override string ToString()
     {
         return JsonSerializer.Serialize(this);

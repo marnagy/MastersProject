@@ -150,7 +150,7 @@ class Program
 
         var dt = DateTime.UtcNow;
 
-        var masterDirectory = Directory.CreateDirectory($"combined-scored_{dt.Year}-{dt.Month:00}-{dt.Day:00}_{dt.Hour:00}-{dt.Minute:00}-{dt.Second:00}");
+        var masterDirectory = Directory.CreateDirectory($"combined-{dt.Year}-{dt.Month:00}-{dt.Day:00}_{dt.Hour:00}-{dt.Minute:00}-{dt.Second:00}");
         var baseDirectory = masterDirectory;
 
         //save cliArgs
