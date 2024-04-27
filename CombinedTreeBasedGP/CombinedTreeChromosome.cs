@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 
 public class CombinedTreeChromosome : Chromosome<CombinedTreeChromosome>
@@ -5,7 +6,7 @@ public class CombinedTreeChromosome : Chromosome<CombinedTreeChromosome>
     public TreeChromosome[] Subchromosomes;
     public const double DefaultFitness = -2d;
     public double Score { get; internal set; }
-    public static int MaxThreads = 4;
+    public static int MaxThreads = 1;
 
     private CombinedTreeChromosome(int outputClasses, TreeChromosome[] newSubchromosomes)
     {
@@ -51,9 +52,22 @@ public class CombinedTreeChromosome : Chromosome<CombinedTreeChromosome>
         .Max();
 
     public IEnumerable<double> ComputeResults()
-    => this.Subchromosomes
-        .AsParallel().WithDegreeOfParallelism(CombinedTreeChromosome.MaxThreads)
-        .Select(subchrom => subchrom.ComputeResult());
+    {
+        if (CombinedTreeChromosome.MaxThreads == 1)
+        {
+            return this.Subchromosomes
+                .Select(subchrom => subchrom.ComputeResult());
+        }
+        else
+        {
+            return this.Subchromosomes
+                .AsParallel().WithDegreeOfParallelism(CombinedTreeChromosome.MaxThreads)
+                .Select(subchrom => subchrom.ComputeResult());
+        }
+    }
+    // => this.Subchromosomes
+    //     .AsParallel().WithDegreeOfParallelism(CombinedTreeChromosome.MaxThreads)
+    //     .Select(subchrom => subchrom.ComputeResult());
     public double[] GetProbabilities()
     {
         var results = this.ComputeResults()
@@ -69,11 +83,19 @@ public class CombinedTreeChromosome : Chromosome<CombinedTreeChromosome>
         .All(subchrom => subchrom.IsValid());
 
     internal string GetRepresentation()
-    => string.Join(
-        '\n',
-        this.Subchromosomes
-            .Select(subchrom => subchrom.GetRepresentation())
-    );
+    {
+        var sb = new StringBuilder();
+        foreach (var subchromosome in this.Subchromosomes)
+        {
+            sb.AppendLine(subchromosome.GetRepresentation());
+        }
+        return sb.ToString();
+    }
+    // => string.Join(
+    //     '\n',
+    //     this.Subchromosomes
+    //         .Select(subchrom => subchrom.GetRepresentation())
+    // );
 
     internal IEnumerable<double> ComputeResult()
     => this.Subchromosomes

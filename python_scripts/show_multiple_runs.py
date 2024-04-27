@@ -58,10 +58,12 @@ def main():
     )
 
     plt.yscale('log')
+    plt.ylim(top=1)
     if not args.save:
         plt.show()
         print('Done')
     else:
+        plt.tight_layout()
         plt.savefig('fitness_graph.png')
         print('Fitness figure has been saved.')
     plt.clf()
@@ -72,7 +74,7 @@ def main():
         x='gen',
         y='minScore',
         color='r',
-        label='MinScore'
+        label='ScoreOfMin'
     )
     ax = sns.lineplot(
         data=df,
@@ -84,10 +86,12 @@ def main():
     )
 
     plt.yscale('log')
+    plt.ylim(top=1)
     if not args.save:
         plt.show()
         print('Done')
     else:
+        plt.tight_layout()
         plt.savefig('score_graph.png')
         print('Score figure has been saved.')
     plt.clf()
@@ -98,7 +102,7 @@ def main():
         x='gen',
         y='minDepth',
         color='r',
-        label='MinDepth'
+        label='DepthOfMin'
     )
     ax = sns.lineplot(
         data=df,
@@ -114,6 +118,7 @@ def main():
         plt.show()
         print('Done')
     else:
+        plt.tight_layout()
         plt.savefig('depth_graph.png')
         print('Depth figure has been saved.')
 

@@ -30,7 +30,7 @@ public class FixedIndexCrossover : Crossover<CartesianChromosome>
             layers1.GetRange(splittingIndex, layers1.Count - splittingIndex)
         );
 
-        // TODO: Fix index of parents within their layer
+        // Fix index of parents within their layer
         foreach (var layers in new[] {newLayers1, newLayers2})
         {
             if ( layers is null )

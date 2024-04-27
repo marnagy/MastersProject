@@ -29,7 +29,7 @@ public class ChangeNodesMutation : Mutation<CombinedTreeChromosome>
     public override CombinedTreeChromosome Mutate(CombinedTreeChromosome ind, int genNum)
     {
         Enumerable.Zip(this.Mutations, ind.Subchromosomes)
-            .AsParallel().WithDegreeOfParallelism(this.MaxThreads)
+            //.AsParallel().WithDegreeOfParallelism(this.MaxThreads)
             .ForEach(tup => _ = tup.First.Mutate(tup.Second, genNum));
         return ind;
     }

@@ -4,6 +4,7 @@
 *.log
 *.zip
 *.csv
+*.arff
 .vs
 *.err
 *.out

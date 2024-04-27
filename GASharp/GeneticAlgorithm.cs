@@ -175,6 +175,7 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
         Action<int, IReadOnlyList<T>> callback,
         Func<IReadOnlyList<T>, bool> stopCondition)
     {
+        System.Console.Error.WriteLine("Running single threaded...");
         var population = Enumerable.Range(0, PopulationSize)
             .Select(_ => this.createNewInd())
             .ToArray();

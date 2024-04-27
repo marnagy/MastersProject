@@ -118,6 +118,26 @@ class Program
                 )
         ];
 
+        var ga = new GeneticAlgorithm<CartesianChromosome>(
+            () => CartesianChromosome.CreateNewRandom(
+                layerSizes,
+                cliArgs.TerminalNodesProbability,
+                terminalNodesProbabilities,
+                nonTerminalNodesProbabilities
+            ),
+            [new ChangeNodeMutation(
+                cliArgs.PercentageToChange,
+                cliArgs.ChangeNodeMutationProbability,
+                cliArgs.TerminalNodesProbability,
+                nonTerminalNodesProbabilities,
+                terminalNodesProbabilities
+            )],
+            [new FixedIndexCrossover()],
+            trainAccuracy,
+            new MinTournamentSelection<CartesianChromosome>(folds: 5),
+            new TakeNewCombination<CartesianChromosome>()
+        );
+
         Func<CartesianChromosome> createNewChromosome = ()
             => CartesianChromosome.CreateNewRandom(
                 layerSizes,
@@ -205,7 +225,7 @@ class Program
                         .Average();
                     
                     double currentMinScore = population
-                        .First(ind => ind.Fitness == currentMinFitness)
+                        .MinBy(ind => ind.Fitness)
                         .Score;
                     double currentAvgScore = population
                         // fitness can be +inf
@@ -216,7 +236,9 @@ class Program
                     int[] depths = population
                         .Select(ind => ind.GetDepth())
                         .ToArray();
-                    int minDepth = depths.Min();
+                    int minDepth = population
+                        .MinBy(ind => ind.Fitness)
+                        .GetDepth();
                     double averageDepth = depths.Average();
                     sw.WriteLine(string.Join(',', new[]{
                         genNum,
@@ -235,7 +257,7 @@ class Program
                             $"AvgFitness: {currentAvgFitness} " + //:F2} " +
                             $"ScoreOfMin: {currentMinScore:F3} " +
                             $"AvgScore: {currentAvgScore:F3} " +
-                            $"Depth of min: {population.First(ind => ind.Fitness == currentMinFitness).GetDepth():F1} " +
+                            $"Depth of min: {minDepth:F1} " +
                             $"AvgDepth: {averageDepth:F1} "
                         );
                     }
@@ -260,7 +282,7 @@ class Program
                 System.Console.Error.WriteLine(bestIndividual.GetRepresentation());
                 System.Console.Error.WriteLine();
 
-                System.Console.WriteLine("Calculating prediction accuracy...");
+                System.Console.Error.WriteLine("Calculating prediction accuracy...");
 
                 // load test inputs & outputs if specified
                 if (cliArgs.TestCSVFilePath != null)
@@ -270,7 +292,8 @@ class Program
                         cliArgs.CSVDelimiter
                     );
 
-                double accuracyScore = 1d - testAccuracy.ComputeFitness(bestIndividual);
+                testAccuracy.ComputeFitness(bestIndividual);
+                double accuracyScore = 1d - bestIndividual.Score;
                 
                 System.Console.Error.WriteLine($"Accuracy score: {accuracyScore * 100 :F2} %");
                 sw.WriteLine($"Accuracy score: {accuracyScore * 100} %");

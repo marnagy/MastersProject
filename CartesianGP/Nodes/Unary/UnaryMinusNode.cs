@@ -27,8 +27,8 @@ public class UnaryMinusNode : UnaryNode
     public override void GetRepresentation(StringBuilder sb, CartesianChromosome ind)
     {
         var firstParent = this.Parents[0];
-        sb.Append("-(");
+        sb.Append("(-(");
         ind[firstParent.LayerIndex][firstParent.Index].GetRepresentation(sb, ind);
-        sb.Append(')');
+        sb.Append("))");
     }
 }

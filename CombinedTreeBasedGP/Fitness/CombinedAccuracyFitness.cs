@@ -4,7 +4,7 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
 {
     private readonly double[,] Inputs;
     private readonly int[,] Outputs;
-    private const double coeff = 0.5;
+    private const double coeff = 0.4;
     private bool UseClip = true;
     private readonly InputFunctionality[] InputNodes;
     private readonly int MaxThreads;

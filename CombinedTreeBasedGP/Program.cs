@@ -146,7 +146,9 @@ class Program
             MaxThreads = cliArgs.MaxThreads
         };
 
-        CombinedTreeChromosome.MaxThreads = cliArgs.MaxThreads;
+        CombinedTreeChromosome.MaxThreads = cliArgs.MultiThreaded
+            ? cliArgs.MaxThreads
+            : 1;
 
         var dt = DateTime.UtcNow;
 
@@ -199,7 +201,7 @@ class Program
                         .Average();
                     
                     var currentMinScore = population
-                        .First(ind => ind.Fitness == currentMinFitness)
+                        .MinBy(ind => ind.Fitness)
                         .Score;
                     var currentAvgScore = population
                         // fitness can be +inf
@@ -213,7 +215,9 @@ class Program
                     // previousMinFitness = currentMinFitness;
 
                     var depthsFunc = population.Select(ind => ind.GetDepth());
-                    var minDepth = depthsFunc.Min();
+                    var minDepth = population
+                        .MinBy(ind => ind.Fitness)
+                        .GetDepth();
                     var averageDepth = depthsFunc.Average();
                     sw.WriteLine(string.Join(',', new[]{
                         genNum,
@@ -276,7 +280,8 @@ class Program
                     testAccuracyFitness = trainAccuracy;
                 }
 
-                double accuracyScore = 1d - testAccuracyFitness.ComputeFitness(bestIndividual);
+                testAccuracyFitness.ComputeFitness(bestIndividual);
+                double accuracyScore = 1d - bestIndividual.Score;
                 
                 System.Console.Error.WriteLine($"Accuracy score: {accuracyScore * 100 } %");
                 sw.WriteLine($"Accuracy score: {accuracyScore * 100} %");
