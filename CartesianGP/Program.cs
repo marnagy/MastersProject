@@ -52,7 +52,7 @@ class Program
         var nonTerminalNodesProbabilities = new Dictionary<CartesianNode, double>
         {
             // tertiary
-            // {new ConditionNode(emptyParents), cliArgs.ConditionNodeProbability},
+            {new ConditionNode(emptyParents), cliArgs.ConditionNodeProbability},
             // binary
             {new SumNode(emptyParents), cliArgs.SumNodeProbability},
             {new ProductNode(emptyParents), cliArgs.ProductNodeProbability},
@@ -70,25 +70,6 @@ class Program
             cliArgs.MaxThreads
         );
 
-        AccuracyFitness testAccuracy;
-        if (cliArgs.TestCSVFilePath == null)
-        {
-            testAccuracy = trainAccuracy;
-        }
-        else
-        {
-            (double[,] testInputs, int[,] testOutputs) = CSVHelper.PrepareCSV(
-                cliArgs.TestCSVFilePath,
-                cliArgs.CSVInputsAmount,
-                cliArgs.CSVDelimiter
-            );
-            testAccuracy = new AccuracyFitness(
-                testInputs,
-                testOutputs,
-                cliArgs.MaxThreads
-            );
-
-        }
         int[] hiddenlayerSizes = cliArgs.LayerSizes.ToArray();
         int[] layerSizes = new int[1 + hiddenlayerSizes.Length + 1];
         layerSizes[0] = inputsAmount;
@@ -117,26 +98,6 @@ class Program
                     cliArgs.RemoveNodeFromLayerMutationProbability
                 )
         ];
-
-        var ga = new GeneticAlgorithm<CartesianChromosome>(
-            () => CartesianChromosome.CreateNewRandom(
-                layerSizes,
-                cliArgs.TerminalNodesProbability,
-                terminalNodesProbabilities,
-                nonTerminalNodesProbabilities
-            ),
-            [new ChangeNodeMutation(
-                cliArgs.PercentageToChange,
-                cliArgs.ChangeNodeMutationProbability,
-                cliArgs.TerminalNodesProbability,
-                nonTerminalNodesProbabilities,
-                terminalNodesProbabilities
-            )],
-            [new FixedIndexCrossover()],
-            trainAccuracy,
-            new MinTournamentSelection<CartesianChromosome>(folds: 5),
-            new TakeNewCombination<CartesianChromosome>()
-        );
 
         Func<CartesianChromosome> createNewChromosome = ()
             => CartesianChromosome.CreateNewRandom(
@@ -285,12 +246,25 @@ class Program
                 System.Console.Error.WriteLine("Calculating prediction accuracy...");
 
                 // load test inputs & outputs if specified
+                AccuracyFitness testAccuracy;
                 if (cliArgs.TestCSVFilePath != null)
+                {
                     (inputs, outputs) = CSVHelper.PrepareCSV(
                         cliArgs.TrainCSVFilePath,
                         cliArgs.CSVInputsAmount,
                         cliArgs.CSVDelimiter
                     );
+
+                    testAccuracy = new AccuracyFitness(
+                        inputs,
+                        outputs,
+                        cliArgs.MaxThreads
+                    );
+                }
+                else
+                {
+                    testAccuracy = trainAccuracy;
+                }
 
                 testAccuracy.ComputeFitness(bestIndividual);
                 double accuracyScore = 1d - bestIndividual.Score;
@@ -328,7 +302,6 @@ class Program
             && cliArgs.UnaryMinusNodeProbability >= 0d
             && cliArgs.SigmoidNodeProbability >= 0d
             && cliArgs.ReLUNodeProbability >= 0d
-            && cliArgs.ConditionNodeProbability >= 0d
-            && cliArgs.InputNodeProbability >= 0d;
+            && cliArgs.ConditionNodeProbability >= 0d;
     }
 }

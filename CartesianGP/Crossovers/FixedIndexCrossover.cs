@@ -7,7 +7,7 @@ public class FixedIndexCrossover : Crossover<CartesianChromosome>
 {
     public override Tuple<CartesianChromosome, CartesianChromosome> Cross(CartesianChromosome ind1, CartesianChromosome ind2)
     {
-        // TODO: choose index to split chromosomes (single for both)
+        // Choose index to split chromosomes (single for both)
         // This way there is no need for fixing layer numbers of parents.
         int count1 = ind1.GetLayerSizes().Count();
         int count2 = ind2.GetLayerSizes().Count();

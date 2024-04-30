@@ -91,7 +91,7 @@ class Program
         );
         Mutation<CombinedTreeChromosome>[] mutations = [
             mutationChange,
-            // mutationShuffle
+            mutationShuffle
         ];
         // ramped half-and-half
         Func<TreeChromosome> newTreeChromosome = () => 

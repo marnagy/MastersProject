@@ -93,7 +93,7 @@ public class OptionsImmutable
     public double SigmoidNodeProbability { get; }
     public double ReLUNodeProbability { get; }
     public double ConditionNodeProbability { get; }
-    public double InputNodeProbability { get; }
+    // public double InputNodeProbability { get; }
     [JsonConstructor]
     public OptionsImmutable(
         bool multiThreaded,
@@ -125,8 +125,8 @@ public class OptionsImmutable
         double unaryMinusNodeProbability,
         double sigmoidNodeProbability,
         double reLUNodeProbability,
-        double conditionNodeProbability,
-        double inputNodeProbability
+        double conditionNodeProbability
+        //double inputNodeProbability
     )
     {
         this.MultiThreaded = multiThreaded;
@@ -162,7 +162,7 @@ public class OptionsImmutable
         this.SigmoidNodeProbability = sigmoidNodeProbability;
         this.ReLUNodeProbability = reLUNodeProbability;
         this.ConditionNodeProbability = conditionNodeProbability;
-        this.InputNodeProbability = inputNodeProbability;
+        // this.InputNodeProbability = inputNodeProbability;
     }
     private OptionsImmutable(Options opts, OptionsImmutable? fileOpts)
     {

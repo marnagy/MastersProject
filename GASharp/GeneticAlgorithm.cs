@@ -89,7 +89,7 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
                     System.Console.Error.WriteLine($"Selecting parents took {DateTime.UtcNow - start} s");
 
                 // crossover
-                // TODO: choose only 1 using GA.
+                // choose only 1 using GA.
                 start = DateTime.UtcNow;
                 Enumerable.Range(0, PopulationSize/2)
                     .Select(i => (index1: 2*i, index2: 2*i + 1, par: parents[i], prob: Random.Shared.NextDouble()))
