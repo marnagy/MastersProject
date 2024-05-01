@@ -43,7 +43,6 @@ class Program
         for (int i = 1; i <= 5; i++)
         {
             terminalNodesProbabilities.Add(new ValueFunctionality(i), cliArgs.ValueNodeProbability);
-            //terminalNodesProbabilities.Add(new ValueFunctionality(-i), cliArgs.ValueNodeProbability);
         }
         // also add input nodes so they can be used wherever in trees
         foreach (var inputNode in inputNodes)
@@ -173,10 +172,9 @@ class Program
             if (cliArgs.RepeatAmount > 1)
                 baseDirectory = masterDirectory.CreateSubdirectory($"run_{j}");
 
-            CombinedTreeChromosome[] resultPopulation; // = new CombinedTreeChromosome[cliArgs.PopulationSize];
+            CombinedTreeChromosome[] resultPopulation;
             CombinedTreeChromosome bestIndividual;
             System.Console.Error.WriteLine($"Running GA...");
-            // previousMinFitness = double.PositiveInfinity;
             string[] columnNames = [
                 "gen",
                 "minFitness",
@@ -238,7 +236,6 @@ class Program
                             $"Depth of min: {population.MinBy(ind => ind.Fitness).GetDepth():F1} " +
                             $"AvgDepth: {averageDepth:F1}"
                         );
-                    // System.Console.WriteLine(population.Select(ind => ind.Fitness).Stringify());
                 };
                 double smallDelta = 1d / inputs.GetRowsAmount();
                 Func<IReadOnlyList<CombinedTreeChromosome>, bool> stopCond = (population)

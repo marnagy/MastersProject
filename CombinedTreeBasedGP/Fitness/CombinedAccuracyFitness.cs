@@ -24,10 +24,6 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
     
     public override double ComputeFitness(CombinedTreeChromosome ind)
     {
-        // don't compute fitness again
-        // if (ind.Fitness != CombinedTreeChromosome.DefaultFitness)
-        //     return ind.Fitness;
-
         double accurateCounter = 0;
         int rowsAmount = this.Inputs.GetRowsAmount();
         for (int rowIndex = 0; rowIndex < rowsAmount; rowIndex++)
@@ -59,12 +55,9 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
         if (!this.HasInputNode(ind))
             return double.PositiveInfinity;
 
-        // int inputNodesAmount = this.CountInputNodes(ind);
-        // without cast to double, the operation would mean "div"
         double accuracy = accurateCounter / rowsAmount;
         ind.Score = 1d - accuracy;
         double fitness = ind.Score + CombinedAccuracyFitness.coeff*ind.GetDepth() / this.Inputs.GetRowsAmount();
-        // System.Console.Error.WriteLine($"Accuracy: {accuracy}");
         return fitness;
     }
 
@@ -73,10 +66,7 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
         int totalRows = this.Inputs.GetRowsAmount();
         double[] accurateCounters = new double[population.Length];
         for (int i = 0; i < totalRows; i++)
-        {
-            // if (i % 100 == 0)
-            //     System.Console.Error.Write($"Calculating fitness: {i}/{totalRows}\r");
- 
+        { 
             // update input nodes
             foreach (
                 (InputFunctionality inputNode, double inputValue)
@@ -89,11 +79,8 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
             int[] wantedResults = this.Outputs.GetRow(i).ToArray();
             Enumerable.Range(0, population.Length)
                 .Select(i => (index: i, ind: population[i]))
-                // don't compute fitness again
-                //.Where(tup => tup.ind.Fitness == TreeChromosome.DefaultFitness)
                 .AsParallel().WithDegreeOfParallelism(this.MaxThreads)
                 .Select(tup => (tup.index, computedResult: tup.ind.ComputeResults()))
-                //.AsSequential()
                 .ForEach(tup => {
                     double[] computedResults = tup.computedResult.ToArray();
                     var computedOnehot = this.ConvertToOnehot(computedResults);
@@ -113,15 +100,10 @@ public class CombinedAccuracyFitness : Fitness<CombinedTreeChromosome>
             else
             {
                 population[j].Score = accurateCounters[j];
-                population[j].Fitness = accurateCounters[j] + CombinedAccuracyFitness.coeff*population[j].GetDepth() / this.Inputs.GetRowsAmount(); // * this.MagicNormalizationCoefficient(population[j]);
+                population[j].Fitness = accurateCounters[j] + CombinedAccuracyFitness.coeff*population[j].GetDepth() / this.Inputs.GetRowsAmount();
 
             }
         }
-
-        // if (population.Select(ind => ind.Fitness).Any(fitness => fitness > 1d))
-        // {
-        //     int a = 5;
-        // }
     }
     private bool HasInputNode(CombinedTreeChromosome ind)
     => ind.Subchromosomes

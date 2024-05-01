@@ -11,7 +11,7 @@ public class CombinedDifferenceFitness : Fitness<CombinedTreeChromosome>
         this.InputNodes = inputNodes;
     }
     private double MagicNormalizationCoefficient(CombinedTreeChromosome ind)
-    => 1d; // 1d/Math.Pow(2, ind.Subchromosomes.Max(subchrom => subchrom.GetDepth()));
+    => 1d;
     public override double ComputeFitness(CombinedTreeChromosome ind)
     {
         // don't compute fitness again
@@ -33,11 +33,7 @@ public class CombinedDifferenceFitness : Fitness<CombinedTreeChromosome>
 
             double[] values = ind.Subchromosomes
                 .Select(subchrom => subchrom.ComputeResult())
-                .ToArray();
-            // double maxValue = values.Max();
-            // int maxValueIndex = Enumerable.Range(0, values.Length)
-            //     .First(index => values[index] == maxValue);
-            
+                .ToArray();            
             
             int[] wantedResults = this.Outputs
                 .GetRow(rowIndex)
@@ -59,10 +55,6 @@ public class CombinedDifferenceFitness : Fitness<CombinedTreeChromosome>
 
                 diff += Math.Abs(wantedResult - computedResult);
             }
-            
-            // // make correct class more significant
-            // if (wantedResult == 1d && diff > 0)
-            //             diff *= this.Inputs.GetColumnsAmount();
 
             totalDiff += diff;
         }
@@ -92,11 +84,7 @@ public class CombinedDifferenceFitness : Fitness<CombinedTreeChromosome>
 
             Enumerable.Range(0, population.Length)
                 .Select(i => (index: i, ind: population[i]))
-                // don't compute fitness again
-                .Where(tup => tup.ind.Fitness == TreeChromosome.DefaultFitness)
-                //.AsParallel()
                 .Select(tup => (tup.index, computedResult: tup.ind.ComputeResults()))
-                //.AsSequential()
                 .ForEach(tup => {
                     IEnumerable<int> wantedResults = this.Outputs.GetRow(i);
                     IEnumerable<double> computedResults = tup.computedResult;
@@ -115,25 +103,10 @@ public class CombinedDifferenceFitness : Fitness<CombinedTreeChromosome>
 
                         double diff = Math.Abs(wantedResult - computedResult);
 
-                        // if (wantedResult == 1 && diff > 0)
-                        //     diff *= this.Inputs.GetColumnsAmount();
                         diffCounters[tup.index] += diff;
                     }
                 });
         }
-
-        // Enumerable.Range(0, population.Length)
-        //     .Select(i => (i, ind: population[i]))
-        //     .Where(tup => tup.ind.Fitness != TreeChromosome.DefaultFitness)
-        //     .AsParallel()
-        //     .ForEach(tup => {
-        //         diffCounters[tup.i] = diffCounters[tup.i] / totalRows;
-
-        //         if (double.IsNaN(diffCounters[tup.i]) || !this.HasInputNode(population[tup.i]))
-        //             population[tup.i].Fitness = double.PositiveInfinity;
-        //         else
-        //             population[tup.i].Fitness = diffCounters[tup.i] * this.MagicNormalizationCoefficient(population[tup.i]) / this.CountInputNodes(population[tup.i]); //* this.MagicNormalizationCoefficient(population[j]);
-        //     });
 
         for (int j = 0; j < population.Length; j++)
         {
@@ -143,7 +116,7 @@ public class CombinedDifferenceFitness : Fitness<CombinedTreeChromosome>
             if (double.IsNaN(diffCounters[j]) || inputNodesAmount == 0)
                 population[j].Fitness = double.PositiveInfinity;
             else
-                population[j].Fitness = diffCounters[j] * this.MagicNormalizationCoefficient(population[j]); // / inputNodesAmount;
+                population[j].Fitness = diffCounters[j] * this.MagicNormalizationCoefficient(population[j]);
         }
     }
     private bool HasInputNode(CombinedTreeChromosome ind)

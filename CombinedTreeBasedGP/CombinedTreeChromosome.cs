@@ -23,7 +23,6 @@ public class CombinedTreeChromosome : Chromosome<CombinedTreeChromosome>
     private CombinedTreeChromosome(TreeChromosome[] subchromosomes, double fitness, double score)
     {
         this.Subchromosomes = subchromosomes;
-        //this.Fitness = CombinedTreeChromosome.DefaultFitness;
         this.Fitness = fitness;
         this.Score = score;
     }
@@ -65,9 +64,6 @@ public class CombinedTreeChromosome : Chromosome<CombinedTreeChromosome>
                 .Select(subchrom => subchrom.ComputeResult());
         }
     }
-    // => this.Subchromosomes
-    //     .AsParallel().WithDegreeOfParallelism(CombinedTreeChromosome.MaxThreads)
-    //     .Select(subchrom => subchrom.ComputeResult());
     public double[] GetProbabilities()
     {
         var results = this.ComputeResults()
