@@ -48,10 +48,6 @@ public static class RandomExtensions
         if (weights.Any(p => p < 0))
         {
             throw new ArgumentException("Array of weights cannot contain negative values.");
-            // double minWeight = weights.Min();
-            // weights = weights
-            //     .Select(w => w - minWeight + 1)
-            //     .ToArray();
         }
 
         // normalize
