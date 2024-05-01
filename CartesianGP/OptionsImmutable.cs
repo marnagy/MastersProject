@@ -32,27 +32,12 @@ public class OptionsImmutable
     public const string PopulationCombinationDefault = "take-new";
     public const double MutationProbabilityDefault = 0d;
     public const string MutationProbabilityDefaultString = "0";
-    // public const double ChangeNodeMutationProbabilityDefault = 0d;
-    // public const double ChangeParentsMutationProbabilityDefault = 0d;
-    // public const double AddNodeToLayerMutationProbabilityDefault = 0d;
-    // public const double AddLayerMutationProbabilityDefault = 0d;
-    // public const double RemoveNodeFromLayerMutationProbabilityDefault = 0d;
-    // public const double RemoveLayerMutationProbabilityDefault = 0d;
     public const double PercentageToChangeDefault = 0.2d;
     public const string PercentageToChangeDefaultString = "0.2";
     public const double NodeProbabilityDefault = 0.2d;
     public const string NodeProbabilityDefaultString = "0.2";
     public const double TerminalNodesProbabilityDefault = 0.2d;
     public const string TerminalNodesProbabilityDefaultString = "0.2";
-    // public const double ValueNodeProbabilityDefault = 0.2d;
-    // public const double SumNodeProbabilityDefault = 0.2d;
-    // public const double ProductNodeProbabilityDefault = 0.2d;
-    // public const double SinNodeProbabilityDefault = 0.2d;
-    // public const double PowerNodeProbabilityDefault = 0.2d;
-    // public const double UnaryMinusNodeProbabilityDefault = 0.2d;
-    // public const double SigmoidNodeProbabilityDefault = 0.2d;
-    // public const double ReLUNodeProbabilityDefault = 0.2d;
-    // public const double ConditionNodeProbabilityDefault = 0.2d;
 
     // general
     public bool MultiThreaded { get; }
@@ -93,7 +78,6 @@ public class OptionsImmutable
     public double SigmoidNodeProbability { get; }
     public double ReLUNodeProbability { get; }
     public double ConditionNodeProbability { get; }
-    // public double InputNodeProbability { get; }
     [JsonConstructor]
     public OptionsImmutable(
         bool multiThreaded,
@@ -126,7 +110,6 @@ public class OptionsImmutable
         double sigmoidNodeProbability,
         double reLUNodeProbability,
         double conditionNodeProbability
-        //double inputNodeProbability
     )
     {
         this.MultiThreaded = multiThreaded;
@@ -162,7 +145,6 @@ public class OptionsImmutable
         this.SigmoidNodeProbability = sigmoidNodeProbability;
         this.ReLUNodeProbability = reLUNodeProbability;
         this.ConditionNodeProbability = conditionNodeProbability;
-        // this.InputNodeProbability = inputNodeProbability;
     }
     private OptionsImmutable(Options opts, OptionsImmutable? fileOpts)
     {
@@ -205,7 +187,6 @@ public class OptionsImmutable
         this.SigmoidNodeProbability = opts.SigmoidNodeProbability ?? fileOpts?.SigmoidNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
         this.ReLUNodeProbability = opts.ReLUNodeProbability ?? fileOpts?.ReLUNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
         this.ConditionNodeProbability = opts.ConditionNodeProbability ?? fileOpts?.ConditionNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
-        // exclude input node prob. since CartesianGP does not use it
     }
 
     public static OptionsImmutable From(Options opts)

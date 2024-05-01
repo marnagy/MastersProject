@@ -36,11 +36,8 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
         double terminalNodesProbability,
         IReadOnlyDictionary<CartesianNode, double> terminalNodesProbabilities,
         IReadOnlyDictionary<CartesianNode, double> nonTerminalNodesProbabilities
-        // , IReadOnlyDictionary<int, IReadOnlyList<CartesianNode>> nodeCatalogue
         )
     {
-        // !: Fix creation of chromosome
-        // invalid LayerIndex in nodes
         var now = DateTime.UtcNow;
         IReadOnlyList<CartesianNode> terminalNodes = terminalNodesProbabilities.Keys.ToArray();
         IReadOnlyList<double> terminalNodesWeights = terminalNodes
@@ -74,7 +71,6 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
                         // random from other layers
                         nodeIndex = Random.Shared.Next(layers[layerIndex - 1].Count);
                     }
-                    // System.Console.Error.WriteLine($"Choosing parent LayerIndex {layerIndex} with Index {nodeIndex}");
                     parents.Add(new ParentIndices
                     {
                         LayerIndex = layerIndex,
@@ -98,21 +94,6 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
                 newNode = Random.Shared.Choose(nodes, nodesWeights)
                     .Clone(parents.ToArray());
 
-                // choose node and create clone with new parents
-                // choose random arity
-                // var arities = nodeCatalogue.Keys.ToArray();
-                // var arityIndex = Random.Shared.Choose(arities);
-                // CartesianNode templateNode = Random.Shared.Choose(nodeCatalogue[
-                //     arityIndex
-                // ]);
-                // CartesianNode newNode = templateNode.Clone(
-                //     parents.ToArray()
-                // );
-                // System.Console.Error.WriteLine($"Creating node with parents:");
-                // foreach (ParentIndices par in newNode.Parents)
-                // {
-                //     System.Console.Error.WriteLine($"Choosing parent LayerIndex {par.LayerIndex} with Index {par.Index}");
-                // }
                 layers[currentLayer - 1].Add(
                     newNode
                 );
@@ -215,9 +196,6 @@ public class CartesianChromosome : Chromosome<CartesianChromosome>
     }
     /// <summary>
     /// Get sizes of layers <b>excluding</b> input layer.
-    /// </summary>
-    /// <returns></returns> <summary>
-    /// 
     /// </summary>
     /// <returns></returns>
     public IEnumerable<int> GetLayerSizes()

@@ -34,15 +34,6 @@ public class ChangeParentsMutation : Mutation<CartesianChromosome>
                     // choose new parent nodes
                     // choose layer and index within uniformly
                     ParentIndices[] newParents;
-                    // newParents = Enumerable.Range(0, CartesianNode.ParentsAmount)
-                    //     .Select(_ => Random.Shared.Next(i + 1))
-                    //     .Select(layerIndex => new ParentIndices
-                    //         {
-                    //             LayerIndex=layerIndex,
-                    //             Index=Random.Shared.Next(ind[layerIndex].Count)
-                    //         }
-                    //     )
-                    //     .ToArray();
                     newParents = CartesianChromosome.ChooseParents(
                         inputsAmount: ind.InputsAmount,
                         layers,

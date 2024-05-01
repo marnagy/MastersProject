@@ -17,19 +17,6 @@ public class ConditionNode : CartesianNode
         ? this.GetTrueNode(chromosome).Compute(chromosome)
         : this.GetFalseNode(chromosome).Compute(chromosome);
 
-    // {
-    //     var condNodeParents = Parents[0];
-    //     var condResult = chromosome[condNodeParents.LayerIndex][condNodeParents.Index].Result;
-
-    //     ParentIndices indices;
-    //     if (condResult > 0)
-    //         indices = Parents[1];
-    //     else
-    //         indices = Parents[2];
-        
-    //     this.Result = chromosome[indices.LayerIndex][indices.Index].Result;
-    // }
-
     public override bool Equals(CartesianNode? other)
     {
         if (other is ConditionNode otherCondition)

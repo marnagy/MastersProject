@@ -2,6 +2,12 @@ using CommandLine;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+// constant interpolated strings with non-string types are NOT yet supported in .NET 8
+// so I use *DefaultString suffix from OptionsImmutable to show defaults on --help screen
+
+// while library CommandLineParser supports default CLI arguments, since we want to support
+// loading arguments from JSON, if we used default params we cannot recognize if user ommited argument
+// or specified it -> defaults are applied in OptionsImmutable.From function
 public class Options
 {
     // general

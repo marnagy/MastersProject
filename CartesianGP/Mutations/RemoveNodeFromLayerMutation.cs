@@ -46,12 +46,6 @@ public class RemoveNodeFromLayerMutation : Mutation<CartesianChromosome>
                                 internalLayers: layers,
                                 internalLayerIndex: layerToRemoveNodeFrom
                             )[0];
-
-                            // int newLayerIndex = Random.Shared.Next(layerToRemoveNodeFrom + 1);
-                            // return new ParentIndices(){
-                            //     LayerIndex=newLayerIndex,
-                            //     Index=Random.Shared.Next(ind[newLayerIndex].Count)
-                            // };
                         }
                     })
                     .ToArray();

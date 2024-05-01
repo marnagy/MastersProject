@@ -47,7 +47,6 @@ class Program
                 new ValueNode(i, emptyParents), cliArgs.ValueNodeProbability
             );
         }
-        // no need to add input nodes
 
         var nonTerminalNodesProbabilities = new Dictionary<CartesianNode, double>
         {
@@ -56,7 +55,7 @@ class Program
             // binary
             {new SumNode(emptyParents), cliArgs.SumNodeProbability},
             {new ProductNode(emptyParents), cliArgs.ProductNodeProbability},
-            // {new PowerNode(emptyParents), cliArgs.PowerNodeProbability},
+            {new PowerNode(emptyParents), cliArgs.PowerNodeProbability},
             // unary
             {new UnaryMinusNode(emptyParents), cliArgs.UnaryMinusNodeProbability},
             {new SinNode(emptyParents), cliArgs.SinNodeProbability},
@@ -94,9 +93,16 @@ class Program
                     terminalNodesProbabilities,
                     nonTerminalNodesProbabilities
                 ),
+                new AddLayerMutation(
+                    cliArgs.AddLayerMutationProbability,
+                    cliArgs.TerminalNodesProbability,
+                    terminalNodesProbabilities,
+                    nonTerminalNodesProbabilities
+                ),
                 new RemoveNodeFromLayerMutation(
                     cliArgs.RemoveNodeFromLayerMutationProbability
-                )
+                ),
+                new RemoveLayerMutation(cliArgs.RemoveLayerMutationProbability)
         ];
 
         Func<CartesianChromosome> createNewChromosome = ()

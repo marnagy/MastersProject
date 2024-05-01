@@ -35,18 +35,6 @@ public class AddLayerMutation : Mutation<CartesianChromosome>
 
         var newLayer = Enumerable.Range(0, _newLayerSize)
             .Select(_ => {
-                // ParentIndices[] parents = Enumerable
-                //     .Range(0, CartesianNode.ParentsAmount)
-                //     .Select(_ => {
-                //         // Layer index includes Input layer
-                //         int layerIndex = Random.Shared.Next(indexToInsertLayerTo + 1);
-                //         return new ParentIndices(){
-                //             LayerIndex=layerIndex,
-                //             // should be fine 
-                //             Index=Random.Shared.Next(ind[layerIndex].Count)
-                //         };
-                //     })
-                //     .ToArray();
                 ParentIndices[] parents = CartesianChromosome.ChooseParents(
                     inputsAmount: ind.InputsAmount,
                     internalLayers: layers,

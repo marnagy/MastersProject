@@ -2,13 +2,10 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
 {
     private readonly double PercentageToChange;
     private readonly double TerminalNodesProbability;
-
-    // private readonly IReadOnlyDictionary<int, IReadOnlyList<CartesianNode>> NodeCatalogue;
     private readonly IReadOnlyDictionary<CartesianNode, double> NonTerminalNodesProbabilities;
     private readonly IReadOnlyList<CartesianNode> NonTerminalNodes;
     private readonly IReadOnlyDictionary<CartesianNode, double> TerminalNodesProbabilities;
     private readonly IReadOnlyList<CartesianNode> TerminalNodes;
-    // private readonly IReadOnlyList<CartesianNode> Nodes;
 
     public ChangeNodeMutation(double chromosomePercentageToChange, double probability,
             double terminalNodesProbability,
@@ -49,14 +46,11 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
                 if (shouldNodeMutate[layerIndex][j])
                 {
                     // choose new random node, preserve parents
-                    // System.Console.Error.WriteLine($"PreviousParents: {layers[i][j].Parents.Stringify()}");
                     layers[layerIndex][j] = this.PerformMutation(
                         previousNode: layers[layerIndex][j],
                         layerIndex: layerIndex,
                         nodeIndex: j
                     );
-                    // layers[i][j] = Random.Shared.Choose(this.Nodes).Clone(layers[i][j].Parents);
-                    // System.Console.Error.WriteLine($"Parents after mutation: {layers[i][j].Parents.Stringify()}");
                 }
             }
         }
@@ -65,11 +59,6 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
             ind.InputsAmount,
             layers
         );
-
-        // System.Console.Error.WriteLine($"ChangeNodeCreated valid chromosome? {CartesianChromosome.IsValid(newChromosome)}");
-
-        // if ( !CartesianChromosome.IsValid(newChromosome) )
-        //     throw new Exception($"Created invalid chromosome in {this.GetType()}!");
 
         return newChromosome;
     }
@@ -88,11 +77,11 @@ public class ChangeNodeMutation : Mutation<CartesianChromosome>
         }
         else
         {
+            // exchange for a non-terminal node
             nodes = this.NonTerminalNodes;
             nodesWeights = this.NonTerminalNodes
                     .Select(termNode => this.NonTerminalNodesProbabilities[termNode])
                     .ToArray();
-            // exchange for a non-terminal node
         }
 
         var newNode = Random.Shared.Choose(
