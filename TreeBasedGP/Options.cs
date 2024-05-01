@@ -5,9 +5,9 @@ using System.Text.Json.Serialization;
 public class Options
 {
     // general
-    [Option("multi-threaded", Default = false, HelpText = "Run GP in multiple threads.")]
+    [Option("multi-threaded", Default = false, HelpText = $"Run GP in multiple threads. Default: {OptionsImmutable.MultiThreadedDefaultString}")]
     public bool MultiThreaded { get; set; }
-    [Option("json", Default = null, HelpText = "Input JSON for easier loading of hyperparameters.")]
+    [Option("json", HelpText = "Input JSON for easier loading of hyperparameters.")]
     public string? JsonFilePath { get; set; }
     [Option("train-csv", Required = true, HelpText = "Train CSV of input values. Assumes numbers in en-US style.")]
     public string? TrainCSVFilePath { get; set; }
@@ -15,58 +15,56 @@ public class Options
     public string? TestCSVFilePath { get; set; }
     [Option("csv-inputs-amount", Required = true, HelpText = "Amount of input columns in CSV file.")]
     public int CSVInputsAmount { get; set; }
-    [Option("csv-delimiter", Default = ',', HelpText = "Delimiter")]
-    public char CSVDelimiter { get; set; }
-    [Option("min-threads", /*Min = 1, Max = 32,*/ HelpText = "Minimum amount of threads to be used by ThreadPool class.")]
+    [Option("csv-delimiter", HelpText = $"Delimiter of input CSV files. Default: {OptionsImmutable.CSVDelimiterDefaultString}")]
+    public char? CSVDelimiter { get; set; }
+    [Option("min-threads", HelpText = $"Minimum amount of threads to be used by ThreadPool class. Default: {OptionsImmutable.MinThreadsDefaultString}")]
     public int? MinThreads { get; set; }
-    [Option("max-threads", /*Min = 1, Max = 32,*/ HelpText = "Maximum amount of threads to be used by ThreadPool class.")]
+    [Option("max-threads", HelpText = $"Maximum amount of threads to be used by ThreadPool class. Default: {OptionsImmutable.MaxThreadsDefaultString}")]
     public int? MaxThreads { get; set; }
-    // [Option("seed", HelpText = "Seed for the random number generator used in the GP algorithm.")]
-    // public int? Seed { get; set; } = null;
-    [Option("population-size", HelpText = "Size of population in each generation.")]
+    [Option("population-size", HelpText = $"Size of population in each generation. Default: {OptionsImmutable.PopulationSizeDefaultString}")]
     public int? PopulationSize { get; set; }
-    [Option("max-generations", HelpText = "Maximum amount of generations to evolve.")]
+    [Option("max-generations", HelpText = $"Maximum amount of generations to evolve. Default: {OptionsImmutable.MaxGenerationsDefaultString}")]
     public int? MaxGenerations { get; set; }
-    [Option("repeat-amount", HelpText = "Amount of times to repeat the training of GPs.")]
+    [Option("repeat-amount", HelpText = $"Amount of times to repeat the training of GPs. Default: {OptionsImmutable.RepeatAmountDefaultString}")]
     public int? RepeatAmount { get; set; }
-    [Option("crossover-probability", Default = 0.5d, HelpText = "Probability of each mutation taking action.")]
+    [Option("crossover-probability", HelpText = $"Probability of any crossover taking action. Default: {OptionsImmutable.CrossoverProbabilityDefaultString}")]
     public double? CrossoverProbability { get; set; }
     [Option("population-combination", HelpText = $"Choose the Population combination. [elitism, take-new, combine] Default: {OptionsImmutable.PopulationCombinationDefault}")]
     public string? PopulationCombination { get; set; }
 
     // specific for TreeBasedGP
-    [Option("depth", Default = 3, HelpText = "Maximum depth of starting trees.")]
+    [Option("depth", Default = 3, HelpText = $"Maximum depth of starting trees. Default: {OptionsImmutable.DefaultTreeDepthDefaultString}")]
     public int? DefaultTreeDepth { get; set; }
-    [Option("change-node-mutation-probability", HelpText = "Probability of using ChangeNodeMutation class.")]
+    [Option("change-node-mutation-probability", HelpText = $"Probability of using ChangeNodeMutation class. Default: {OptionsImmutable.MutationProbabilityDefaultString}")]
     public double? ChangeNodeMutationProbability { get; set; }
-    [Option("shuffle-children-mutation-probability", HelpText = "Probability of using ShuffleChildrenMutation class.")]
+    [Option("shuffle-children-mutation-probability", HelpText = $"Probability of using ShuffleChildrenMutation class. Default: {OptionsImmutable.MutationProbabilityDefaultString}")]
     public double? ShuffleChildrenMutationProbability { get; set; }
 
     // node probabilities
-    [Option("percentage-to-change", HelpText = "How much of 1 individual should mutation change.")]
+    [Option("percentage-to-change", HelpText = $"How much of 1 individual should mutation change. Default: {OptionsImmutable.PercentageToChangeDefaultString}")]
     public double? PercentageToChange { get; set; }
     [Option("terminal-nodes-probability", HelpText = "Probability of choosing from terminal nodes instead of non-terminal nodes.")]
     public double? TerminalNodesProbability { get; set; }
-    [Option("value-node-weight")]
+    [Option("value-node-weight", HelpText = $"Probability of choosing Value Node. Default: {OptionsImmutable.NodeProbabilityDefaultString}")]
     public double? ValueNodeProbability { get; set; }
-    [Option("sum-node-weight")]
+    [Option("sum-node-weight", HelpText = $"Probability of choosing Sum Node. Default: {OptionsImmutable.NodeProbabilityDefaultString}")]
     public double? SumNodeProbability { get; set; }
-    [Option("prod-node-weight")]
+    [Option("prod-node-weight", HelpText = $"Probability of choosing Product Node. Default: {OptionsImmutable.NodeProbabilityDefaultString}")]
     public double? ProductNodeProbability { get; set; }
-    [Option("sin-node-weight")]
+    [Option("sin-node-weight", HelpText = $"Probability of choosing Sin Node. Default: {OptionsImmutable.NodeProbabilityDefaultString}")]
     public double? SinNodeProbability { get; set; }
-    [Option("pow-node-weight")]
+    [Option("pow-node-weight", HelpText = $"Probability of choosing Power Node. Default: {OptionsImmutable.NodeProbabilityDefaultString}")]
     public double? PowerNodeProbability { get; set; }
-    [Option("unary-minus-node-weight")]
+    [Option("unary-minus-node-weight", HelpText = $"Probability of choosing UnaryMinus Node. Default: {OptionsImmutable.NodeProbabilityDefaultString}")]
     public double? UnaryMinusNodeProbability { get; set; }
-    [Option("sig-node-weight")]
+    [Option("sig-node-weight", HelpText = $"Probability of choosing Sigmoid Node. Default: {OptionsImmutable.NodeProbabilityDefaultString}")]
     public double? SigmoidNodeProbability { get; set; }
-    [Option("relu-node-weight")]
+    [Option("relu-node-weight", HelpText = $"Probability of choosing ReLU Node. Default: {OptionsImmutable.NodeProbabilityDefaultString}")]
     public double? ReLUNodeProbability { get; set; }
-    [Option("cond-node-weight")]
+    [Option("cond-node-weight", HelpText = $"Probability of choosing Condition Node. Default: {OptionsImmutable.NodeProbabilityDefaultString}")]
     public double? ConditionNodeProbability { get; set; }
-    // [Option("input-node-weight")]
-    // public double? InputNodeProbability { get; set; }
+    [Option("input-node-weight", HelpText = $"Probability of choosing Input Node. Default: {OptionsImmutable.NodeProbabilityDefaultString}")]
+    public double? InputNodeProbability { get; set; }
     public override string ToString()
     {
         return JsonSerializer.Serialize(this);

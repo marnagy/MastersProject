@@ -158,7 +158,7 @@ public class OptionsImmutable
         this.TrainCSVFilePath = opts.TrainCSVFilePath;
         this.TestCSVFilePath = opts.TestCSVFilePath ?? OptionsImmutable.TestCSVFilePathDefault;
         this.CSVInputsAmount = opts.CSVInputsAmount;
-        this.CSVDelimiter = opts.CSVDelimiter;
+        this.CSVDelimiter = opts.CSVDelimiter ?? OptionsImmutable.CSVDelimiterDefault;
         this.MinThreads = opts.MinThreads ?? fileOpts?.MinThreads ?? OptionsImmutable.MinThreadsDefault;
         this.MaxThreads = opts.MaxThreads ?? fileOpts?.MaxThreads ?? OptionsImmutable.MaxThreadsDefault;
         this.PopulationSize = opts.PopulationSize ?? OptionsImmutable.PopulationSizeDefault;
@@ -189,7 +189,7 @@ public class OptionsImmutable
         this.SigmoidNodeProbability = opts.SigmoidNodeProbability ?? fileOpts?.SigmoidNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
         this.ReLUNodeProbability = opts.ReLUNodeProbability ?? fileOpts?.ReLUNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
         this.ConditionNodeProbability = opts.ConditionNodeProbability ?? fileOpts?.ConditionNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
-        // exclude input node prob. since CartesianGP does not use it
+        this.InputNodeProbability = opts.InputNodeProbability ?? fileOpts?.InputNodeProbability ?? OptionsImmutable.NodeProbabilityDefault;
     }
 
     public static OptionsImmutable From(Options opts)
