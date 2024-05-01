@@ -28,7 +28,6 @@ def main():
     dfs = [
         pd.read_csv(
             os.path.join(subdir, file),
-            # index_col='gen'
         )
         for subdir in subdirs
         for file in os.listdir(subdir)
@@ -39,7 +38,6 @@ def main():
 
     os.chdir(args.directory)
 
-    # TODO: continue here
     print('Plotting fitness...', end='')
     ax = sns.lineplot(
         data=df,
@@ -113,7 +111,6 @@ def main():
         label='AvgDepth'
     )
 
-    # plt.yscale('log')
     if not args.save:
         plt.show()
         print('Done')

@@ -48,8 +48,6 @@ def main() -> None:
             stratify=df[df.columns[-1]],
             random_state=args.seed    
         )
-        # print(df_train)
-        # print(df_test)
         dfs = [df_train, df_test]
         file_names = [f"prepared_train_{file_name}", f"prepared_test_{file_name}"]
     else:
@@ -101,13 +99,6 @@ def main() -> None:
                 sep=args.delimiter,
                 index=args.include_index
             )
-            # df_train.to_csv(os.path.join(
-            #         file_path,
-            #         f"prepared_test_{file_name}"
-            #     ),
-            #     sep=args.delimiter,
-            #     index=args.include_index
-            # )
             print(f'Generated file: {final_file_name}')
         else:
             df.to_csv(os.path.join(
