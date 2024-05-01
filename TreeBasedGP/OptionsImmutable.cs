@@ -59,10 +59,8 @@ public class OptionsImmutable
     public char CSVDelimiter { get; }
     public int MinThreads { get; }
     public int MaxThreads { get; }
-    //public readonly int Seed;
     public int MaxGenerations { get; }
     public int PopulationSize { get; }
-    // public readonly double MutationProbability;
     public int RepeatAmount { get; }
     public double CrossoverProbability { get; }
 

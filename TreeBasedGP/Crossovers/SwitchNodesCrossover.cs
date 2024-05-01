@@ -3,9 +3,6 @@ public class SwitchNodesCrossover : Crossover<TreeChromosome>
 {
     public override Tuple<TreeChromosome, TreeChromosome> Cross(TreeChromosome ind1, TreeChromosome ind2)
     {
-        // System.Console.WriteLine(ind1.GetDepth());
-        // System.Console.WriteLine(ind2.GetDepth());
-
         List<TreeNodeMaster> nodes1 = new();
         List<TreeNodeMaster> nodes2 = new();
 

@@ -36,7 +36,6 @@ public class AccuracyFitness : Fitness<TreeChromosome>
             }
 
             double computedResult = ind.ComputeResult();
-            // System.Console.Error.WriteLine($"Computed result: {computedResult}");
             int wantedResult = this.Outputs[rowIndex, this.OutputIndex];
             
             if (this.UseClip)
@@ -104,19 +103,6 @@ public class AccuracyFitness : Fitness<TreeChromosome>
                     diffCounters[tup.index] += diff;
                 });
         }
-
-        // Enumerable.Range(0, population.Length)
-        //     .Select(i => (i, ind: population[i]))
-        //     .Where(tup => tup.ind.Fitness != TreeChromosome.DefaultFitness)
-        //     .AsParallel()
-        //     .ForEach(tup => {
-        //         diffCounters[tup.i] = diffCounters[tup.i] / totalRows;
-
-        //         if (double.IsNaN(diffCounters[tup.i]) || !this.HasInputNode(population[tup.i]))
-        //             population[tup.i].Fitness = double.PositiveInfinity;
-        //         else
-        //             population[tup.i].Fitness = diffCounters[tup.i] * this.MagicNormalizationCoefficient(population[tup.i]) / this.CountInputNodes(population[tup.i]); //* this.MagicNormalizationCoefficient(population[j]);
-        //     });
 
         for (int j = 0; j < population.Length; j++)
         {
