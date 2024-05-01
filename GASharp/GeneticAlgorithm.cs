@@ -93,8 +93,6 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
                 start = DateTime.UtcNow;
                 Enumerable.Range(0, PopulationSize/2)
                     .Select(i => (index1: 2*i, index2: 2*i + 1, par: parents[i], prob: Random.Shared.NextDouble()))
-                // parents
-                //     .Select(p => (p, prob: Random.Shared.NextDouble()))
                     .AsParallel().AsUnordered().WithDegreeOfParallelism(this.MaxThreads)
                     .Select(tup => {
                         if (tup.prob < this.CrossoverProbability)
@@ -153,11 +151,6 @@ public class GeneticAlgorithm<T> where T: Chromosome<T>
             population = populationStrategy.Combine(population, nextPopulation);
             if (UseTimes)
                 System.Console.Error.WriteLine($"Population combination took {DateTime.UtcNow - start} s");
-
-            // for (int i = 0; i < nextPopulation.Length; i++)
-            // {
-            //     nextPopulation[i] = null;
-            // }
 
             start = DateTime.UtcNow;
             callback(genNum, population);
